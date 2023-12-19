@@ -74,7 +74,7 @@ app.get("/Getamudes", async (req, res) => {
     WHERE TABLE_NAME = 'Questionnaire';
     `;
     let result = await SQL(q);
-    console.log(result);
+    // console.log(result);
     result = result.map((element) => {
       return (element = element.a);
     });
@@ -82,6 +82,46 @@ app.get("/Getamudes", async (req, res) => {
     res.json(result);
   } catch (error) {
     res.json(false);
+  }
+});
+app.post("/newequen", async (req, res) => {
+  console.log(req.body.Desc);
+  try {
+    const q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId) VALUES ('${req.body.Desc}', '${req.body.Symbol}', '${req.body.StartQuestion}', '${req.body.StatusId}')`;
+    // let qo = `'INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId) VALUES ('${req.body.Desc}', '${req.body.Symbol}', '${req.body.StartQuestion}', '${req.body.StatusId}');
+    // `
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.delete("/Delquen/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const q = `DELETE FROM Questionnaire WHERE Id = ${id}`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/EditOfquen", async (req, res) => {
+  try {
+    // console.log(req.body);
+    let id = req.body.Id;
+    const q = `
+    UPDATE Questionnaire
+    SET [Desc] = '${req.body.Desc}',Symbol = '${req.body.Symbol}',StartQuestion = '${req.body.StartQuestion}',StatusId =${req.body.StatusId} 
+    WHERE Id = ${id}
+    `;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(true);
   }
 });
 app.listen(port, () => {
