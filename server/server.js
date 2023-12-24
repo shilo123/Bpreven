@@ -50,9 +50,7 @@ async function SQLOS(q) {
   // console.log(res);
 }
 
-// const q = `SELECT COLUMN_NAME AS a
-// FROM INFORMATION_SCHEMA.COLUMNS
-// WHERE TABLE_NAME = 'Questionnaire';
+// const q = `SELECT * FROM Questions
 // `;
 // SQLOS(q);
 app.get("/", async (req, res) => {
@@ -123,6 +121,183 @@ app.post("/EditOfquen", async (req, res) => {
     console.log(error);
     res.json(true);
   }
+});
+app.get("/GetQuestions", async (req, res) => {
+  // Questions.NextQuestionId,
+  // Questions.ScreenId,
+  const q = `SELECT 
+  Questions.Id,
+  Questions.[Desc],
+  Questions.StatusId,
+  Questions.IsEnd,
+  Questionnaire.[Desc] AS DescQuestionnaire,
+  DataTypes.[Desc] AS DescDataType
+  FROM Questions
+  INNER JOIN Questionnaire ON Questionnaire.Id = Questions.QuestionnaireId
+  INNER JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId
+`;
+  let result = await SQL(q);
+  // console.log(result);
+  res.json(result);
+});
+app.get("/GetData", async (req, res) => {
+  try {
+    const query = `SELECT [Desc] AS NameQuen FROM Questionnaire`;
+    const queryTwo = `SELECT [Desc] AS DataType FROM DataTypes`;
+    let result = await SQL(query);
+    let result2 = await SQL(queryTwo);
+    let NameQuen = result.map((e) => (e = e.NameQuen));
+    let DataType = result2.map((e) => (e = e.DataType));
+    // console.log(result);
+    // console.log(result2);
+    let datut = { NameQuen, DataType };
+    // console.log(datut);
+
+    res.json(datut);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/Updata", async (req, res) => {
+  // console.log(req.body);
+  // console.log("req.body.DescDataType", req.body.DescDataType);
+  try {
+    const Q = `SELECT Id AS id FROM Questionnaire WHERE [Desc] = '${req.body.DescQuestionnaire}'`;
+    let idOfQuestionnaire = await SQL(Q);
+    idOfQuestionnaire = idOfQuestionnaire[0].id;
+    const qu = `SELECT Id FROM DataTypes  WHERE [Desc] = '${req.body.DescDataType}'`;
+    let idOfDescDataType = await SQL(qu);
+    idOfDescDataType = idOfDescDataType[0].Id;
+    const query = `UPDATE Questions
+    SET [Desc] = '${req.body.Desc}',IsEnd = '${req.body.IsEnd}',QuestionnaireId = ${idOfQuestionnaire},DataTypesId = ${idOfDescDataType}
+    WHERE Id = ${req.body.Id} `;
+    await SQL(query);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/AddQuestin", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${req.body.NameQ}'`;
+    let IDnameQ = await SQL(q);
+    IDnameQ = IDnameQ[0].Id;
+    // console.log(IDnameQ);
+    const qu = `SELECT Id FROM DataTypes WHERE [Desc] = '${req.body.typeData}'`;
+    let IDdataTy = await SQL(qu);
+    IDdataTy = IDdataTy[0].Id;
+    // console.log(IDdataTy);
+    const query = `INSERT INTO Questions (QuestionnaireId,DataTypesId,[Desc],IsEnd) VALUES 
+    (${IDnameQ},${IDdataTy},'${req.body.DescQ}',
+    '${req.body.IsEnd}'
+    )`;
+    await SQL(query);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.delete("/DeleteQustions/:id", async (req, res) => {
+  try {
+    const q = `DELETE FROM Questions WHERE Id = ${req.params.id}`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/FIndQustinnare", async (req, res) => {
+  console.log(req.body);
+  try {
+    let query = `SELECT 
+    Questions.Id,
+    Questions.[Desc],
+    Questions.StatusId,
+    Questions.IsEnd,
+    Questionnaire.[Desc] AS DescQuestionnaire,
+    DataTypes.[Desc] AS DescDataType
+    FROM Questions
+    INNER JOIN Questionnaire ON Questionnaire.Id = Questions.QuestionnaireId
+    INNER JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId WHERE Questionnaire.[Desc] = '${req.body.val}'`;
+    let data = await SQL(query);
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/Serch", async (req, res) => {
+  console.log(req.body);
+  let Q;
+  try {
+    if (req.body.clumn !== "Questions.IsEnd" && req.body.clumn !== "הכל") {
+      // console.log("heasdkahsdkasjbdhabsdajh");
+      Q = `SELECT 
+      Questions.Id,
+      Questions.[Desc],
+      Questions.StatusId,
+      Questions.IsEnd,
+      Questionnaire.[Desc] AS DescQuestionnaire,
+      DataTypes.[Desc] AS DescDataType
+      FROM Questions
+      INNER JOIN Questionnaire ON Questionnaire.Id = Questions.QuestionnaireId
+      INNER JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId
+      WHERE ${req.body.clumn} LIKE '${req.body.val}%'
+      `;
+    } else if (req.body.clumn === "Questions.IsEnd") {
+      Q = `SELECT 
+      Questions.Id,
+      Questions.[Desc],
+      Questions.StatusId,
+      Questions.IsEnd,
+      Questionnaire.[Desc] AS DescQuestionnaire,
+      DataTypes.[Desc] AS DescDataType
+      FROM Questions
+      INNER JOIN Questionnaire ON Questionnaire.Id = Questions.QuestionnaireId
+      INNER JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId
+      WHERE Questions.IsEnd = '${req.body.val}'
+`;
+    } else if (req.body.clumn === "הכל") {
+      Q = `SELECT 
+  Questions.Id,
+  Questions.[Desc],
+  Questions.StatusId,
+  Questions.IsEnd,
+  Questionnaire.[Desc] AS DescQuestionnaire,
+  DataTypes.[Desc] AS DescDataType
+  FROM Questions
+  INNER JOIN Questionnaire ON Questionnaire.Id = Questions.QuestionnaireId
+  INNER JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId
+  WHERE Questions.[Desc] LIKE '%${req.body.val}%'
+  OR
+  Questionnaire.[Desc] LIKE '%${req.body.val}%'
+  OR
+  DataTypes.[Desc] LIKE '%${req.body.val}%'  
+`;
+    }
+    `  OR
+Questions.IsEnd = '${req.body.val}'
+`;
+    `  Questions.StatusId LIKE '${req.body.val}%'
+OR
+`;
+    let result = await SQL(Q);
+    res.json(result);
+  } catch (error) {
+    console.log(error);
+  }
+});
+app.get("/GetOption/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const q = `SELECT * FROM QuestionsOptions WHERE QuestionsId = ${id} ORDER BY sek`;
+    let result = await SQL(q);
+    // console.log(result);
+    res.json(result);
+  } catch (error) {}
 });
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);

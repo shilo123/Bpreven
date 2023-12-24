@@ -383,9 +383,8 @@ a {
   display: block;
   border: none;
   outline: none;
-
-  border-bottom: 1px solid #ccc;
-  width: 100%;
+  border-bottom: 3px solid rgb(120, 230, 155);
+  /* width: 100%; */
 }
 .w3-select {
   padding: 9px 0;

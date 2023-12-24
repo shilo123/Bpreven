@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import queshtinnre from "@/views/questionnaireView.vue";
+import queshtins from "@/views/queshtinsView.vue";
 Vue.use(VueRouter);
 
 const routes = [
@@ -14,6 +15,11 @@ const routes = [
     path: "/queshtinnre",
     name: "queshtinnre",
     component: queshtinnre,
+  },
+  {
+    path: "/queshtins",
+    name: "queshtins",
+    component: queshtins,
   },
 ];
 

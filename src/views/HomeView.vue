@@ -2,6 +2,7 @@
   <div class="all">
     <h1>היי</h1>
     <div class="content">שלום שלום שלום</div>
+    <i class="fa-solid fa-bars icon"></i>
   </div>
 </template>
 <script>
@@ -28,5 +29,11 @@ export default {
 .content {
   position: relative;
   right: 50px;
+}
+.icon {
+  font-size: 50px;
+  position: absolute;
+  left: -520%;
+  top: 55%;
 }
 </style>

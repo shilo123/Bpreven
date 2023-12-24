@@ -15,6 +15,11 @@
             <el-col :span="24">שאלונים</el-col>
           </el-row>
         </div>
+        <div @click="$router.push('/queshtins')">
+          <el-row :class="{ row: true, active: $route.path === '/queshtins' }">
+            <el-col :span="24">שאלות</el-col>
+          </el-row>
+        </div>
         <div v-for="n in 26" :key="n">
           <el-row :class="{ row: true }">
             <el-col :span="24">{{ `item-${n}` }}</el-col>
@@ -67,6 +72,7 @@ export default {
   top: 0;
   overflow-y: auto;
   padding: 5px;
+  padding-left: 40px;
 }
 .HazeSham::-webkit-scrollbar {
   display: none;
@@ -99,8 +105,11 @@ export default {
 }
 .active {
   background: rgb(53, 103, 203);
-  font-size: 25px;
+  font-size: 29px;
   color: white;
+  position: relative;
+  right: 30px;
+  width: 200px;
 }
 .active:hover {
   background: rgb(31, 141, 205);

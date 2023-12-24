@@ -27,14 +27,7 @@
         v-show="d !== 'Id'"
       ></el-option>
     </el-select>
-    <el-table :data="data" class="table" stripe>
-      <el-table-column label="שם" prop="Desc"></el-table-column>
-      <el-table-column label="סימן" prop="Symbol"></el-table-column>
-      <el-table-column
-        label="שאלה ראשונית"
-        prop="StartQuestion"
-      ></el-table-column>
-      <el-table-column label="סטטוס" prop="StatusId"></el-table-column>
+    <el-table :data="data" class="table" ref="Table" border>
       <el-table-column label="אפשרויות">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="Edit(scope.row)"
@@ -45,6 +38,16 @@
           >
         </template>
       </el-table-column>
+      <el-table-column label="סטטוס" prop="StatusId"></el-table-column>
+
+      <el-table-column
+        label="שאלה ראשונית"
+        prop="StartQuestion"
+      ></el-table-column>
+
+      <el-table-column label="סימן" prop="Symbol"></el-table-column>
+
+      <el-table-column label="שם" prop="Desc"></el-table-column>
     </el-table>
     <div class="divos" v-if="shows.SHdivos">
       <transition appear name="expand">
@@ -101,22 +104,22 @@
                 placeholder="סטטוס"
               />
               <!-- v-if="active === 3" -->
-              <div class="buttons" v-show="true">
-                <el-button
-                  type="success"
-                  class="ButtonNext"
-                  @click="Inserquen"
-                  :loading="loadingButton"
-                  ref="buttonNext"
-                  >צור</el-button
-                >
-                <el-button
-                  type="danger"
-                  class="ButtonNext"
-                  @click="shows.SHdivos = false"
-                  >סגור</el-button
-                >
-              </div>
+            </div>
+            <div class="buttons" v-show="true">
+              <el-button
+                type="success"
+                class="ButtonNext"
+                @click="Inserquen"
+                :loading="loadingButton"
+                ref="buttonNext"
+                >צור</el-button
+              >
+              <el-button
+                type="danger"
+                class="ButtonNext"
+                @click="shows.SHdivos = false"
+                >סגור</el-button
+              >
             </div>
           </div>
           <div v-show="shows.SHdivos && shows.showWarnning">
@@ -247,12 +250,6 @@ export default {
         }
       }
     },
-    // loadingButton(val) {
-    //   if (val) {
-    //     this.$refs.buttonNext.$el.style.left = "30%";
-    //     // console.log(this.$refs.buttonNext.$el);
-    //   }
-    // },
     serch(val) {
       this.data = this.data.filter((e) => {
         console.log(e);
@@ -265,7 +262,9 @@ export default {
       });
       if (val === "") {
         this.data = this.data2;
+        this.SortTable();
       }
+      this.SortTable();
     },
   },
   computed: {
@@ -282,12 +281,26 @@ export default {
     this.loading = false;
     let el = this.$refs.Divos;
     el.style.zIndex = "";
-    // setInterval(() => {
-    //   console.log(this.newquen);
-    // }, 1000);
+    await this.$nextTick();
+    this.SortTable();
   },
-
   methods: {
+    SortTable() {
+      let table = this.$refs.Table.$el;
+      // console.log(table);
+      let TableHeader =
+        table.children[1].children[0].children[1].children[0].children;
+      Array.from(TableHeader).forEach((element) => {
+        element.style.textAlign = "center";
+      });
+      let tds = table.children[2].children[0].children[1].children;
+      // console.log(tds);
+      Array.from(tds).forEach((element) => {
+        Array.from(element.children).forEach((el) => {
+          el.style.textAlign = "right";
+        });
+      });
+    },
     Edit(row) {
       // this.idOfE = row.Id;
       this.rowEdit = [row];
@@ -301,13 +314,12 @@ export default {
     },
     async EditQuen() {
       // let id = this.idOfE;
-      // console.log(this.newqunto);
+      this.newqunto.StatusId = this.newqunto.StatusId;
       if (!this.isNumeric(this.newqunto.StatusId)) {
         this.$message.error("תגיד אחי מה אתה משוגע חייב מספרים");
         this.loadingButton = false;
         return;
       }
-
       this.loadingButton = true;
       let { data } = await this.$ax.post(URL + "EditOfquen", this.newqunto);
       if (data) {
@@ -395,22 +407,6 @@ export default {
   overflow-y: auto;
   padding-bottom: 50px;
 }
-.divos {
-  position: fixed;
-  background: rgba(32, 29, 29, 0.792);
-  width: 100%;
-  height: 100%;
-  z-index: 550;
-}
-.indivos {
-  width: 720px;
-  height: 400px;
-  position: absolute;
-  left: 400px;
-  top: 150px;
-  padding: 5px;
-  overflow-x: hidden;
-}
 .input {
   position: absolute;
   top: 40px;
@@ -435,25 +431,13 @@ export default {
 }
 .queshens {
   background: white;
-  height: 540px;
+  height: 600px;
   top: 60px;
   padding: 40px;
   border: 13px solid rgb(55, 55, 216);
   border-radius: 20px;
   overflow-y: hidden;
   /* padding-bottom: 40px; */
-}
-.el-icon-close {
-  position: absolute;
-  right: 0;
-  top: 0;
-  font-size: 20px;
-  z-index: 1000;
-}
-.el-icon-close:hover {
-  background: rgb(117, 102, 102);
-  border-radius: 1.9px;
-  cursor: pointer;
 }
 .TableB {
   position: relative;
@@ -469,7 +453,7 @@ export default {
   padding-bottom: 40px;
   height: 450px;
   border-radius: 10px;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 .afterTable label {
   float: right;
@@ -495,9 +479,8 @@ export default {
 .buttons {
   width: 100%;
   padding: 10px;
-  /* border-bottom: 2px solid black; */
   margin-top: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 .warning {
   /* background: rgb(255, 255, 255); */
@@ -507,16 +490,6 @@ export default {
   text-align: center;
   left: 530px;
   /* border-radius: 20px; */
-}
-.dangero {
-  position: absolute;
-  bottom: 10px;
-  left: 60px;
-}
-.primaryo {
-  position: absolute;
-  bottom: 10px;
-  right: 60px;
 }
 .EditQuen {
   background: rgba(255, 255, 255, 0.547);
@@ -563,18 +536,6 @@ export default {
   position: relative;
   top: 25px;
 }
-.shmorTO,
-.sgorTo {
-  float: right;
-  width: 140px;
-  box-shadow: 0 0 5px 2px rgba(107, 100, 100, 0.744);
-  margin-right: 20px;
-}
-.shmorTO:hover,
-.sgorTo:hover {
-  box-shadow: 0 0 1px 1px rgba(107, 100, 100, 0.744);
-  font-size: 18px;
-}
 .bottonsInD {
   position: relative;
   right: 20px;
@@ -582,7 +543,8 @@ export default {
 </style>
 <style>
 body {
-  background: rgb(139, 115, 115);
+  background: rgb(170, 170, 170);
+  /* background: rgb(139, 115, 115); */
 }
 input {
   text-align: right;
