@@ -17,12 +17,13 @@
     <el-button type="success" class="Newquen" @click="openNewQuen"
       >הוסף שאלון חדש</el-button
     >
-    <el-input v-model="serch" :placeholder="pleace" class="input">
+    <el-input v-model="serch" :placeholder="pleace" class="input" dir="auto">
       <i slot="prefix" class="el-input__icon el-icon-search"></i></el-input
     ><el-select v-model="selcto" placeholder="חפש לפי.." class="selectA">
       <el-option
         v-for="(d, i) in Allamudot"
         :key="i"
+        :label="computedDat(d)"
         :value="d"
         v-show="d !== 'Id'"
       ></el-option>
@@ -72,6 +73,7 @@
                 key="input-0"
                 type="text"
                 class="w3-input"
+                dir="auto"
                 v-model="newquen.Desc"
                 placeholder="שם שאלון"
               />
@@ -81,6 +83,7 @@
                 key="input-1"
                 type="text"
                 class="w3-input"
+                dir="auto"
                 v-model="newquen.Symbol"
                 placeholder="שם סימן "
               />
@@ -89,6 +92,7 @@
               <el-input
                 key="input-2"
                 type="textarea"
+                dir="auto"
                 :autosize="{ minRows: 4, maxRows: 34 }"
                 v-model="newquen.StartQuestion"
                 placeholder="שאלה ראשונית "
@@ -100,6 +104,7 @@
                 key="input-3"
                 type="text"
                 class="w3-input"
+                dir="auto"
                 v-model="newquen.StatusId"
                 placeholder="סטטוס"
               />
@@ -154,13 +159,19 @@
               <el-row>
                 <el-col :span="12">
                   <label>שם חדש</label>
-                  <input type="text" class="w3-input" v-model="newqunto.Desc" />
+                  <input
+                    type="text"
+                    class="w3-input"
+                    v-model="newqunto.Desc"
+                    dir="auto"
+                  />
                 </el-col>
                 <el-col :span="12">
                   <label class="labelBayaB">סימן חדש</label>
                   <input
                     type="text"
                     class="w3-input"
+                    dir="auto"
                     v-model="newqunto.Symbol"
                   />
                 </el-col>
@@ -171,6 +182,7 @@
                   <input
                     type="text"
                     class="w3-input"
+                    dir="auto"
                     v-model="newqunto.StatusId"
                   />
                 </el-col>
@@ -183,6 +195,7 @@
                     type="textarea"
                     :autosize="{ minRows: 4, maxRows: 4 }"
                     class="inputTextarea"
+                    dir="auto"
                     v-model="newqunto.StartQuestion"
                   />
                 </el-col>
@@ -283,8 +296,27 @@ export default {
     el.style.zIndex = "";
     await this.$nextTick();
     this.SortTable();
+    document.addEventListener("DOMContentLoaded", function () {
+      let inputs = document.querySelectorAll('input[type="text"]');
+      inputs.forEach(function (input) {
+        input.setAttribute("dir", "auto");
+      });
+    });
   },
   methods: {
+    computedDat(val) {
+      if (val === "Desc") {
+        return "שם";
+      } else if (val === "Symbol") {
+        return "סימן";
+      } else if (val === "StartQuestion") {
+        return "שאלה ראשונית";
+      } else if (val === "StatusId") {
+        return "סטטוס";
+      }
+
+      return "val";
+    },
     SortTable() {
       let table = this.$refs.Table.$el;
       // console.log(table);
@@ -544,7 +576,7 @@ export default {
 <style>
 body {
   background: rgb(170, 170, 170);
-  /* background: rgb(139, 115, 115); */
+  padding-bottom: 1000px;
 }
 input {
   text-align: right;

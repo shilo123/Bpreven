@@ -13,6 +13,7 @@
       <el-input
         v-show="!showRadio"
         v-model="serch"
+        dir="auto"
         placeholder="חפש"
         class="inputSerch"
         ref="inputSerch"
@@ -72,10 +73,20 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="NextQuestionId"
+        label="השאלה הבאה"
         prop="NextQuestionId"
       ></el-table-column>
-      <el-table-column label="StatusId" prop="StatusId"></el-table-column>
+      <el-table-column label="אם פעיל">
+        <template slot-scope="scope">
+          {{
+            scope.row.StatusId === 1
+              ? "כן"
+              : scope.row.StatusId === 0
+              ? "לא"
+              : ""
+          }}
+        </template>
+      </el-table-column>
       <el-table-column label="אם אחרון">
         <template slot-scope="scope">
           {{ computedOfisEnd(scope.row.IsEnd) }}
@@ -89,23 +100,69 @@
       <el-table-column label="שאלה" prop="Desc"></el-table-column>
       <el-table-column label="שאלון" prop="DescQuestionnaire"></el-table-column>
       <el-table-column type="expand" v-if="LoadingOptionss">
-        <template>
-          <div v-show="theOption.length > 0">
-            <div class="parentsheaderOFAnswers">
-              <h1 class="headerOFAnswers">אופציות</h1>
+        <template slot-scope="props">
+          <div class="Options" v-show="props.row.DescDataType === 'OptionId'">
+            <div v-show="theOption.length > 0">
+              <div class="parentsheaderOFAnswers">
+                <h1 class="headerOFAnswers">אופציות</h1>
+              </div>
+              <ul class="Answers">
+                <li v-for="(O, i) in theOption" :key="i" class="button-and-li">
+                  <span>{{ O.Desc }}</span>
+                  <el-button
+                    type="primary"
+                    size="mini"
+                    v-show="O.Id"
+                    @click="UpdateOption(O.Id)"
+                    >עדכן</el-button
+                  >
+                  <el-button
+                    type="danger"
+                    size="mini"
+                    @click="DeleteAnswerTHEshows(O.Id)"
+                    v-show="O.Id"
+                    >מחק</el-button
+                  >
+                </li>
+                <el-divider></el-divider>
+                <el-button
+                  type="success"
+                  @click="
+                    shows.showAddAnswer = true;
+                    shows.showDivos = true;
+                    ModelInputDivAnswer = '';
+                  "
+                  >הוספה</el-button
+                >
+              </ul>
             </div>
-            <ul class="Answers">
-              <li v-for="(O, i) in theOption" :key="i" class="button-and-li">
-                <span>{{ O.Desc }}</span>
-                <el-button type="primary" size="mini">עדכן</el-button>
-                <el-button type="danger" size="mini">מחק</el-button>
-              </li>
-              <el-divider></el-divider>
-              <el-button type="success">הוספה</el-button>
-            </ul>
+            <div v-show="!theOption.length > 0" class="Div-else-show">
+              <ul class="Answers">
+                <li class="button-and-li EN">
+                  <span
+                    contenteditable="true"
+                    ref="inptutDiv"
+                    @input="inptutDiv"
+                  ></span>
+                  <el-button
+                    type="success"
+                    @click="ADDnewtAnswer(props.row.Id, ModelInputDivAnswer)"
+                    :loading="LoadingButton"
+                    v-show="ModelInputDivAnswer"
+                    >הוסף</el-button
+                  >
+                </li>
+              </ul>
+            </div>
           </div>
-          <div v-show="!theOption.length > 0" class="Div-else-show">
-            <el-button type="success">אין כאן כלום זמן להוסיף</el-button>
+          <div class="Date" v-show="props.row.DescDataType === 'Date'">
+            תאריך
+          </div>
+          <div class="Text" v-show="props.row.DescDataType === 'Text'">
+            טקסט
+          </div>
+          <div class="Numeric" v-show="props.row.DescDataType === 'Numeric'">
+            מספר
           </div>
         </template>
       </el-table-column>
@@ -118,7 +175,13 @@
         <div
           class="indivos"
           :class="[
-            { Edito: shows.showEdit, newQ: shows.shownewqustion },
+            {
+              Edito: shows.showEdit,
+              newQ: shows.shownewqustion,
+              AddNewAnswer: shows.showAddAnswer,
+              DeleteAnswer: shows.showDeleteAnswer,
+              EditOption: shows.showEditOption,
+            },
             shows.showWarnning
               ? 'w3-panel w3-pale-red w3-leftbar w3-border-red warning'
               : '',
@@ -131,10 +194,17 @@
                 label="NextQuestionId"
                 prop="NextQuestionId"
               ></el-table-column>
-              <el-table-column
-                label="StatusId"
-                prop="StatusId"
-              ></el-table-column>
+              <el-table-column label="אם פעיל">
+                <template slot-scope="scope">
+                  {{
+                    scope.row.StatusId === 1
+                      ? "כן"
+                      : scope.row.StatusId === 0
+                      ? "לא"
+                      : ""
+                  }}
+                </template>
+              </el-table-column>
               <el-table-column label="אם אחרון">
                 <template slot-scope="scope">
                   {{ computedOfisEnd(scope.row.IsEnd) }}
@@ -154,7 +224,12 @@
             <div class="inEdito w3-card-4">
               <div class="iteminEdit">
                 <label>שם שאלה</label>
-                <input type="text" class="w3-input" v-model="rowEdit.Desc" />
+                <input
+                  type="text"
+                  class="w3-input"
+                  v-model="rowEdit.Desc"
+                  dir="auto"
+                />
               </div>
               <div class="allitemsSelect">
                 <div class="iteminEditSelct">
@@ -193,6 +268,15 @@
                   >
                   </el-switch>
                 </div>
+                <div class="itemEditisEnd Stat">
+                  <label>אם פעיל</label>
+                  <el-switch
+                    v-model="rowEdit.StatusId"
+                    active-text="כן"
+                    inactive-text="לא"
+                  >
+                  </el-switch>
+                </div>
               </div>
             </div>
             <div class="butonas">
@@ -216,6 +300,7 @@
               <div class="itemNewQA">
                 <label>שם השאלה</label>
                 <input
+                  dir="auto"
                   type="text"
                   class="w3-input"
                   placeholder="שם השאלה"
@@ -236,7 +321,6 @@
                   ></el-option>
                 </el-select>
               </div>
-
               <div class="itemNewQC">
                 <label>סוג התשובה</label>
                 <el-select
@@ -256,6 +340,14 @@
                 <label>אם אחרון</label>
                 <el-switch
                   v-model="newQuens.IsEnd"
+                  active-text="כן"
+                  inactive-text="לא"
+                ></el-switch>
+              </div>
+              <div class="itemNewQD">
+                <label>אם פעיל</label>
+                <el-switch
+                  v-model="newQuens.StatusId"
                   active-text="כן"
                   inactive-text="לא"
                 ></el-switch>
@@ -295,6 +387,54 @@
               >סגור</el-button
             >
           </div>
+          <div v-show="shows.showAddAnswer">
+            <input
+              type="text"
+              dir="auto"
+              class="w3-input"
+              v-model="ModelInputDivAnswer"
+            />
+            <el-button
+              type="success"
+              class="ButAdANs"
+              @click="ADDnewtAnswer(IdniFtah, ModelInputDivAnswer)"
+              :loading="LoadingButton"
+              ref="butnoc"
+              >הוסף אופציה</el-button
+            >
+          </div>
+          <div v-show="shows.showDeleteAnswer">
+            <div class="text">הפריט ימחק לעולם ולא יחזור גם אם תרצה מאוד</div>
+            <div class="butonascy">
+              <el-button
+                type="danger"
+                size="mini"
+                @click="shows.showDivos = false"
+                >סגור</el-button
+              >
+              <el-button
+                type="success"
+                size="mini"
+                @click="DelOfAnswer(idOfDelAnswer)"
+                :loading="LoadingButton"
+                >מחק</el-button
+              >
+            </div>
+          </div>
+          <div v-show="shows.showEditOption">
+            <el-input
+              dir="auto"
+              placeholder="עדכן אופציה"
+              v-model="ModelUpdateOption.Desc"
+            ></el-input>
+            <el-button
+              type="primary"
+              size="medium"
+              @click="UpdateForOption"
+              :loading="LoadingButton"
+              >עדכן</el-button
+            >
+          </div>
         </div>
       </transition>
     </div>
@@ -303,13 +443,14 @@
 <script>
 import { URL } from "@/URL/url";
 import _ from "lodash";
-
 export default {
   name: "BprevenQueshtinsView",
 
   data() {
     return {
       serch: "",
+      ModelInputDivAnswer: "",
+      ModelUpdateOption: "",
       TimeoutSerch: null,
       FilterChange: "הכל",
       FilterOf: "הכל",
@@ -320,33 +461,45 @@ export default {
         showEdit: false,
         showWarnning: false,
         shownewqustion: false,
+        showAddAnswer: false,
+        showDeleteAnswer: false,
+        showEditOption: false,
       },
       Alldata: {
         NameQuen: [],
         DataType: [],
       },
       rowEdit: {},
+
       newQuens: {
         DescQ: "",
         NameQ: "",
         typeData: "",
         IsEnd: false,
+        StatusId: true,
       },
       idOfDel: "",
+      IdniFtah: "",
+      idOfDelAnswer: "",
       LoadingButton: false,
       showZE: false,
-      loadingTABLE: false,
       showRadio: false,
-      theOption: [],
+      loadingTABLE: false,
       LoadingOptionss: true,
+      theOption: [],
     };
   },
   watch: {
+    LoadingButton(val) {
+      if (val) {
+        this.$refs.butnoc.$el.style.position = "absolute";
+      }
+    },
     LoadingOptionss(val) {
-      console.log(" LoadingOptionss(val)", val);
+      // console.log(" LoadingOptionss(val)", val);
     },
     loadingTABLE(val) {
-      if (!val) {
+      if (!val && this.theOption.length === 0) {
         this.SortTable();
       }
     },
@@ -423,27 +576,31 @@ export default {
   methods: {
     async GetOptions(row, expanded) {
       await this.$nextTick();
-      // console.log("Row:", row);
-      // console.log("Expanded:", expanded.length);
-      if (expanded.length === 0) {
-        this.theOption = [];
-        // this.$message("נסגר");
-      } else if (expanded.length !== 0) {
-        // this.$message("פתוח");
-        this.loadingTABLE = true;
-        this.LoadingOptionss = false;
-        let { data } = await this.$ax.get(URL + "GetOption/" + row.Id);
-        this.theOption = data;
-        // console.log("this.theOption", this.theOption);
-        // console.log(this.LoadingOptionss);
-        setTimeout(() => {
-          this.loadingTABLE = false;
-          this.LoadingOptionss = true;
-        }, 500);
+
+      if (row.DescDataType === "OptionId") {
+        this.IdniFtah = row.Id;
+        if (expanded.length === 0) {
+          this.theOption = [];
+          this.ModelInputDivAnswer = "";
+          this.SortTable();
+        } else if (expanded.length !== 0) {
+          this.loadingTABLE = true;
+          this.LoadingOptionss = false;
+          let { data } = await this.$ax.get(URL + "GetOption/" + row.Id);
+          this.theOption = data;
+          if (!this.theOption.length > 0) {
+            setTimeout(() => {
+              this.$refs.inptutDiv.focus();
+            }, 700);
+          }
+          setTimeout(() => {
+            this.loadingTABLE = false;
+            this.LoadingOptionss = true;
+          }, 500);
+        }
       }
       // console.log(data);
     },
-
     computedData(val) {
       //   console.log(val);
       if (val === "Text") {
@@ -479,19 +636,22 @@ export default {
     },
     SortTable() {
       let table = this.$refs.Table.$el;
-      let TableHeader =
-        table.children[1].children[0].children[1].children[0].children;
-      Array.from(TableHeader).forEach((element) => {
-        element.style.textAlign = "center";
-      });
-      let tds = table.children[2].children[0].children[1].children;
-      Array.from(tds).forEach((element, i) => {
-        let elco = element.children[7].children[0].children[0].children[0];
-        elco.classList = "el-icon-arrow-left";
-        Array.from(element.children).forEach((el) => {
-          el.style.textAlign = "right";
+      if (table.children[1].children[0].children[1].children[0].children) {
+        let TableHeader =
+          table.children[1].children[0].children[1].children[0].children;
+
+        Array.from(TableHeader).forEach((element) => {
+          element.style.textAlign = "center";
         });
-      });
+        let tds = table.children[2].children[0].children[1].children;
+        Array.from(tds).forEach((element, i) => {
+          let elco = element.children[7].children[0].children[0].children[0];
+          elco.classList = "el-icon-arrow-left";
+          Array.from(element.children).forEach((el) => {
+            el.style.textAlign = "right";
+          });
+        });
+      }
     },
     sortInput() {
       let input = this.$refs.inputSerch.$el.children[0];
@@ -519,11 +679,13 @@ export default {
     },
     SerchQuery(val) {
       this.data = this.data2;
-      ["טקסט", "אופציות", "מספר", "תאריך"].forEach((text) => {
-        if (Array.from(text).every((character) => val.includes(character))) {
-          val = this.REVERScomputedData(text);
-        }
-      });
+      if (this.FilterOf !== "אם אחרון") {
+        ["טקסט", "אופציות", "מספר", "תאריך"].forEach((text) => {
+          if (Array.from(text).every((character) => val.includes(character))) {
+            val = this.REVERScomputedData(text);
+          }
+        });
+      }
       let ClumnSerch;
       if (this.FilterOf === "שאלון") {
         ClumnSerch = "Questionnaire.[Desc]";
@@ -574,17 +736,17 @@ export default {
       }
     },
     Edit(row) {
-      // console.log(row);
       this.rowEdit = row;
       this.shows.showDivos = true;
       this.shows.showEdit = true;
-      this.rowEdit.DescDataType = this.computedData(this.rowEdit.DescDataType);
     },
     async EditQ() {
-      //   console.log(this.rowEdit);
-      this.rowEdit.DescDataType = this.REVERScomputedData(
-        this.rowEdit.DescDataType
-      );
+      if (this.rowEdit.StatusId) {
+        this.rowEdit.StatusId = 1;
+      } else if (!this.rowEdit.StatusId) {
+        this.rowEdit.StatusId = 0;
+      }
+      // console.log(this.rowEdit);
       let { data } = await this.$ax.post(URL + "Updata", this.rowEdit);
       console.log(data);
       if (data) {
@@ -602,6 +764,12 @@ export default {
         this.newQuens.NameQ &&
         this.newQuens.typeData
       ) {
+        if (this.newQuens.StatusId) {
+          this.newQuens.StatusId = 1;
+        } else {
+          this.newQuens.StatusId = 0;
+        }
+
         this.LoadingButton = true;
         let { data } = await this.$ax.post(URL + "AddQuestin", this.newQuens);
         this.LoadingButton = false;
@@ -613,6 +781,80 @@ export default {
         }
       } else {
         this.$message.error("אחינו מלא את הכל");
+      }
+    },
+    addAnswer() {
+      // this.$nextTick(function () {
+      this.LoadingOptionss = false;
+    },
+    inptutDiv(e) {
+      // console.log(e.target.innerText);
+      this.ModelInputDivAnswer = e.target.innerText;
+    },
+    async ADDnewtAnswer(id, text) {
+      this.LoadingButton = true;
+      if (text) {
+        try {
+          await this.$ax.post(URL + "AddAnswer", { text, id });
+          this.$message.success("התשובה נוספה");
+          this.theOption.push({ Desc: text });
+          this.shows.showDivos = false;
+        } catch (error) {
+          this.$message.error("משהו השתבש");
+        } finally {
+          this.LoadingButton = false;
+        }
+        console.log(data);
+      }
+    },
+    DeleteAnswerTHEshows(id) {
+      this.shows.showDivos = true;
+      this.shows.showDeleteAnswer = true;
+      // console.log(id);
+      this.idOfDelAnswer = id;
+    },
+    async DelOfAnswer(id) {
+      // console.log(id);
+      this.LoadingButton = true;
+      try {
+        await this.$ax.delete(URL + "DeleteAnswer/" + id);
+        this.$message.success("נמחק בהצלחה");
+        this.shows.showDivos = false;
+        let i = this.theOption.findIndex((e) => e.Id === id);
+        // console.log(i);
+        this.theOption.splice(i, 1);
+      } catch (error) {
+        this.$message.error("משהו השתבש");
+      } finally {
+        this.LoadingButton = false;
+      }
+    },
+    UpdateOption(id) {
+      this.shows.showDivos = true;
+      this.shows.showEditOption = true;
+      let OptionOfUp = this.theOption.find((e) => e.Id === id);
+      this.ModelUpdateOption = OptionOfUp;
+      // console.log(OptionOfUp);
+      //UpdateOption
+    },
+    async UpdateForOption() {
+      let id = this.ModelUpdateOption.Id;
+      let text = this.ModelUpdateOption.Desc;
+      const params = { id, text };
+      this.LoadingButton = true;
+      try {
+        let { data } = await this.$ax.put(URL + "UpdateOP", params);
+        if (data) {
+          this.$message.success("עודכן בהצלחה");
+          this.shows.showDivos = false;
+          let i = this.theOption.findIndex((e) => e.Id === id);
+          this.theOption[i].Desc = text;
+        } else {
+          this.$message.error("משהו השתבש");
+        }
+      } catch (error) {
+      } finally {
+        this.LoadingButton = false;
       }
     },
   },
@@ -668,7 +910,6 @@ export default {
   height: 2.7em;
   overflow: hidden;
 }
-
 .table {
   width: 76%;
   position: absolute;
@@ -734,6 +975,11 @@ export default {
   left: 320px;
   bottom: 70px;
 }
+.itemEditisEnd.Stat {
+  position: relative;
+  left: 320px;
+  bottom: 10px;
+}
 .iteminEditSelct {
   margin-bottom: 40px;
 }
@@ -752,7 +998,7 @@ export default {
   background: rgba(255, 255, 255, 0.879);
   border: 11px solid rgba(171, 192, 167, 0.645);
   border-radius: 20px;
-  height: 440px;
+  height: 520px;
   width: 800px;
   left: 280px;
   top: 60px;
@@ -761,7 +1007,7 @@ export default {
   border: 3px solid black;
   width: 600px;
   /* width: 480px; */
-  height: 300px;
+  height: 360px;
   position: relative;
   left: 100px;
   border-radius: 20px;
@@ -808,6 +1054,19 @@ export default {
   left: 17px;
   bottom: 10px;
 }
+.itemNewQD {
+  position: absolute;
+  bottom: 60px;
+  right: 75px;
+}
+.itemNewQD label {
+  position: absolute;
+  width: 50px;
+  bottom: 30px;
+  /* right: 31px; */
+  right: 16px;
+}
+
 .newQ .butonas {
   position: relative;
   top: 50px;
@@ -856,7 +1115,6 @@ option {
   transition: 0.25s all ease;
   pointer-events: none;
 }
-/* Transition */
 .select:hover::after {
   /* display: none; */
   color: #f39c12;
@@ -934,11 +1192,11 @@ option {
   list-style-position: inside;
   padding: 15px;
 }
-.Answers .el-button--success {
+.Answers .el-button--success:not(.EN .el-button--success) {
   width: 300px;
   background: rgb(46, 156, 46);
 }
-.Answers .el-button--success:hover {
+.Answers .el-button--success:hover:not(.EN .el-button--success) {
   width: 300px;
   background: rgba(46, 156, 46, 0.589);
   font-size: 18px;
@@ -966,5 +1224,107 @@ option {
 
   height: 60px;
   color: #000;
+}
+.EN span {
+  margin: 0;
+}
+.EN .el-button--success {
+  width: 200px;
+  font-size: 15px;
+  height: 3em;
+  position: absolute;
+  bottom: -11px;
+  left: 50px;
+  margin-left: 220px;
+}
+.EN .el-button--success:hover {
+  width: 200px;
+  font-size: 15px;
+  height: 3em;
+  color: #34495e;
+}
+.AddNewAnswer {
+  background: white;
+  height: 300px;
+  width: 400px;
+  border-radius: 20px;
+}
+.AddNewAnswer .w3-input {
+  background: rgb(183, 174, 174);
+  border-radius: 10px;
+  position: relative;
+  left: 20%;
+  top: 80px;
+}
+.ButAdANs {
+  position: absolute;
+  left: 28%;
+  bottom: 30%;
+  width: 180px;
+  box-shadow: 0 0 7px 2px #34495e;
+}
+.ButAdANs:hover {
+  box-shadow: 0 0 1px 1px;
+  font-size: 20px;
+}
+.DeleteAnswer {
+  width: 300px;
+  height: 200px;
+  background: rgba(226, 97, 97, 0.699);
+  left: 35%;
+  top: 35%;
+  padding: 10px;
+}
+.DeleteAnswer .text {
+  position: relative;
+  top: 50px;
+  left: 10px;
+}
+.butonascy {
+  position: absolute;
+  bottom: 50px;
+  width: 100%;
+  left: 0;
+}
+.butonascy .el-button--danger {
+  position: absolute;
+  left: 50px;
+}
+.butonascy .el-button--success {
+  position: absolute;
+  right: 50px;
+}
+.Date,
+.Text,
+.Numeric {
+  text-align: center;
+  font-size: 20px;
+  background: rgba(227, 224, 47, 0.615);
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.EditOption {
+  background: rgb(0, 70, 132);
+  height: 150px;
+  width: 400px;
+  border-radius: 20px;
+  left: 30%;
+  padding: 20px;
+}
+.EditOption .el-input {
+  width: 300px;
+  position: relative;
+  left: 30px;
+}
+.EditOption .el-button {
+  position: absolute;
+  bottom: 30px;
+  left: 140px;
+  border: 2px solid black;
+  width: 130px;
+}
+.EditOption .el-button:hover {
+  border: 0 solid rgb(45, 43, 43);
 }
 </style>

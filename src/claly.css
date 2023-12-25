@@ -48,3 +48,6 @@
   bottom: 10px;
   right: 60px;
 }
+input[type="text"] {
+  direction: auto;
+}

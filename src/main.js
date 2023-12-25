@@ -9,6 +9,7 @@ import "./w3Style.css";
 import "./transInput.css";
 import "./claly.css";
 // import "./fontawesome.js";
+
 Vue.use(ElementUI);
 Vue.prototype.$ax = axios;
 Vue.prototype.$eventB = new Vue();

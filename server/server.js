@@ -51,6 +51,7 @@ async function SQLOS(q) {
 }
 
 // const q = `SELECT * FROM Questions
+
 // `;
 // SQLOS(q);
 app.get("/", async (req, res) => {
@@ -108,11 +109,11 @@ app.delete("/Delquen/:id", async (req, res) => {
 });
 app.post("/EditOfquen", async (req, res) => {
   try {
-    // console.log(req.body);
+    console.log(req.body);
     let id = req.body.Id;
     const q = `
     UPDATE Questionnaire
-    SET [Desc] = '${req.body.Desc}',Symbol = '${req.body.Symbol}',StartQuestion = '${req.body.StartQuestion}',StatusId =${req.body.StatusId} 
+    SET [Desc] = '${req.body.Desc}',Symbol = '${req.body.Symbol}',StartQuestion = '${req.body.StartQuestion}',StatusId = ${req.body.StatusId} 
     WHERE Id = ${id}
     `;
     await SQL(q);
@@ -171,6 +172,7 @@ app.post("/Updata", async (req, res) => {
     idOfDescDataType = idOfDescDataType[0].Id;
     const query = `UPDATE Questions
     SET [Desc] = '${req.body.Desc}',IsEnd = '${req.body.IsEnd}',QuestionnaireId = ${idOfQuestionnaire},DataTypesId = ${idOfDescDataType}
+    ,StatusId = ${req.body.StatusId}
     WHERE Id = ${req.body.Id} `;
     await SQL(query);
     res.json(true);
@@ -190,9 +192,9 @@ app.post("/AddQuestin", async (req, res) => {
     let IDdataTy = await SQL(qu);
     IDdataTy = IDdataTy[0].Id;
     // console.log(IDdataTy);
-    const query = `INSERT INTO Questions (QuestionnaireId,DataTypesId,[Desc],IsEnd) VALUES 
+    const query = `INSERT INTO Questions (QuestionnaireId,DataTypesId,[Desc],IsEnd,StatusId) VALUES 
     (${IDnameQ},${IDdataTy},'${req.body.DescQ}',
-    '${req.body.IsEnd}'
+    '${req.body.IsEnd}',${req.body.StatusId}
     )`;
     await SQL(query);
     res.json(true);
@@ -230,7 +232,7 @@ app.post("/FIndQustinnare", async (req, res) => {
   }
 });
 app.post("/Serch", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   let Q;
   try {
     if (req.body.clumn !== "Questions.IsEnd" && req.body.clumn !== "הכל") {
@@ -298,6 +300,49 @@ app.get("/GetOption/:id", async (req, res) => {
     // console.log(result);
     res.json(result);
   } catch (error) {}
+});
+app.post("/AddAnswer", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const query = `SELECT MAX(sek) AS maxSec FROM QuestionsOptions WHERE QuestionsId = ${req.body.id}`;
+    let sek = await SQL(query);
+    sek = sek[0].maxSec;
+    console.log(sek);
+    if (!sek) {
+      sek = 1;
+    }
+    const q = `INSERT INTO QuestionsOptions (QuestionsId,[Desc],sek) VALUES (${req.body.id},'${req.body.text}',${sek})`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(true);
+  }
+});
+app.delete("/DeleteAnswer/:id", async (req, res) => {
+  let id = req.params.id;
+  // console.log(id);
+  try {
+    const query = `DELETE FROM QuestionsOptions WHERE Id = ${id}
+    `;
+    await SQL(query);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+  }
+});
+app.put("/UpdateOP", async (req, res) => {
+  console.log(req.body);
+  try {
+    const q = `UPDATE  QuestionsOptions 
+    SET [Desc] = '${req.body.text}'
+    WHERE Id = ${req.body.id}`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
 });
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);
