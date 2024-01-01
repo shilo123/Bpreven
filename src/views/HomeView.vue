@@ -2,7 +2,7 @@
   <div class="all">
     <h1>היי</h1>
     <div class="content">שלום שלום שלום</div>
-    <i class="fa-solid fa-bars icon"></i>
+    <i class="fa-solid fa-paper-plane-top icon"></i>
   </div>
 </template>
 <script>

@@ -14,21 +14,43 @@
     "
     ref="Divos"
   >
-    <el-button type="success" class="Newquen" @click="openNewQuen"
-      >הוסף שאלון חדש</el-button
+    <div class="optionsONtheTable">
+      <el-button type="success" class="Newquen" @click="openNewQuen"
+        >הוסף שאלון חדש</el-button
+      >
+      <el-input
+        v-model="serch"
+        :placeholder="pleace"
+        class="input"
+        dir="auto"
+        ref="inputSerch"
+      >
+        <i
+          slot="prefix"
+          class="el-input__icon el-icon-search"
+          ref="iconInp"
+        ></i></el-input
+      ><el-select v-model="selcto" placeholder="חפש לפי.." class="selectA">
+        <el-option
+          v-for="(d, i) in Allamudot"
+          :key="i"
+          :label="computedDat(d)"
+          :value="d"
+          v-show="d !== 'Id'"
+        ></el-option>
+      </el-select>
+    </div>
+    <h1 class="LoMatzanu" v-show="!data.length > 0">
+      "{{ this.serch }}" לא נמצאו תוצאות ל
+    </h1>
+    <el-table
+      :data="data"
+      class="table"
+      ref="Table"
+      border
+      v-loading="loadingTABLE"
+      v-show="data.length > 0"
     >
-    <el-input v-model="serch" :placeholder="pleace" class="input" dir="auto">
-      <i slot="prefix" class="el-input__icon el-icon-search"></i></el-input
-    ><el-select v-model="selcto" placeholder="חפש לפי.." class="selectA">
-      <el-option
-        v-for="(d, i) in Allamudot"
-        :key="i"
-        :label="computedDat(d)"
-        :value="d"
-        v-show="d !== 'Id'"
-      ></el-option>
-    </el-select>
-    <el-table :data="data" class="table" ref="Table" border>
       <el-table-column label="אפשרויות">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="Edit(scope.row)"
@@ -230,6 +252,8 @@ export default {
       data: [],
       data2: [],
       serch: "",
+      loadingTABLE: false,
+      TimeoutSerch: "",
       loading: true,
       selcto: "Desc",
       Allamudot: [],
@@ -264,20 +288,19 @@ export default {
       }
     },
     serch(val) {
-      this.data = this.data.filter((e) => {
-        console.log(e);
-        // console.log(e[this.selcto]);
-        if (e[this.selcto]) {
-          return e[this.selcto].includes(val);
-        } else {
-          return false;
-        }
-      });
-      if (val === "") {
-        this.data = this.data2;
-        this.SortTable();
+      this.loadingTABLE = true;
+      if (this.TimeoutSerch) {
+        clearTimeout(this.TimeoutSerch);
       }
-      this.SortTable();
+      this.TimeoutSerch = setTimeout(() => {
+        if (this.serch === "כן") {
+          this.serch = true;
+        } else if (this.serch === "לא") {
+          this.serch = false;
+        }
+        this.SerchQuery(this.serch);
+        this.TimeoutSerch = null;
+      }, 500);
     },
   },
   computed: {
@@ -294,14 +317,11 @@ export default {
     this.loading = false;
     let el = this.$refs.Divos;
     el.style.zIndex = "";
+    el.style.position = "absolute";
     await this.$nextTick();
     this.SortTable();
-    document.addEventListener("DOMContentLoaded", function () {
-      let inputs = document.querySelectorAll('input[type="text"]');
-      inputs.forEach(function (input) {
-        input.setAttribute("dir", "auto");
-      });
-    });
+    this.SortInput();
+    //inputSerch
   },
   methods: {
     computedDat(val) {
@@ -332,6 +352,34 @@ export default {
           el.style.textAlign = "right";
         });
       });
+    },
+    SortInput() {
+      let inp = this.$refs.inputSerch.$el.children[0];
+      inp.style.background = "none";
+      inp.style.color = "black";
+      inp.addEventListener("focus", () => {
+        inp.style.backgroundColor = "white";
+        inp.style.borderRadius = "20px";
+      });
+      inp.addEventListener("blur", () => {
+        inp.style.background = "none";
+        inp.style.borderRadius = "";
+      });
+      let icon = this.$refs.iconInp;
+      icon.style.fontSize = "20px";
+      icon.style.position = "absolute";
+      icon.style.left = "0";
+      icon.style.top = "-6px";
+    },
+    async SerchQuery(query) {
+      const params = { query, clumn: this.selcto };
+      // console.log(params);
+      let { data } = await this.$ax.post(URL + "SerchQushinnere", params);
+      // console.log(data);
+      this.data = data;
+      this.SortTable();
+
+      this.loadingTABLE = false;
     },
     Edit(row) {
       // this.idOfE = row.Id;
@@ -427,6 +475,39 @@ export default {
 };
 </script>
 <style scoped>
+.optionsONtheTable {
+  background: linear-gradient(
+    rgb(166, 209, 209),
+    rgb(174, 107, 107),
+    rgb(52, 55, 64)
+  );
+  display: flex;
+  flex-direction: row-reverse;
+  position: absolute;
+  width: 69.9%;
+  top: 40px;
+  height: 3.9em;
+  left: 117px;
+}
+.input {
+  width: 400px;
+  z-index: 501;
+  position: relative;
+  right: 250px;
+  top: 8px;
+}
+.selectA {
+  z-index: 501;
+  position: relative;
+  right: 300px;
+  top: 8px;
+}
+.Newquen {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 .table {
   width: 70%;
   position: absolute;
@@ -438,24 +519,6 @@ export default {
   border: 3px solid black;
   overflow-y: auto;
   padding-bottom: 50px;
-}
-.input {
-  position: absolute;
-  top: 40px;
-  right: 35.7%;
-  width: 400px;
-  z-index: 501;
-}
-.selectA {
-  position: absolute;
-  top: 40px;
-  right: 61.8%;
-  z-index: 501;
-}
-.Newquen {
-  position: absolute;
-  top: 40px;
-  right: 22.2%;
 }
 .Newquen:hover {
   font-size: 23px;
@@ -572,19 +635,10 @@ export default {
   position: relative;
   right: 20px;
 }
-</style>
-<style>
-body {
-  background: rgb(170, 170, 170);
-  padding-bottom: 1000px;
-}
-input {
-  text-align: right;
-}
-input::placeholder {
-  text-align: right;
-}
-textarea::placeholder {
-  text-align: right;
+.LoMatzanu {
+  position: absolute;
+  top: 30%;
+  left: 30%;
 }
 </style>
+<style></style>

@@ -45,26 +45,81 @@ function SQL(query) {
   });
 }
 async function SQLOS(q) {
-  let res = await SQL(q);
-  console.log(res);
+  let data = await SQL(q);
+
+  console.log(data);
   // console.log(res);
 }
 
 // const q = `SELECT * FROM Questions
-
 // `;
+
 // SQLOS(q);
 app.get("/", async (req, res) => {
-  const q = `SELECT TOP (1000) [Id]
-,[Desc]
-,[Symbol]
-,[StartQuestion]
-,[StatusId]
-FROM [Bpreven].[dbo].[Questionnaire]
+  const q = `SELECT * 
+FROM [Questionnaire]
 `;
   let result = await SQL(q);
   // console.log(result);
   res.json(result);
+});
+
+app.get("/GetOPtionForQuestion/:qushinnare", async (req, res) => {
+  try {
+    let activQushinnare = req.params.qushinnare;
+    const Query = `SELECT Id FROM Questionnaire WHERE [Desc] = '${activQushinnare}'`;
+    let idQus = await SQL(Query);
+    idQus = idQus[0].Id;
+    console.log(idQus);
+    const query = `SELECT * FROM Questions WHERE QuestionnaireId = ${idQus}`;
+    let questions = await SQL(query);
+    console.log(questions);
+    let arr = [];
+    const Promises = questions.map(async (e) => {
+      let q = `SELECT * FROM QuestionsOptions WHERE QuestionsId = ${e.Id}`;
+      let result = await SQL(q);
+      arr.push({ [e.Desc]: result });
+    });
+    console.log(arr);
+    await Promise.all(Promises);
+    // console.log(activQushinnare);
+    res.json(arr);
+  } catch (error) {
+    res.json(true);
+  }
+});
+app.get("/GetallQuestions", async (req, res) => {
+  try {
+    const q = `SELECT Id ,[Desc] FROM Questionnaire `;
+    let resultA = await SQL(q);
+    let obj = {};
+    const Promises = resultA.map(async (el) => {
+      let propery = el.Desc;
+      const QU = `SELECT Questions.*, DataTypes.[Desc] AS DescDateTypes FROM Questions 
+      LEFT JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId
+       WHERE QuestionnaireId = ${el.Id}`;
+      let val = await SQL(QU);
+      // console.log(val);
+      obj[propery] = val;
+    });
+    // console.log(resultA);
+    await Promise.all(Promises);
+    // console.log(obj);
+    //
+    //
+    // let arr = [];
+    // for (const key in obj) {
+    //   arr.push({ nameQuesinnare: key, qustions: obj[key] });
+    // }
+    // console.log(arr[0].qustions);
+
+    //
+    //
+    res.json(obj);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
 });
 app.get("/Getamudes", async (req, res) => {
   try {
@@ -84,7 +139,7 @@ app.get("/Getamudes", async (req, res) => {
   }
 });
 app.post("/newequen", async (req, res) => {
-  console.log(req.body.Desc);
+  // console.log(req.body.Desc);
   try {
     const q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId) VALUES ('${req.body.Desc}', '${req.body.Symbol}', '${req.body.StartQuestion}', '${req.body.StatusId}')`;
     // let qo = `'INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId) VALUES ('${req.body.Desc}', '${req.body.Symbol}', '${req.body.StartQuestion}', '${req.body.StatusId}');
@@ -123,19 +178,35 @@ app.post("/EditOfquen", async (req, res) => {
     res.json(true);
   }
 });
+app.post("/SerchQushinnere", async (req, res) => {
+  try {
+    const query = req.body.query;
+    const Clumn = req.body.clumn;
+    // console.log(query, Clumn);
+    const q = `SELECT * FROM Questionnaire WHERE [${Clumn}] LIKE '${query}%'`;
+    let result = await SQL(q);
+    res.json(result);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
 app.get("/GetQuestions", async (req, res) => {
   // Questions.NextQuestionId,
   // Questions.ScreenId,
   const q = `SELECT 
-  Questions.Id,
-  Questions.[Desc],
-  Questions.StatusId,
-  Questions.IsEnd,
+  Q1.Id,
+  Q1.[Desc],
+  Q1.StatusId,
+  Q1.IsEnd,
   Questionnaire.[Desc] AS DescQuestionnaire,
-  DataTypes.[Desc] AS DescDataType
-  FROM Questions
-  INNER JOIN Questionnaire ON Questionnaire.Id = Questions.QuestionnaireId
-  INNER JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId
+  DataTypes.[Desc] AS DescDataType,
+  Q2.[Desc] AS NextQuestionDesc
+FROM Questions AS Q1
+LEFT JOIN Questionnaire ON Questionnaire.Id = Q1.QuestionnaireId
+LEFT JOIN Questions AS Q2 ON Q1.NextQuestionId = Q2.Id
+LEFT JOIN DataTypes ON DataTypes.Id = Q1.DataTypesId ORDER BY Questionnaire.[Desc] Desc;
+
 `;
   let result = await SQL(q);
   // console.log(result);
@@ -161,20 +232,64 @@ app.get("/GetData", async (req, res) => {
   }
 });
 app.post("/Updata", async (req, res) => {
-  // console.log(req.body);
-  // console.log("req.body.DescDataType", req.body.DescDataType);
+  let body = req.body;
   try {
-    const Q = `SELECT Id AS id FROM Questionnaire WHERE [Desc] = '${req.body.DescQuestionnaire}'`;
-    let idOfQuestionnaire = await SQL(Q);
-    idOfQuestionnaire = idOfQuestionnaire[0].id;
-    const qu = `SELECT Id FROM DataTypes  WHERE [Desc] = '${req.body.DescDataType}'`;
-    let idOfDescDataType = await SQL(qu);
-    idOfDescDataType = idOfDescDataType[0].Id;
-    const query = `UPDATE Questions
-    SET [Desc] = '${req.body.Desc}',IsEnd = '${req.body.IsEnd}',QuestionnaireId = ${idOfQuestionnaire},DataTypesId = ${idOfDescDataType}
-    ,StatusId = ${req.body.StatusId}
-    WHERE Id = ${req.body.Id} `;
-    await SQL(query);
+    let nextQuestionId = null;
+
+    // חיפוש מספר הזיהוי של השאלה הבאה, אם קיימת
+    if (body.NextQuestionDesc && body.NextQuestionDesc !== "ללא שאלה הבאה") {
+      const nextQuestionQuery = `SELECT Id FROM Questions WHERE [Desc] = '${body.NextQuestionDesc}'`;
+      const nextQuestionResult = await SQL(nextQuestionQuery);
+      if (nextQuestionResult[0]) {
+        nextQuestionId = nextQuestionResult[0].Id;
+      }
+    }
+
+    let questionnaireId = null;
+    // חיפוש מספר הזיהוי של השאלון, אם קיים
+    if (body.DescQuestionnaire) {
+      const questionnaireQuery = `SELECT Id FROM Questionnaire WHERE [Desc] = '${body.DescQuestionnaire}'`;
+      const questionnaireResult = await SQL(questionnaireQuery);
+      if (questionnaireResult[0]) {
+        questionnaireId = questionnaireResult[0].Id;
+      }
+    }
+
+    let dataTypesId = null;
+    // חיפוש מספר הזיהוי של סוג הנתונים, אם קיים
+    if (body.DescDataType) {
+      const dataTypesQuery = `SELECT Id FROM DataTypes WHERE [Desc] = '${body.DescDataType}'`;
+      const dataTypesResult = await SQL(dataTypesQuery);
+      if (dataTypesResult[0]) {
+        dataTypesId = dataTypesResult[0].Id;
+      }
+    }
+
+    // עדכון שדות השאלה
+    let updateQuery = `
+          UPDATE Questions
+          SET
+              [Desc] = '${body.Desc}',
+              IsEnd = ${body.IsEnd ? 1 : 0},
+              StatusId = ${body.StatusId}
+      `;
+
+    // הוספת QuestionnaireId, DataTypesId ו-NextQuestionId לשאילתה אם קיימים
+    if (questionnaireId !== null) {
+      updateQuery += `, QuestionnaireId = ${questionnaireId}`;
+    }
+    if (dataTypesId !== null) {
+      updateQuery += `, DataTypesId = ${dataTypesId}`;
+    }
+    if (nextQuestionId !== null) {
+      updateQuery += `, NextQuestionId = ${nextQuestionId}`;
+    } else {
+      updateQuery += `, NextQuestionId = NULL`;
+    }
+
+    updateQuery += ` WHERE Id = ${body.Id}`;
+
+    await SQL(updateQuery);
     res.json(true);
   } catch (error) {
     console.log(error);
@@ -294,12 +409,19 @@ OR
 });
 app.get("/GetOption/:id", async (req, res) => {
   const id = req.params.id;
+  console.log(id);
   try {
-    const q = `SELECT * FROM QuestionsOptions WHERE QuestionsId = ${id} ORDER BY sek`;
+    const q = `SELECT QuestionsOptions.[Desc], QuestionsOptions.Id, Questions.[Desc] AS Nextques
+    FROM QuestionsOptions
+    LEFT JOIN Questions ON QuestionsOptions.NextQuestionId = Questions.Id
+     WHERE QuestionsId = ${id} ORDER BY sek`;
     let result = await SQL(q);
     // console.log(result);
     res.json(result);
-  } catch (error) {}
+    // res.json([]);
+  } catch (error) {
+    console.log(error);
+  }
 });
 app.post("/AddAnswer", async (req, res) => {
   // console.log(req.body);
@@ -307,9 +429,11 @@ app.post("/AddAnswer", async (req, res) => {
     const query = `SELECT MAX(sek) AS maxSec FROM QuestionsOptions WHERE QuestionsId = ${req.body.id}`;
     let sek = await SQL(query);
     sek = sek[0].maxSec;
-    console.log(sek);
+    // console.log(sek);
     if (!sek) {
       sek = 1;
+    } else {
+      sek++;
     }
     const q = `INSERT INTO QuestionsOptions (QuestionsId,[Desc],sek) VALUES (${req.body.id},'${req.body.text}',${sek})`;
     await SQL(q);
@@ -332,12 +456,87 @@ app.delete("/DeleteAnswer/:id", async (req, res) => {
   }
 });
 app.put("/UpdateOP", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     const q = `UPDATE  QuestionsOptions 
     SET [Desc] = '${req.body.text}'
     WHERE Id = ${req.body.id}`;
     await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/GetQestion", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const query = `SELECT Id FROM Questionnaire WHERE [Desc] = '${req.body.DescQuestionnaire}'`;
+    let id = await SQL(query);
+    id = id[0].Id;
+    const query2 = `SELECT * FROM Questions 
+    WHERE QuestionnaireId = ${id} AND [Desc] != '${req.body.Desc}'
+    `;
+    let data = await SQL(query2);
+    // console.log("data", data);
+    // console.log(id);
+    res.json(data);
+    // res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/addNewQustionsId", async (req, res) => {
+  try {
+    console.log(req.body);
+    const query = `SELECT Id FROM Questions WHERE [Desc] = '${req.body.nextQusions}'`;
+    let id = await SQL(query);
+    if (req.body.nextQusions !== "ללא שאלה הבאה") {
+      id = id[0].Id;
+    } else {
+      id = null;
+    }
+    console.log(id);
+    const Q = `UPDATE QuestionsOptions
+    SET NextQuestionId = ${id}
+    WHERE QuestionsId = ${req.body.IdQuestion} AND Id = ${req.body.idOfOption}
+    `;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/AddnewNextquestionNoOption", async (req, res) => {
+  try {
+    console.log(req.body);
+    if (req.body.neXtQuestionsId === "ללא שאלה הבאה") {
+      req.body.neXtQuestionsId = null;
+    }
+    const q = `UPDATE Questions
+    SET NextQuestionId = ${req.body.neXtQuestionsId}
+    WHERE Id = ${req.body.id}
+    `;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/updateSek", async (req, res) => {
+  try {
+    console.log(req.body);
+
+    const Promises = req.body.arr.map(async (e) => {
+      let q = `UPDATE QuestionsOptions
+        SET sek = ${e.newSek}
+        WHERE Id = ${e.id}`;
+      await SQL(q);
+    });
+    await Promise.all(Promises);
     res.json(true);
   } catch (error) {
     console.log(error);
