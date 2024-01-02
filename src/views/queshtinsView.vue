@@ -1,6 +1,11 @@
 <template>
   <div>
-    <div class="optionsONtheTable">
+    <div
+      :class="{
+        optionsONtheTable: !wachtStore,
+        optionsONtheTableBig: wachtStore,
+      }"
+    >
       <el-button
         type="success"
         class="ButtonHosef"
@@ -15,7 +20,7 @@
         v-model="serch"
         dir="auto"
         placeholder="חפש"
-        class="inputSerch"
+        :class="{ inputSerch: !wachtStore, inputSerchBig: wachtStore }"
         ref="inputSerch"
         ><i slot="suffix" class="el-icon-search" ref="iconOfInp"></i
       ></el-input>
@@ -23,7 +28,11 @@
         <el-radio-button label="כן" ref="itemRadioA"></el-radio-button>
         <el-radio-button label="לא" ref="itemRadioB"></el-radio-button>
       </el-radio-group>
-      <el-select v-model="FilterOf" placeholder="סנן לפי" class="Tselect">
+      <el-select
+        v-model="FilterOf"
+        placeholder="סנן לפי"
+        :class="{ Tselect: !wachtStore, TselectBig: wachtStore }"
+      >
         <el-option
           v-for="מ in ['שאלון', 'שאלה', 'סוג התשובה', 'אם אחרון', 'הכל']"
           :key="מ"
@@ -45,7 +54,7 @@
 
     <el-table
       :data="data"
-      class="table"
+      :class="{ table: !wachtStore, bigTable: wachtStore }"
       height="100%"
       ref="Table"
       border
@@ -150,8 +159,39 @@
         <template slot-scope="props">
           <div class="Options" v-show="props.row.DescDataType === 'OptionId'">
             <div v-show="theOption.length > 0">
+              <label
+                :class="{
+                  DefaultSelectLabel: !wachtStore,
+                  DefaultSelectLabelBig: wachtStore,
+                }"
+                >כל האופציות</label
+              >
+              <el-select
+                v-model="DefoltSelsct"
+                placeholder="כל השאלות פה"
+                :class="{
+                  DefaultSelect: !wachtStore,
+                  DefaultSelectBig: wachtStore,
+                }"
+                @change="SelectFromAll(DefoltSelsct, IdniFtah, props.row)"
+              >
+                <el-option value="לפי האופציה"></el-option>
+                <el-option value="שאלה אחרונה"></el-option>
+                <el-option
+                  v-for="(q, i) in Alldata.questionsOnly"
+                  :key="i"
+                  :value="q.Desc"
+                ></el-option>
+              </el-select>
               <div class="parentsheaderOFAnswers">
-                <h1 class="headerOFAnswers">אופציות</h1>
+                <h1
+                  :class="{
+                    headerOFAnswers: !wachtStore,
+                    headerOFAnswersBig: !!wachtStore,
+                  }"
+                >
+                  אופציות
+                </h1>
               </div>
               <ul class="Answers">
                 <draggable
@@ -162,6 +202,7 @@
                     v-for="(O, i) in theOption"
                     :key="i"
                     class="button-and-li"
+                    :class="{ bigScreenOPtion: wachtStore }"
                     :id="O.Id"
                   >
                     <span>{{ O.Desc }}</span>
@@ -224,6 +265,10 @@
                 </draggable>
                 <el-divider></el-divider>
                 <el-button
+                  :class="{
+                    buttonSuccessBig: wachtStore,
+                    buttonSuccess: !wachtStore,
+                  }"
                   type="success"
                   @click="
                     shows.showAddAnswer = true;
@@ -379,7 +424,9 @@
                 <div class="itemEditisEnd">
                   <label>אם אחרון</label>
                   <el-switch
-                    :disabled="rowEdit.DescDataType === 'OptionId'"
+                    :disabled="
+                      rowEdit.DescDataType === 'OptionId' && !rowEdit.IsEnd
+                    "
                     v-model="rowEdit.IsEnd"
                     active-text="כן"
                     inactive-text="לא"
@@ -573,6 +620,7 @@ export default {
   data() {
     return {
       s: "",
+      DefoltSelsct: "לפי האופציה",
       serch: "",
       ModelInputDivAnswer: "",
       ModelUpdateOption: "",
@@ -604,6 +652,7 @@ export default {
       showSelectOfNextQuestion: {},
       ModelOfNewNextQuestion: {},
       disabledQushinnare: {},
+      beforModelQestions: {},
       newQuens: {
         DescQ: "",
         NameQ: "",
@@ -693,7 +742,11 @@ export default {
       }
     },
   },
-  computed: {},
+  computed: {
+    wachtStore() {
+      return this.$store.state.TogelAnimate;
+    },
+  },
   async mounted() {
     try {
       let { data } = await this.$ax(URL + "GetQuestions");
@@ -722,7 +775,7 @@ export default {
         }
       });
       this.disabledQushinnare = groupCount;
-      console.log(groupCount);
+      // console.log(groupCount);
       await this.$nextTick();
       this.SortTable();
       this.sortInput();
@@ -770,6 +823,12 @@ export default {
           }, 300);
         }
       }
+      let values = Object.values(this.ModelQestions);
+      const boolian = values.every((val) => val === values[0]);
+      if (boolian) {
+        this.DefoltSelsct = values[0];
+      }
+
       // console.log(data);
     },
     computedData(val) {
@@ -835,7 +894,11 @@ export default {
       icon.style.transition = "left 2s";
       icon.style.top = "10px";
       icon.style.position = "absolute";
-      icon.style.left = "-310px";
+      if (!this.wachtStore) {
+        icon.style.left = "-310px";
+      } else {
+        icon.style.left = "-470px";
+      }
     },
     sortRadio() {
       let elRadA = this.$refs.itemRadioA.$el;
@@ -1091,6 +1154,15 @@ export default {
       }
     },
     async AddNewQuestion(idOfOption, nextQusions, IdQuestion) {
+      this.beforModelQestions = this.ModelQestions;
+      let values = Object.values(this.ModelQestions);
+      const boolian = values.every((val) => val === values[0]);
+      if (boolian) {
+        this.DefoltSelsct = values[0];
+      } else {
+        this.DefoltSelsct = "לפי האופציה";
+      }
+
       const params = { idOfOption, nextQusions, IdQuestion };
       this.LoadingButton = true;
 
@@ -1147,6 +1219,45 @@ export default {
         this.$message.error("משהו השתבש");
       }
     },
+    SelectFromAll(val, id, row) {
+      if (val !== "לפי אופציה") {
+        this.beforModelQestions = this.ModelQestions;
+      }
+      if (val !== "שאלה אחרונה" && val !== "לפי אופציה") {
+        for (const key in this.ModelQestions) {
+          if (val !== "לפי האופציה") {
+            this.ModelQestions[key] = val;
+          }
+        }
+      }
+      if (
+        val === "לפי האופציה" &&
+        Object.keys(this.beforModelQestions).length !== 0
+      ) {
+        this.ModelQestions = this.beforModelQestions;
+      }
+      if (val === "שאלה אחרונה") {
+        for (const key in this.ModelQestions) {
+          this.ModelQestions[key] = "ללא שאלה הבאה";
+        }
+      }
+      // console.log(this.ModelQestions);
+
+      const IdofQuestions = id;
+      console.log(this.ModelQestions);
+      for (const key in this.ModelQestions) {
+        let idofOpt = key.split("-")[1];
+        let valTheOp = this.ModelQestions[key];
+        setTimeout(() => {
+          this.AddNewQuestion(idofOpt, valTheOp, IdofQuestions);
+        }, 500);
+      }
+
+      this.LoadingOptionss = false;
+      setTimeout(() => {
+        this.LoadingOptionss = true;
+      }, 100);
+    },
   },
 };
 </script>
@@ -1156,12 +1267,22 @@ export default {
   display: flex;
   flex-direction: row-reverse;
   position: absolute;
-  /* width: 76%; */
   width: 78%;
   top: 40px;
   height: 4em;
-  /* left: 85px; */
   left: 80px;
+  transition: all 0.3s;
+}
+.optionsONtheTableBig {
+  background: linear-gradient(rgb(158, 170, 170), rgb(59, 62, 70));
+  display: flex;
+  flex-direction: row-reverse;
+  position: absolute;
+  width: 90%;
+  top: 40px;
+  height: 4em;
+  left: 80px;
+  transition: all 0.3s;
 }
 .ButtonHosef {
   /* display: none; */
@@ -1178,6 +1299,14 @@ export default {
   right: 170px;
   bottom: -8px;
   width: 360px;
+  transition: all 0.3s;
+}
+.inputSerchBig {
+  position: relative;
+  right: 170px;
+  bottom: -8px;
+  width: 500px;
+  transition: all 0.3s;
 }
 .radio {
   position: relative;
@@ -1191,6 +1320,13 @@ export default {
   position: relative;
   right: 220px;
   top: 8px;
+  transition: all 0.3s;
+}
+.TselectBig {
+  position: relative;
+  right: 240px;
+  top: 8px;
+  transition: all 0.3s;
 }
 .select {
   /* display: none; */
@@ -1209,6 +1345,14 @@ export default {
   top: 100px;
   margin-left: 80px;
   /* margin-left: 85px; */
+  transition: all 0.3s;
+}
+.bigTable {
+  width: 90%;
+  position: absolute;
+  top: 100px;
+  margin-left: 80px;
+  transition: all 0.3s;
 }
 .buttons {
   display: flex;
@@ -1449,6 +1593,10 @@ option {
   border-radius: 15px;
   color: black;
 }
+.headerOFAnswersBig {
+  position: relative;
+  left: 52.3%;
+}
 .Del-andComp .indeSel {
   position: absolute;
   left: 90px;
@@ -1501,11 +1649,24 @@ option {
   overflow-y: auto;
   padding: 10px;
   border-radius: 20px;
+  transition: all 0.3s;
 }
 .button-and-li span:hover {
   background: rgba(206, 69, 0, 0.821);
   cursor: grab;
 }
+.bigScreenOPtion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  left: 140px;
+}
+.bigScreenOPtion span {
+  position: relative;
+  right: 620px;
+}
+
 .button-and-li span:active {
   cursor: move;
   background: rgb(255, 0, 0);
@@ -1522,14 +1683,18 @@ option {
   list-style-position: inside;
   padding: 15px;
 }
-.Answers .el-button--success:not(.EN .el-button--success) {
-  width: 300px;
+.buttonSuccess:not(.EN .el-button--success) {
   background: rgb(46, 156, 46);
-}
-.Answers .el-button--success:hover:not(.EN .el-button--success) {
   width: 300px;
+  transition: all 0.3s;
+  position: relative;
+  left: 30px;
+}
+.buttonSuccess:hover:not(.EN .el-button--success) {
   background: rgba(46, 156, 46, 0.589);
+  width: 300px;
   font-size: 18px;
+  transition: all 0.3s;
 }
 .ButtonAndLi {
   display: flex;
@@ -1659,5 +1824,52 @@ option {
 }
 .ButtonAddNewNextQustion {
   width: 130px;
+}
+.DefaultSelect {
+  position: absolute;
+  left: 20px;
+  z-index: 2;
+  top: 60px;
+  width: 350px;
+  color: blue;
+  transition: all 0.3s;
+}
+.DefaultSelectLabel {
+  position: absolute;
+  left: 160px;
+  z-index: 2;
+  top: 30px;
+  font-size: 20px;
+  transition: all 0.3s;
+}
+.DefaultSelectBig {
+  position: absolute;
+  left: 160px;
+  z-index: 2;
+  top: 80px;
+  width: 350px;
+  color: blue;
+  transition: all 0.3s;
+}
+.DefaultSelectLabelBig {
+  position: absolute;
+  left: 300px;
+  z-index: 2;
+  top: 50px;
+  font-size: 20px;
+  transition: all 0.3s;
+}
+.buttonSuccessBig {
+  background: rgb(46, 156, 46);
+  width: 310px;
+  position: relative;
+  left: 80px;
+  transition: all 0.3s;
+}
+.buttonSuccessBig:hover {
+  background: rgba(46, 156, 46, 0.589);
+  width: 310px;
+  font-size: 20px;
+  transition: all 0.3s;
 }
 </style>

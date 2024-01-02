@@ -16,7 +16,7 @@
           : !null && activQushinnare !== ''
       "
     >
-      לא נמצע ערך זהה ל "{{ activQushinnare }}"
+      "לא נמצע ערך זהה ל "{{ activQushinnare }}
     </h1>
     <div v-if="shomes">
       <el-row>
@@ -111,20 +111,15 @@ export default {
     },
     async sortTabs() {
       await this.$nextTick();
-      setTimeout(() => {
-        if (this.$refs.HeaderQuestions && this.$refs.contentCOL) {
+      setTimeout(async () => {
+        let widtho;
+        let col;
+        if (this.$refs.contentCOL) {
           let ItemsOnly = this.$refs.ItemsNoheader;
-          /*  display: flex;
-  justify-content: center; */
-          // ItemsOnly.forEach((elo) => {
-          //   console.log(elo);
-          //   // elo.style.position = "absolute";
-          //   // elo.style.justifyContent = "center";
-          //   // elo.style.flexDirection = "column";
-          // });
-          console.log(ItemsOnly);
-          let col = this.$refs.contentCOL;
-          let widtho = this.Screen / col.length - 65 + "px";
+          // console.log(ItemsOnly);
+          col = this.$refs.contentCOL;
+          widtho = this.Screen / col.length - 65 + "px";
+
           // console.log(col.length);
           col.forEach((e) => {
             e = e.$el;
@@ -139,13 +134,16 @@ export default {
             e.style.marginRight = "30px";
           });
           let item = this.$refs.ItemContent;
-          item.forEach((elo) => {
-            elo.style.position = "relative";
-            elo.style.left = "50%";
-            elo.style.transform = "translateX(-50%)";
-          });
-
-          // console.log(item);
+          if (!item) {
+            await this.delay(500);
+          }
+          if (item) {
+            item.forEach((elo) => {
+              elo.style.position = "relative";
+              elo.style.left = "50%";
+              elo.style.transform = "translateX(-50%)";
+            });
+          }
         }
       }, 200);
     },
@@ -157,6 +155,9 @@ export default {
       // console.log(result);
       // console.log(result[val.Desco]);
       return result[val.Desco];
+    },
+    delay(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
     },
   },
 };

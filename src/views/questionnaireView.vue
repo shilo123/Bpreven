@@ -14,14 +14,19 @@
     "
     ref="Divos"
   >
-    <div class="optionsONtheTable">
+    <div
+      :class="{
+        optionsONtheTable: !wachtStore,
+        optionsONtheTableBig: wachtStore,
+      }"
+    >
       <el-button type="success" class="Newquen" @click="openNewQuen"
         >הוסף שאלון חדש</el-button
       >
       <el-input
         v-model="serch"
         :placeholder="pleace"
-        class="input"
+        :class="{ input: !wachtStore, inputBig: wachtStore }"
         dir="auto"
         ref="inputSerch"
       >
@@ -30,7 +35,11 @@
           class="el-input__icon el-icon-search"
           ref="iconInp"
         ></i></el-input
-      ><el-select v-model="selcto" placeholder="חפש לפי.." class="selectA">
+      ><el-select
+        v-model="selcto"
+        placeholder="חפש לפי.."
+        :class="{ selectA: !wachtStore, selectABig: wachtStore }"
+      >
         <el-option
           v-for="(d, i) in Allamudot"
           :key="i"
@@ -45,7 +54,7 @@
     </h1>
     <el-table
       :data="data"
-      class="table"
+      :class="{ table: !wachtStore, tableBig: wachtStore }"
       ref="Table"
       border
       v-loading="loadingTABLE"
@@ -305,7 +314,10 @@ export default {
   },
   computed: {
     pleace() {
-      return `סנן לפי ${this.selcto}...`;
+      return `סנן לפי ${this.computedDat(this.selcto)}...`;
+    },
+    wachtStore() {
+      return this.$store.state.TogelAnimate;
     },
   },
   async mounted() {
@@ -488,6 +500,22 @@ export default {
   top: 40px;
   height: 3.9em;
   left: 117px;
+  transition: all 0.3s;
+}
+.optionsONtheTableBig {
+  background: linear-gradient(
+    rgb(166, 209, 209),
+    rgb(174, 107, 107),
+    rgb(52, 55, 64)
+  );
+  display: flex;
+  flex-direction: row-reverse;
+  position: absolute;
+  width: 86%;
+  top: 40px;
+  height: 3.9em;
+  left: 117px;
+  transition: all 0.3s;
 }
 .input {
   width: 400px;
@@ -495,11 +523,26 @@ export default {
   position: relative;
   right: 250px;
   top: 8px;
+  transition: all 0.3s;
+}
+.inputBig {
+  width: 650px;
+  z-index: 501;
+  position: relative;
+  right: 250px;
+  top: 8px;
+  transition: all 0.3s;
 }
 .selectA {
   z-index: 501;
   position: relative;
   right: 300px;
+  top: 8px;
+}
+.selectABig {
+  z-index: 501;
+  position: relative;
+  right: 340px;
   top: 8px;
 }
 .Newquen {
@@ -519,6 +562,20 @@ export default {
   border: 3px solid black;
   overflow-y: auto;
   padding-bottom: 50px;
+  transition: all 0.3s;
+}
+.tableBig {
+  width: 86%;
+  position: absolute;
+  top: 100px;
+  right: 0;
+  margin-right: 96.9px;
+  height: 700px;
+  z-index: 3;
+  border: 3px solid black;
+  overflow-y: auto;
+  padding-bottom: 50px;
+  transition: all 0.3s;
 }
 .Newquen:hover {
   font-size: 23px;

@@ -76,7 +76,7 @@ app.get("/GetOPtionForQuestion/:qushinnare", async (req, res) => {
     console.log(questions);
     let arr = [];
     const Promises = questions.map(async (e) => {
-      let q = `SELECT * FROM QuestionsOptions WHERE QuestionsId = ${e.Id}`;
+      let q = `SELECT * FROM QuestionsOptions WHERE QuestionsId = ${e.Id} ORDER BY sek`;
       let result = await SQL(q);
       arr.push({ [e.Desc]: result });
     });
@@ -424,7 +424,7 @@ app.get("/GetOption/:id", async (req, res) => {
   }
 });
 app.post("/AddAnswer", async (req, res) => {
-  // console.log(req.body);
+  console.log(req.body);
   try {
     const query = `SELECT MAX(sek) AS maxSec FROM QuestionsOptions WHERE QuestionsId = ${req.body.id}`;
     let sek = await SQL(query);
@@ -436,7 +436,8 @@ app.post("/AddAnswer", async (req, res) => {
       sek++;
     }
     const q = `INSERT INTO QuestionsOptions (QuestionsId,[Desc],sek) VALUES (${req.body.id},'${req.body.text}',${sek})`;
-    await SQL(q);
+    let Request = await SQL(q);
+    console.log(Request);
     res.json(true);
   } catch (error) {
     console.log(error);
@@ -445,7 +446,7 @@ app.post("/AddAnswer", async (req, res) => {
 });
 app.delete("/DeleteAnswer/:id", async (req, res) => {
   let id = req.params.id;
-  // console.log(id);
+  console.log(id);
   try {
     const query = `DELETE FROM QuestionsOptions WHERE Id = ${id}
     `;

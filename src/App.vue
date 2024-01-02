@@ -5,8 +5,8 @@
         <span class="text"> שלום ישראל ישראלי </span>
         <el-avatar icon="el-icon-user-solid" v-if="true"></el-avatar>
       </div>
+      <!-- v-show="$route.path === '/Score'" -->
       <div
-        v-show="$route.path === '/Score'"
         class="icons"
         @click="togelAnimate = !togelAnimate"
         @mouseover="over = true"
@@ -64,6 +64,8 @@
   </div>
 </template>
 <script>
+import { URL } from "@/URL/url";
+
 export default {
   name: "BprevenZeshebatzad",
 
@@ -83,6 +85,7 @@ export default {
           Last: "fa-solid fa-left-long  fa-2xl",
         },
       ],
+      Alldata: {},
     };
   },
   computed: {
@@ -125,8 +128,35 @@ export default {
       }
     },
   },
-  mounted() {
+  async mounted() {
     // console.log(this.$store.state.message);
+    if (this.$route.path === "/") {
+      document.body.style.background = "";
+    }
+    if (this.$route.path === "/queshtinnre") {
+      document.body.style.background = "";
+    }
+    if (this.$route.path === "/queshtins") {
+      document.body.style.background = "";
+    }
+    if (this.$route.path === "/Score") {
+      document.body.style.background =
+        "linear-gradient(to right, #c0a59f, #4f4e64, #616f79)";
+    }
+    if (this.$route.path === "/Users") {
+      document.body.style.background = "";
+    }
+
+    // let { data } = await this.$ax(URL + "GetQuestions");
+    // // this.data = data;
+    // let res = await this.$ax.get(URL + "GetData");
+    // let allquestions = await this.$ax.get(URL + "GetallQuestions");
+    // this.Alldata.DataType = res.data.DataType;
+    // this.Alldata.NameQuen = res.data.NameQuen;
+    // this.Alldata.Allquestions = allquestions.data;
+    // // console.log(this.Alldata);
+    // this.$store.commit("setDataANDallData", { data, allo: this.Alldata });
+    await this.$store.dispatch("fetchData");
   },
 
   methods: {
