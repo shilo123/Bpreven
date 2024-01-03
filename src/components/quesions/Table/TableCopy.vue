@@ -107,16 +107,18 @@
       <el-table-column label="שאלון" prop="DescQuestionnaire"></el-table-column>
       <el-table-column type="expand" v-if="LoadingOptionss">
         <template slot-scope="props">
-          <OptionInTable
-            v-if="IfComponent"
-            :props="props"
-            :theOption="theOption"
-            :IdniFtah="IdniFtah"
-            :Alldata="Alldata"
-            :ModelQestions="ModelQestions"
-            :LoadingButton="LoadingButton"
-            :OptheOption="OptheOption"
-          />
+          <div>
+            <OptionInTable
+              v-if="IfComponent"
+              :props="props"
+              :theOption="theOption"
+              :IdniFtah="IdniFtah"
+              :Alldata="Alldata"
+              :ModelQestions="ModelQestions"
+              :LoadingButton="LoadingButton"
+              :OptheOption="OptheOption"
+            />
+          </div>
           <!--  -->
         </template>
       </el-table-column>
@@ -249,11 +251,6 @@ export default {
       if (boolian) {
         this.DefoltSelsct = values[0];
       }
-      setTimeout(() => {
-        this.IfComponent = true;
-      }, 1000);
-
-      // console.log(data);
     },
     Delete(row) {
       // console.log(row);

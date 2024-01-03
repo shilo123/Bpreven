@@ -18,7 +18,7 @@
     >
       "לא נמצע ערך זהה ל "{{ activQushinnare }}
     </h1>
-    <div v-if="shomes">
+    <div>
       <el-row>
         <el-col
           :span="6"
@@ -49,7 +49,7 @@
 </template>
 <script>
 import { URL } from "@/URL/url";
-import InputAutoComplitade from "@/components/Elements/inputAutoComp.vue";
+import InputAutoComplitade from "@/components/Score/inputAutoComp.vue";
 export default {
   components: {
     InputAutoComplitade,
