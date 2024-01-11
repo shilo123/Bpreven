@@ -186,7 +186,16 @@
                             v-for="(q, i) in Alldata.questionsOnly"
                             :key="i"
                             :value="q.Desc"
-                          ></el-option>
+                            v-show="q.sek > activQ.sek"
+                            :style="
+                              bodek({
+                                q: q.sek,
+                                activQ: activQ.sek,
+                                BoolBool: q.sek > activQ.sek,
+                              })
+                            "
+                          >
+                          </el-option>
                         </el-select>
                         <el-button
                           type="primary"
@@ -279,6 +288,7 @@ export default {
       showHosef: {},
       OptheOption: {},
       ModelQestions: {},
+      activQ: {},
       showSelectOfNextQuestion: {},
       ModelOfNewNextQuestion: {},
       ModelInputDivAnswer: "",
@@ -303,9 +313,9 @@ export default {
       this.$store.commit("UptheOption", val);
     },
     LoadingButton(val) {
-      if (val && this.$refs.butnoc) {
-        this.$refs.butnoc.$el.style.position = "absolute";
-      }
+      // if (val && this.$refs.butnoc) {
+      //   this.$refs.butnoc.$el.style.position = "absolute";
+      // }
     },
     LoadingOptionss(val) {
       // console.log(" LoadingOptionss(val)", val);
@@ -342,8 +352,13 @@ export default {
   },
 
   methods: {
+    bodek(val) {
+      console.log("val", val);
+    },
     async GetOptions(row, expanded) {
       await this.$nextTick();
+      this.activQ = row;
+      // console.log(row);
       if (row.DescDataType === "OptionId") {
         this.IdniFtah = row.Id;
         this.$emit("IdniFtah", row.Id);
@@ -620,14 +635,15 @@ export default {
           await this.$ax.post(URL + "AddAnswer", { text, id });
           this.$message.success("התשובה נוספה");
           this.theOption.push({ Desc: text });
-          this.shows.showDivos = false;
+          // this.shows.showDivos = false;
           // this.RafreseTable();
         } catch (error) {
           this.$message.error("משהו השתבש");
+          console.log(error);
         } finally {
           this.LoadingButton = false;
         }
-        console.log(data);
+        // console.log(data);
       }
     },
   },

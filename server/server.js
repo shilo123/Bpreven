@@ -51,9 +51,8 @@ async function SQLOS(q) {
   // console.log(res);
 }
 
-// const q = `SELECT * FROM Questions
+// const q = `SELECT * FROM score
 // `;
-
 // SQLOS(q);
 app.get("/", async (req, res) => {
   const q = `SELECT * 
@@ -63,7 +62,6 @@ FROM [Questionnaire]
   // console.log(result);
   res.json(result);
 });
-
 app.get("/GetOPtionForQuestion/:qushinnare", async (req, res) => {
   try {
     let activQushinnare = req.params.qushinnare;
@@ -97,7 +95,7 @@ app.get("/GetallQuestions", async (req, res) => {
       let propery = el.Desc;
       const QU = `SELECT Questions.*, DataTypes.[Desc] AS DescDateTypes FROM Questions 
       LEFT JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId
-       WHERE QuestionnaireId = ${el.Id}`;
+       WHERE QuestionnaireId = ${el.Id} ORDER BY Questions.sek`;
       let val = await SQL(QU);
       // console.log(val);
       obj[propery] = val;
@@ -196,6 +194,7 @@ app.get("/GetQuestions", async (req, res) => {
   // Questions.ScreenId,
   const q = `SELECT 
   Q1.Id,
+  Q1.sek,
   Q1.[Desc],
   Q1.StatusId,
   Q1.IsEnd,
@@ -205,8 +204,7 @@ app.get("/GetQuestions", async (req, res) => {
 FROM Questions AS Q1
 LEFT JOIN Questionnaire ON Questionnaire.Id = Q1.QuestionnaireId
 LEFT JOIN Questions AS Q2 ON Q1.NextQuestionId = Q2.Id
-LEFT JOIN DataTypes ON DataTypes.Id = Q1.DataTypesId ORDER BY Questionnaire.[Desc] Desc;
-
+LEFT JOIN DataTypes ON DataTypes.Id = Q1.DataTypesId ORDER BY Questionnaire.[Desc] Desc ,Q1.sek ASC;
 `;
   let result = await SQL(q);
   // console.log(result);
@@ -297,19 +295,28 @@ app.post("/Updata", async (req, res) => {
   }
 });
 app.post("/AddQuestin", async (req, res) => {
-  // console.log(req.body);
+  console.log(req.body);
   try {
     const q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${req.body.NameQ}'`;
     let IDnameQ = await SQL(q);
     IDnameQ = IDnameQ[0].Id;
-    // console.log(IDnameQ);
+    console.log(IDnameQ);
     const qu = `SELECT Id FROM DataTypes WHERE [Desc] = '${req.body.typeData}'`;
     let IDdataTy = await SQL(qu);
     IDdataTy = IDdataTy[0].Id;
     // console.log(IDdataTy);
-    const query = `INSERT INTO Questions (QuestionnaireId,DataTypesId,[Desc],IsEnd,StatusId) VALUES 
+    const que = `SELECT MAX(sek) AS LastSek FROM Questions WHERE QuestionnaireId = ${IDnameQ}`;
+    let lsatSek = await SQL(que);
+    lsatSek = lsatSek[0];
+    if (!lsatSek) {
+      lsatSek = 1;
+    } else {
+      lsatSek = lsatSek.LastSek + 1;
+    }
+    console.log("lsatSek", lsatSek);
+    const query = `INSERT INTO Questions (QuestionnaireId,DataTypesId,[Desc],IsEnd,StatusId,sek) VALUES 
     (${IDnameQ},${IDdataTy},'${req.body.DescQ}',
-    '${req.body.IsEnd}',${req.body.StatusId}
+    '${req.body.IsEnd}',${req.body.StatusId},${lsatSek}
     )`;
     await SQL(query);
     res.json(true);
@@ -414,7 +421,7 @@ app.get("/GetOption/:id", async (req, res) => {
     const q = `SELECT QuestionsOptions.[Desc], QuestionsOptions.Id, Questions.[Desc] AS Nextques
     FROM QuestionsOptions
     LEFT JOIN Questions ON QuestionsOptions.NextQuestionId = Questions.Id
-     WHERE QuestionsId = ${id} ORDER BY sek`;
+     WHERE QuestionsId = ${id} ORDER BY QuestionsOptions.sek`;
     let result = await SQL(q);
     // console.log(result);
     res.json(result);
@@ -543,6 +550,70 @@ app.post("/updateSek", async (req, res) => {
     console.log(error);
     res.json(false);
   }
+});
+app.post("/AddScore", async (req, res) => {
+  try {
+    // console.log(req.body);
+    const Score = req.body.Score;
+    const arrIds = req.body.arrIds;
+    const QushinnareName = req.body.Qushinnare;
+    const Q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${QushinnareName}' `;
+    let id = await SQL(Q);
+    if (id) {
+      id = id[0].Id;
+    }
+    const QueryIf = `SELECT * FROM Score WHERE QuestionnaireId = ${id} AND QuestionsAnswersIds = '${arrIds}'`;
+    let Bool = await SQL(QueryIf);
+    if (Bool.length === 0) {
+      Bool = false;
+    } else {
+      Bool = true;
+    }
+    if (!Bool) {
+      const query = `INSERT INTO Score (QuestionnaireId,QuestionsAnswersIds,QuestionnaireScore) VALUES (${id},'${arrIds}','${Score}')`;
+      await SQL(query);
+    } else {
+      const QueryUpdate = `UPDATE Score
+      SET QuestionnaireScore = '${Score}'
+      WHERE QuestionnaireId = ${id} AND QuestionsAnswersIds = '${arrIds}'`;
+      await SQL(QueryUpdate);
+    }
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+  // console.log(id);
+});
+app.post("/deleteScore", async (req, res) => {
+  // console.log("req.body", req.body);
+  try {
+    const Score = req.body.Score;
+    const QushinnareName = req.body.Qushinnare;
+    const arrIds = req.body.arrIds.join();
+    const Q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${QushinnareName}' `;
+    let id = await SQL(Q);
+    if (id) {
+      id = id[0].Id;
+    }
+    const Query = `DELETE FROM Score WHERE QuestionnaireId = ${id} AND QuestionsAnswersIds = '${arrIds}' AND 
+    QuestionnaireScore = '${Score}'`;
+    await SQL(Query);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.get("/GetScore/:nameQueshenner", async (req, res) => {
+  const Q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${req.params.nameQueshenner}' `;
+  let id = await SQL(Q);
+  if (id.length !== 0) {
+    id = id[0].Id;
+  }
+  const q = `SELECT * FROM Score WHERE QuestionnaireId = ${id}`;
+  let data = await SQL(q);
+  // console.log(data);
+  res.json(data);
 });
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);

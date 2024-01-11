@@ -18,16 +18,19 @@
     >
       "לא נמצע ערך זהה ל "{{ activQushinnare }}
     </h1>
-    <div>
+    <div v-if="shomes" ref="TheAlElements" class="Allel">
+      <!-- style="position: Sticky; top: -130px; z-index: 3" -->
       <el-row>
         <el-col
-          :span="6"
+          :span="0.5"
           v-for="(q, i) in ObjDataQuestions[activQushinnare]"
           :key="i"
           class="content"
           ref="contentCOL"
+          v-show="q.DescDateTypes === 'OptionId'"
         >
           <div class="HeaderQuestions" ref="HeaderQuestions">
+            <!-- {{ ObjDataQuestions[activQushinnare].length - i }} /-->
             {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
           </div>
           <div ref="ItemsNoheader">
@@ -45,14 +48,26 @@
         </el-col>
       </el-row>
     </div>
+    <Cardos
+      :activQushinnare="activQushinnare"
+      :width="width"
+      v-show="
+        activQushinnare
+          ? ObjDataQuestions[activQushinnare].length > 0
+          : null && activQushinnare !== ''
+      "
+      v-if="IfComponents && activQushinnare"
+    />
   </div>
 </template>
 <script>
 import { URL } from "@/URL/url";
 import InputAutoComplitade from "@/components/Score/inputAutoComp.vue";
+import Cardos from "@/components/Score/CardsOfScoreComp.vue";
 export default {
   components: {
     InputAutoComplitade,
+    Cardos,
   },
   name: "BprevenScoreView",
   data() {
@@ -62,6 +77,8 @@ export default {
       activQushinnare: "",
       shomes: false,
       Screen: window.innerWidth - 240,
+      width: "",
+      IfComponents: false,
     };
   },
   computed: {
@@ -74,11 +91,17 @@ export default {
       this.shomes = false;
       let res = await this.$ax.get(URL + "GetOPtionForQuestion/" + val);
       this.arrOptions = res.data;
+      this.ObjDataQuestions[this.activQushinnare].reverse();
+      const Params = {
+        Questions: this.ObjDataQuestions[this.activQushinnare],
+        Op: res.data,
+      };
+      this.$store.commit("Score/UpData", Params);
       this.shomes = true;
     },
     wachtStore(val) {
       if (val) {
-        this.Screen = window.innerWidth;
+        // this.Screen = window.innerWidth;
       } else {
         this.Screen = window.innerWidth - 240;
       }
@@ -94,9 +117,6 @@ export default {
   },
 
   methods: {
-    bdika(val) {
-      console.log(val);
-    },
     computedData(val) {
       //   console.log(val);
       if (val === "Text") {
@@ -107,6 +127,8 @@ export default {
         return "אופציות";
       } else if (val === "Date") {
         return "תאריך";
+      } else {
+        return val;
       }
     },
     async sortTabs() {
@@ -116,19 +138,24 @@ export default {
         let col;
         if (this.$refs.contentCOL) {
           let ItemsOnly = this.$refs.ItemsNoheader;
-          // console.log(ItemsOnly);
           col = this.$refs.contentCOL;
           widtho = this.Screen / col.length - 65 + "px";
-
+          this.width = widtho;
           // console.log(col.length);
-          col.forEach((e) => {
+          let elAll = this.$refs.TheAlElements;
+          this.$store.commit("Score/UpItems", elAll);
+          col.forEach((e, i) => {
             e = e.$el;
-
             // console.log(e);
             if (col.length === 2) {
               widtho = this.Screen / col.length - 75 + "px";
             } else if (col.length === 1) {
               widtho = this.Screen / col.length - 175 + "px";
+            } else if (col.length > 7) {
+              widtho = this.Screen / col.length - 15 + "px";
+              if (i === col.length - 1) {
+                this.ItemosSorted(ItemsOnly);
+              }
             }
             e.style.width = widtho;
             e.style.marginRight = "30px";
@@ -145,13 +172,57 @@ export default {
             });
           }
         }
+        this.IfComponents = true;
       }, 200);
+    },
+    async ItemosSorted(elements) {
+      elements.forEach((el) => {
+        // console.log(el);
+        Array.from(el.children).forEach((e) => {
+          // console.log(e);
+          e.style.width = "120px";
+        });
+      });
+      let Headers = this.$refs.HeaderQuestions;
+      // console.log(Headers);
+      Headers.forEach((element) => {
+        // console.log(element);
+        element.style.fontSize = "10px";
+        element.style.width = "130px";
+      });
+      let all = this.$refs.contentCOL;
+
+      all.forEach((element) => {
+        // console.log("Yesh");
+        // console.log("element.$el", element.$el);
+        let W =
+          +element.$el.style.width.split("px")[0] +
+          +element.$el.style.marginRight.split("px")[0];
+        W = W + "px";
+        this.width = W;
+        element.$el.style.position = "relative";
+        element.$el.style.left = "40px";
+        // element.$el.style.width = "0px";
+        let ELOS = Array.from(element.$el.children[1].children);
+        setTimeout(() => {
+          ELOS.forEach((e) => {
+            // console.log("e", e);
+            e.style.position = "relative";
+            e.style.left = "60px";
+            e.style.marginRight = "30px";
+            // console.log(e.style.left);
+          });
+        }, 300);
+      });
     },
     ComputedOptions(val) {
       // console.log(val);
-      const result = val.arrOptions.find((e) => {
+      let result = val.arrOptions.find((e) => {
         return e[val.Desco];
       });
+      if (!result) {
+        result = [];
+      }
       // console.log(result);
       // console.log(result[val.Desco]);
       return result[val.Desco];
@@ -182,7 +253,7 @@ export default {
 }
 .content:not(.HeaderQuestions) {
   position: relative;
-  top: 200px;
+  top: 130px;
   left: 90px;
   display: flex;
   flex-direction: column;
@@ -194,10 +265,10 @@ export default {
 .Item-content {
   background: rgb(159, 195, 101);
   padding: 5px;
-  width: 200px;
+  width: 160px;
   margin-top: 30px;
   border-radius: 10px;
-  font-size: 20px;
+  font-size: 14px;
   position: relative;
   left: 30px;
   transition: all 0.4s;
@@ -218,16 +289,16 @@ export default {
 .inlineInput {
   position: absolute;
   left: 30%;
-  top: 80px;
+  top: 50px;
   width: 360px;
   transition: all 0.3s;
-  z-index: 1;
+  z-index: 15;
 }
 .BigScreen {
-  z-index: 1;
+  z-index: 11;
   position: absolute;
   left: 40%;
-  top: 80px;
+  top: 50px;
   width: 360px;
   transition: all 0.3s;
 }
@@ -279,5 +350,12 @@ export default {
   position: absolute;
   left: 22%;
   top: 30%;
+}
+.Allel {
+  /* background: rgba(0, 0, 0, 0.415); */
+  padding-bottom: 12%;
+  /* position: relative;
+  top: -130px;
+  z-index: 3; */
 }
 </style>

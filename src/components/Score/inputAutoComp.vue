@@ -121,4 +121,7 @@ export default {
   background: rgb(255, 172, 172);
   cursor: pointer;
 }
+.el-input:focus {
+  border: 3px solid white;
+}
 </style>

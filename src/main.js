@@ -2,9 +2,11 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import ElementUI from "element-ui";
-import "element-ui/lib/theme-chalk/index.css";
 import axios from "axios";
 import store from "@/store/index";
+import Input from "@/components/ComponenetsCloly/InitialInput.vue";
+import * as GlobalFunction from "@/GlobalFunction";
+import "element-ui/lib/theme-chalk/index.css";
 import "./w3Style.css";
 import "./transInput.css";
 import "./claly.css";
@@ -22,8 +24,13 @@ import "../FileTheFontAwemson/css/duotone.min.css"; // כולל אייקונים
 import "../FileTheFontAwemson/css/v4-shims.min.css"; // עבור תאימות עם גרסה 4
 import "../FileTheFontAwemson/css/svg-with-js.min.css"; // עבור שילוב עם JavaScript ו-SVG
 import "../FileTheFontAwemson/css/sharp-solid.min.css"; // סגנון נוסף של אייקונים מלאים
+for (const [key, value] of Object.entries(GlobalFunction)) {
+  Vue.prototype["$" + key] = value;
+}
 
+Vue.component("InitialInput", Input);
 Vue.use(ElementUI);
+// Vue.use(Quasar);
 Vue.prototype.$ax = axios;
 Vue.prototype.$eventB = new Vue();
 Vue.config.productionTip = false;

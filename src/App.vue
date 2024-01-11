@@ -122,6 +122,9 @@ export default {
       if (path === "/Score") {
         document.body.style.background =
           "linear-gradient(to right, #c0a59f, #4f4e64, #616f79)";
+        setTimeout(() => {
+          this.togelAnimate = true;
+        }, 500);
       }
       if (path === "/Users") {
         document.body.style.background = "";
@@ -138,25 +141,18 @@ export default {
     }
     if (this.$route.path === "/queshtins") {
       document.body.style.background = "";
+      await this.$store.dispatch("fetchData");
     }
     if (this.$route.path === "/Score") {
       document.body.style.background =
         "linear-gradient(to right, #c0a59f, #4f4e64, #616f79)";
+      setTimeout(() => {
+        this.togelAnimate = true;
+      }, 500);
     }
     if (this.$route.path === "/Users") {
       document.body.style.background = "";
     }
-
-    // let { data } = await this.$ax(URL + "GetQuestions");
-    // // this.data = data;
-    // let res = await this.$ax.get(URL + "GetData");
-    // let allquestions = await this.$ax.get(URL + "GetallQuestions");
-    // this.Alldata.DataType = res.data.DataType;
-    // this.Alldata.NameQuen = res.data.NameQuen;
-    // this.Alldata.Allquestions = allquestions.data;
-    // // console.log(this.Alldata);
-    // this.$store.commit("setDataANDallData", { data, allo: this.Alldata });
-    await this.$store.dispatch("fetchData");
   },
 
   methods: {
@@ -275,6 +271,7 @@ body {
 body {
   background: rgb(170, 170, 170);
   padding-bottom: 1000px;
+  width: 100%;
 }
 input {
   text-align: right;

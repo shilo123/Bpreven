@@ -3,16 +3,29 @@
     <h1>היי</h1>
     <div class="content">שלום שלום שלום</div>
     <i class="fa-solid fa-paper-plane-top icon"></i>
+    <miniSelect :Option="Opto" :value="model" @value="model = $event" />
   </div>
 </template>
 <script>
+import miniSelect from "@/components/ComponenetsCloly/MiniSelect.vue";
 export default {
   name: "BprevenHomeView",
+  components: { miniSelect },
 
   data() {
-    return {};
+    return {
+      model: "",
+      Opto: [
+        { name: "jhon", age: 19 },
+        { name: "itzik", age: 15 },
+      ],
+    };
   },
-
+  watch: {
+    model(val) {
+      console.log(val);
+    },
+  },
   mounted() {},
 
   methods: {},
