@@ -7,57 +7,63 @@
         activQushinnare = $event;
         sortTabs();
       "
-    />
-    <h1
-      class="LoMatzanu"
-      v-show="
-        activQushinnare
-          ? !ObjDataQuestions[activQushinnare].length > 0
-          : !null && activQushinnare !== ''
+      @clear="ClearOption"
+      @Inp="
+        afterClear ? FuncafterClear() : '';
+        shomesALL = true;
       "
-    >
-      "לא נמצע ערך זהה ל "{{ activQushinnare }}
-    </h1>
-    <div v-if="shomes" ref="TheAlElements" class="Allel">
-      <!-- style="position: Sticky; top: -130px; z-index: 3" -->
-      <el-row>
-        <el-col
-          :span="0.5"
-          v-for="(q, i) in ObjDataQuestions[activQushinnare]"
-          :key="i"
-          class="content"
-          ref="contentCOL"
-          v-show="q.DescDateTypes === 'OptionId'"
-        >
-          <div class="HeaderQuestions" ref="HeaderQuestions">
-            <!-- {{ ObjDataQuestions[activQushinnare].length - i }} /-->
-            {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
-          </div>
-          <div ref="ItemsNoheader">
-            <div
-              v-for="(s, i) in ComputedOptions({ arrOptions, Desco: q.Desc })"
-              :key="i"
-              class="Item-content"
-              ref="ItemContent"
-            >
-              <span>
-                {{ s.Desc }}
-              </span>
+    />
+    <div v-show="shomesALL">
+      <h1
+        class="LoMatzanu"
+        v-show="
+          activQushinnare
+            ? !ObjDataQuestions[activQushinnare].length > 0
+            : !null && activQushinnare !== ''
+        "
+      >
+        "לא נמצע ערך זהה ל "{{ activQushinnare }}
+      </h1>
+      <div v-if="shomes" ref="TheAlElements" class="Allel">
+        <!-- style="position: Sticky; top: -130px; z-index: 3" -->
+        <el-row>
+          <el-col
+            :span="0.5"
+            v-for="(q, i) in ObjDataQuestions[activQushinnare]"
+            :key="i"
+            class="content"
+            ref="contentCOL"
+            v-show="q.DescDateTypes === 'OptionId'"
+          >
+            <div class="HeaderQuestions" ref="HeaderQuestions">
+              {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
             </div>
-          </div>
-        </el-col>
-      </el-row>
+            <div ref="ItemsNoheader">
+              <div
+                v-for="(s, i) in ComputedOptions({ arrOptions, Desco: q.Desc })"
+                :key="i"
+                class="Item-content"
+                ref="ItemContent"
+              >
+                <span>
+                  {{ s.Desc }}
+                </span>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+      <Cardos
+        :activQushinnare="activQushinnare"
+        :width="width"
+        v-show="
+          activQushinnare
+            ? ObjDataQuestions[activQushinnare].length > 0
+            : null && activQushinnare !== ''
+        "
+        v-if="IfComponents && activQushinnare"
+      />
     </div>
-    <Cardos
-      :activQushinnare="activQushinnare"
-      :width="width"
-      v-show="
-        activQushinnare
-          ? ObjDataQuestions[activQushinnare].length > 0
-          : null && activQushinnare !== ''
-      "
-      v-if="IfComponents && activQushinnare"
-    />
   </div>
 </template>
 <script>
@@ -79,6 +85,9 @@ export default {
       Screen: window.innerWidth - 240,
       width: "",
       IfComponents: false,
+      shomesALL: false,
+      afterClear: false,
+      reverse: false,
     };
   },
   computed: {
@@ -87,23 +96,20 @@ export default {
     },
   },
   watch: {
-    async activQushinnare(val) {
-      this.shomes = false;
-      let res = await this.$ax.get(URL + "GetOPtionForQuestion/" + val);
-      this.arrOptions = res.data;
-      this.ObjDataQuestions[this.activQushinnare].reverse();
-      const Params = {
-        Questions: this.ObjDataQuestions[this.activQushinnare],
-        Op: res.data,
-      };
-      this.$store.commit("Score/UpData", Params);
-      this.shomes = true;
+    activQushinnare(val, Old) {
+      if (val) {
+        this.FunctionActiveQushinnare(val);
+      }
     },
     wachtStore(val) {
       if (val) {
         // this.Screen = window.innerWidth;
+        if (this.afterClear && this.activQushinnare) {
+          this.FunctionActiveQushinnare(this.activQushinnare);
+        }
       } else {
         this.Screen = window.innerWidth - 240;
+        this.ClearOption();
       }
       this.sortTabs();
     },
@@ -117,6 +123,9 @@ export default {
   },
 
   methods: {
+    FuncafterClear() {
+      this.FunctionActiveQushinnare(this.activQushinnare);
+    },
     computedData(val) {
       //   console.log(val);
       if (val === "Text") {
@@ -229,6 +238,34 @@ export default {
     },
     delay(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
+    },
+    async FunctionActiveQushinnare(val, bool) {
+      try {
+        if (!this.wachtStore) {
+          this.shomesALL = false;
+          this.$store.commit("SetTogel", true);
+          return;
+        }
+        this.shomes = false;
+        this.shomesALL = true;
+        let res = await this.$ax.get(URL + "GetOPtionForQuestion/" + val);
+        this.arrOptions = res.data;
+        if (!this.reverse) {
+          this.ObjDataQuestions[this.activQushinnare].reverse();
+          this.reverse = true;
+        }
+        const Params = {
+          Questions: this.ObjDataQuestions[this.activQushinnare],
+          Op: res.data,
+        };
+        this.$store.commit("Score/UpData", Params);
+        this.shomes = true;
+      } catch (error) {}
+    },
+    ClearOption() {
+      this.arrOptions = [];
+      this.shomesALL = false;
+      this.afterClear = true;
     },
   },
 };

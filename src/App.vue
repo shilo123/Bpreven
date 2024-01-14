@@ -92,11 +92,18 @@ export default {
     wachtStore() {
       return this.$store.state.message;
     },
+    watchtogelAnimate() {
+      return this.$store.state.TogelAnimate;
+    },
   },
   watch: {
     togelAnimate(val) {
       this.$store.commit("SetTogel", val);
     },
+    watchtogelAnimate(val) {
+      this.togelAnimate = val;
+    },
+
     wachtStore(val) {
       if (val) {
         let eles = document.querySelectorAll(".row");
@@ -141,7 +148,9 @@ export default {
     }
     if (this.$route.path === "/queshtins") {
       document.body.style.background = "";
+      this.$store.commit("SetLoadingTable", true);
       await this.$store.dispatch("fetchData");
+      this.$store.commit("SetLoadingTable", false);
     }
     if (this.$route.path === "/Score") {
       document.body.style.background =

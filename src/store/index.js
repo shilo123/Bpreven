@@ -8,6 +8,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    LoadingTable: false,
     message: false,
     TogelAnimate: false,
     SgorDivos: false,
@@ -22,6 +23,9 @@ export default new Vuex.Store({
     },
     SetTogel(state, val) {
       state.TogelAnimate = val;
+    },
+    SetLoadingTable(state, val) {
+      state.LoadingTable = val;
     },
     SgorDivos(state, val) {
       state.SgorDivos = val;

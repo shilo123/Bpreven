@@ -6,10 +6,10 @@
       height="100%"
       ref="Table"
       border
-      v-show="data.length > 0"
       v-loading="loadingTABLE"
       v-if="RafreshTable"
       @expand-change="GetOptions"
+      v-show="showTable"
     >
       <el-table-column label="אופציות" ref="Clumn">
         <template slot-scope="scope">
@@ -304,8 +304,14 @@ export default {
     };
   },
   computed: {
+    showTable() {
+      return !this.loadingTABLE ? this.data.length > 0 : true;
+    },
     wachtStore() {
       return this.$store.state.TogelAnimate;
+    },
+    WachLoadingTable() {
+      return this.$store.state.LoadingTable;
     },
   },
   watch: {
@@ -324,6 +330,9 @@ export default {
       if (!val && this.$store.state.theOption.length === 0) {
         this.SortTable();
       }
+    },
+    WachLoadingTable(val) {
+      this.loadingTABLE = val;
     },
   },
   async mounted() {

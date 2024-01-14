@@ -68,17 +68,17 @@ app.get("/GetOPtionForQuestion/:qushinnare", async (req, res) => {
     const Query = `SELECT Id FROM Questionnaire WHERE [Desc] = '${activQushinnare}'`;
     let idQus = await SQL(Query);
     idQus = idQus[0].Id;
-    console.log(idQus);
+    // console.log(idQus);
     const query = `SELECT * FROM Questions WHERE QuestionnaireId = ${idQus}`;
     let questions = await SQL(query);
-    console.log(questions);
+    // console.log(questions);
     let arr = [];
     const Promises = questions.map(async (e) => {
       let q = `SELECT * FROM QuestionsOptions WHERE QuestionsId = ${e.Id} ORDER BY sek`;
       let result = await SQL(q);
       arr.push({ [e.Desc]: result });
     });
-    console.log(arr);
+    // console.log(arr);
     await Promise.all(Promises);
     // console.log(activQushinnare);
     res.json(arr);
@@ -162,7 +162,7 @@ app.delete("/Delquen/:id", async (req, res) => {
 });
 app.post("/EditOfquen", async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     let id = req.body.Id;
     const q = `
     UPDATE Questionnaire
@@ -295,12 +295,12 @@ app.post("/Updata", async (req, res) => {
   }
 });
 app.post("/AddQuestin", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     const q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${req.body.NameQ}'`;
     let IDnameQ = await SQL(q);
     IDnameQ = IDnameQ[0].Id;
-    console.log(IDnameQ);
+    // console.log(IDnameQ);
     const qu = `SELECT Id FROM DataTypes WHERE [Desc] = '${req.body.typeData}'`;
     let IDdataTy = await SQL(qu);
     IDdataTy = IDdataTy[0].Id;
@@ -313,7 +313,7 @@ app.post("/AddQuestin", async (req, res) => {
     } else {
       lsatSek = lsatSek.LastSek + 1;
     }
-    console.log("lsatSek", lsatSek);
+    // console.log("lsatSek", lsatSek);
     const query = `INSERT INTO Questions (QuestionnaireId,DataTypesId,[Desc],IsEnd,StatusId,sek) VALUES 
     (${IDnameQ},${IDdataTy},'${req.body.DescQ}',
     '${req.body.IsEnd}',${req.body.StatusId},${lsatSek}
@@ -334,7 +334,7 @@ app.delete("/DeleteQustions/:id", async (req, res) => {
   }
 });
 app.post("/FIndQustinnare", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     let query = `SELECT 
     Questions.Id,
@@ -416,7 +416,7 @@ OR
 });
 app.get("/GetOption/:id", async (req, res) => {
   const id = req.params.id;
-  console.log(id);
+  // console.log(id);
   try {
     const q = `SELECT QuestionsOptions.[Desc], QuestionsOptions.Id, Questions.[Desc] AS Nextques
     FROM QuestionsOptions
@@ -431,7 +431,7 @@ app.get("/GetOption/:id", async (req, res) => {
   }
 });
 app.post("/AddAnswer", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     const query = `SELECT MAX(sek) AS maxSec FROM QuestionsOptions WHERE QuestionsId = ${req.body.id}`;
     let sek = await SQL(query);
@@ -444,7 +444,7 @@ app.post("/AddAnswer", async (req, res) => {
     }
     const q = `INSERT INTO QuestionsOptions (QuestionsId,[Desc],sek) VALUES (${req.body.id},'${req.body.text}',${sek})`;
     let Request = await SQL(q);
-    console.log(Request);
+    // console.log(Request);
     res.json(true);
   } catch (error) {
     console.log(error);
@@ -453,7 +453,7 @@ app.post("/AddAnswer", async (req, res) => {
 });
 app.delete("/DeleteAnswer/:id", async (req, res) => {
   let id = req.params.id;
-  console.log(id);
+  // console.log(id);
   try {
     const query = `DELETE FROM QuestionsOptions WHERE Id = ${id}
     `;
@@ -497,7 +497,7 @@ app.post("/GetQestion", async (req, res) => {
 });
 app.post("/addNewQustionsId", async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const query = `SELECT Id FROM Questions WHERE [Desc] = '${req.body.nextQusions}'`;
     let id = await SQL(query);
     if (req.body.nextQusions !== "ללא שאלה הבאה") {
@@ -505,7 +505,7 @@ app.post("/addNewQustionsId", async (req, res) => {
     } else {
       id = null;
     }
-    console.log(id);
+    // console.log(id);
     const Q = `UPDATE QuestionsOptions
     SET NextQuestionId = ${id}
     WHERE QuestionsId = ${req.body.IdQuestion} AND Id = ${req.body.idOfOption}
@@ -519,7 +519,7 @@ app.post("/addNewQustionsId", async (req, res) => {
 });
 app.post("/AddnewNextquestionNoOption", async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     if (req.body.neXtQuestionsId === "ללא שאלה הבאה") {
       req.body.neXtQuestionsId = null;
     }
@@ -536,7 +536,7 @@ app.post("/AddnewNextquestionNoOption", async (req, res) => {
 });
 app.post("/updateSek", async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
 
     const Promises = req.body.arr.map(async (e) => {
       let q = `UPDATE QuestionsOptions

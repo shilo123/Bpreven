@@ -3,32 +3,26 @@
     <h1>היי</h1>
     <div class="content">שלום שלום שלום</div>
     <i class="fa-solid fa-paper-plane-top icon"></i>
-    <miniSelect :Option="Opto" :value="model" @value="model = $event" />
+    <Select @Baharty="BodekTo($event)" :pleaceHolder="'בחר'" />
   </div>
 </template>
 <script>
-import miniSelect from "@/components/ComponenetsCloly/MiniSelect.vue";
+import Select from "@/components/ComponenetsCloly/SelectozComp.vue";
 export default {
   name: "BprevenHomeView",
-  components: { miniSelect },
+  components: { Select },
 
   data() {
-    return {
-      model: "",
-      Opto: [
-        { name: "jhon", age: 19 },
-        { name: "itzik", age: 15 },
-      ],
-    };
+    return {};
   },
-  watch: {
-    model(val) {
-      console.log(val);
-    },
-  },
+  watch: {},
   mounted() {},
 
-  methods: {},
+  methods: {
+    BodekTo(e) {
+      console.log(e);
+    },
+  },
 };
 </script>
 <style scoped>

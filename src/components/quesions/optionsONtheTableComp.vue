@@ -37,7 +37,7 @@
         ></el-option>
       </el-select>
       <div class="select">
-        <select name="S" v-model="FilterChange">
+        <select name="S" v-model="FilterChange" @change="$emit('SortTable')">
           <option label="הכל" value="הכל" selected>הכל</option>
           <option
             v-for="n in Alldata.NameQuen"

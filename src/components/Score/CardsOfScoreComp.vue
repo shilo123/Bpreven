@@ -1,28 +1,37 @@
 <template>
   <div class="all">
+    <el-radio-group v-model="ValRadio" class="Radioz">
+      <el-radio-button label="ניתן ציון"></el-radio-button>
+      <el-radio-button label="לא ניתן ציון"></el-radio-button>
+      <el-radio-button label="הכל"></el-radio-button>
+    </el-radio-group>
     <div class="parentsSelects">
       <div v-for="(n, i) in RevereseQu" :key="i" class="Selects">
-        <miniSelect
-          :i="i"
-          :Option="n.op"
-          :placeholder="n.Desc"
-          :value="ModelSelect[`Model-${i}`]"
-          @value="ModelSelect[`Model-${i}`] = $event"
-          @change="
-            ModelSelect[`Model-${i}`] = $event.val;
-            EventChange(
-              ModelSelect[`Model-${i}`],
-              RevereseQu.length - ($event.i + 1)
-            );
-          "
-        />
+        <el-tooltip effect="dark" :content="n.Desc" placement="top">
+          <miniSelect
+            :i="i"
+            :Option="n.op"
+            :placeholder="`אופציה-${RevereseQu.length - i}`"
+            :value="ModelSelect[`Model-${RevereseQu.length - (i + 1)}`]"
+            @value="
+              ModelSelect[`Model-${RevereseQu.length - (i + 1)}`] = $event
+            "
+            @change="
+              ModelSelect[`Model-${RevereseQu.length - (i + 1)}`] = $event.val;
+              EventChange(
+                ModelSelect[`Model-${RevereseQu.length - (i + 1)}`],
+                RevereseQu.length - ($event.i + 1)
+              );
+            "
+          />
+        </el-tooltip>
       </div>
     </div>
     <div v-for="(A, i) in arrsTheOP" :key="i">
       <div
         class="container"
         v-if="i < counteros"
-        :class="{ YeshCvar: ModelInputL[`Model-${i}`] }"
+        :class="{ YeshCvar: ModelInputL[`Model-${A[A.length - 2]}`] }"
       >
         <div class="inContainer">
           <div
@@ -41,8 +50,8 @@
           </div>
           <div class="inptut">
             <InitialInput
-              @value="ModelInputL[`Model-${i}`] = $event"
-              :val="ModelInputL[`Model-${i}`]"
+              @value="ModelInputL[`Model-${A[A.length - 2]}`] = $event"
+              :val="ModelInputL[`Model-${A[A.length - 2]}`]"
               background="blue"
               placeHolder="כתוב ציון"
               class="inponenets"
@@ -53,7 +62,11 @@
               class="inponenets-button"
               :loading="LoadingButton"
               @click="
-                SaveScore(ObjIds[`IDS-${i}`], ModelInputL[`Model-${i}`], i)
+                SaveScore(
+                  A[A.length - 1],
+                  ModelInputL[`Model-${A[A.length - 2]}`],
+                  `${A[A.length - 1]}`
+                )
               "
               >שמור</el-button
             >
@@ -64,10 +77,15 @@
               icon-color="red"
               title="?בטוח שאתה רוצה למחוק"
               @confirm="
-                DeleteScore(ObjIds[`IDS-${i}`], ModelInputL[`Model-${i}`], i)
+                DeleteScore(
+                  A[A.length - 1],
+                  ModelInputL[`Model-${A[A.length - 2]}`],
+                  `${A[A.length - 2]}`
+                )
               "
             >
               <el-button
+                v-show="ModelInputL[`Model-${A[A.length - 2]}`]"
                 slot="reference"
                 type="danger"
                 size="mini"
@@ -86,6 +104,22 @@
       v-show="counteros < arrsTheOP.length"
     >
       <i class="el-icon-more Icnoc"></i>
+    </div>
+    <div class="LoNimtzeou" v-show="ShowLomatz">
+      <div class="title">לא מצאנו אחי</div>
+      <br />
+      <div class="Haze">
+        <div v-for="(A, i) in ArrLoMatzanu" :key="i" class="Haze-item">
+          <i
+            v-show="i !== 0"
+            class="fa-solid fa-arrow-right fa-rotate-180 fa-xl"
+            style="color: #000"
+          ></i>
+          {{ A ? A : "ללא" }}
+        </div>
+        <br />
+      </div>
+      <div class="ValRadio">{{ ValRadio }}</div>
     </div>
   </div>
 </template>
@@ -107,13 +141,26 @@ export default {
       width: "",
       marginLeft: "",
       arrsTheOP: [],
+      arrsTheOPG: [],
       Questos: [],
       RevereseQu: [],
+      ArrLoMatzanu: [],
       LoadingButton: false,
-      Ifos: false,
+      ValRadio: "הכל",
+      ShowLomatz: false,
     };
   },
   watch: {
+    ValRadio(val) {
+      // if (!this.filter) {
+      //   this.arrsTheOP = this.arrsTheOPG;
+      // }
+      // this.filter = false;
+      this.EventChange(val);
+
+      if (val === "הכל") {
+      }
+    },
     Elall(val) {
       if (val) {
         this.width = val.children[0].children[0].style.width;
@@ -124,11 +171,11 @@ export default {
       // console.log(val);
     },
     dataQ(valu) {
-      this.ObjIds = {};
       this.arrsTheOP = [];
-      this.ModelInputL = {};
       this.Questos = [];
       this.RevereseQu = [];
+      this.ModelInputL = {};
+      this.ModelSelect = {};
       let val = this.$store.state.Score.data;
       val.Questions.forEach((el) => {
         let Options = val.Op.find((eo) => eo[el.Desc]);
@@ -147,23 +194,21 @@ export default {
       // this.RevereseQu.reverse();
 
       this.compData();
-      this.BuildArrIds();
 
       this.$ax.get(URL + "GetScore/" + this.activQushinnare).then((res) => {
         // let arr = [];
         res.data.forEach((el) => {
-          for (const key in this.ObjIds) {
-            if (!Array.isArray(el.QuestionsAnswersIds)) {
-              el.QuestionsAnswersIds = el.QuestionsAnswersIds.split(",");
-            }
-            el.QuestionsAnswersIds = el.QuestionsAnswersIds.map((e) => {
-              return +e;
-            });
-            if (this.arraysEqual(el.QuestionsAnswersIds, this.ObjIds[key])) {
-              // arr.push(key);
-              this.UpdateModel(key.split("-")[1], el.QuestionnaireScore);
-            }
+          if (!Array.isArray(el.QuestionsAnswersIds)) {
+            el.QuestionsAnswersIds = el.QuestionsAnswersIds.split(",");
           }
+          el.QuestionsAnswersIds = el.QuestionsAnswersIds.map((e) => {
+            return +e;
+          });
+          this.arrsTheOP.forEach((e) => {
+            if (this.arraysEqual(el.QuestionsAnswersIds, e[e.length - 1])) {
+              this.UpdateModel(e[e.length - 2], el.QuestionnaireScore);
+            }
+          });
         });
         // console.log("arr", arr);
       });
@@ -201,7 +246,10 @@ export default {
       this.Questos.sort((a, b) => {
         return a.sek - b.sek;
       });
-      this.Ifos = true;
+      this.Questos.forEach((element) => {
+        this.RevereseQu.unshift(element);
+      });
+
       this.compData();
     }
     if (
@@ -212,51 +260,58 @@ export default {
       this.width = this.Elall.children[0].children[0].style.width;
       this.marginLeft = this.Elall.children[0].children[0].style.marginRight;
     }
-    this.BuildArrIds();
-    this.BuildIndexes();
+    // this.BuildIndexes();
 
     this.$ax.get(URL + "GetScore/" + this.activQushinnare).then((res) => {
       // let arr = [];
       res.data.forEach((el) => {
-        for (const key in this.ObjIds) {
-          if (!Array.isArray(el.QuestionsAnswersIds)) {
-            el.QuestionsAnswersIds = el.QuestionsAnswersIds.split(",");
-          }
-          el.QuestionsAnswersIds = el.QuestionsAnswersIds.map((e) => {
-            return +e;
-          });
-          if (this.arraysEqual(el.QuestionsAnswersIds, this.ObjIds[key])) {
-            // arr.push(key);
-            this.UpdateModel(key.split("-")[1], el.QuestionnaireScore);
-          }
+        if (!Array.isArray(el.QuestionsAnswersIds)) {
+          el.QuestionsAnswersIds = el.QuestionsAnswersIds.split(",");
         }
+        el.QuestionsAnswersIds = el.QuestionsAnswersIds.map((e) => {
+          return +e;
+        });
+        this.arrsTheOP.forEach((e) => {
+          if (this.arraysEqual(el.QuestionsAnswersIds, e[e.length - 1])) {
+            this.UpdateModel(e[e.length - 2], el.QuestionnaireScore);
+          }
+        });
       });
       // console.log("arr", arr);
     });
   },
 
   methods: {
-    BuildArrIds() {
-      this.arrsTheOP.forEach((e, i) => {
-        e.forEach((op) => {
-          if (op) {
-            if (!this.ObjIds[`IDS-${i}`]) this.ObjIds[`IDS-${i}`] = [];
-            if (!this.ObjIds[`IDS-${i}`].includes(op.Id)) {
-              this.ObjIds[`IDS-${i}`].push(op.Id);
-            }
-          }
-        });
+    addIdsArrayToEach(arrs) {
+      arrs.forEach((innerArr) => {
+        const idsArray = innerArr
+          .filter(
+            (obj) => obj !== null && obj !== undefined && obj.Id !== undefined
+          )
+          .map((obj) => obj.Id);
+
+        innerArr.push(idsArray);
       });
+
+      return arrs;
     },
-    BuildIndexes() {},
     compData() {
       this.arrsTheOP = this.generateOptionsPaths(this.Questos);
-      // .map(
-      //   (innerArray, index) => {
-      //     return { val: innerArray, id: index };
-      //   }
-      // );
-      console.log(this.arrsTheOP);
+      this.arrsTheOP.forEach((element, i) => {
+        element.push(i);
+      });
+      // this.arrsTheOP.forEach((element) => {
+      //   if (typeof element[element.length - 1] !== "object") {
+      this.arrsTheOPG = this.arrsTheOP;
+      this.arrsTheOP = this.addIdsArrayToEach(this.arrsTheOP);
+      this.arrsTheOPG = this.addIdsArrayToEach(this.arrsTheOPG);
+      this.arrsTheOPG.forEach((element, i) => {
+        element.splice(element.length - 1, 1);
+        // this.arrsTheOPG[i].splice(element.length - 1, 1);
+      }); //   }
+      // });
+      // console.log(this.arrsTheOP);
+      // console.log(this.arrsTheOPG);
     },
     generateOptionsPaths(questions) {
       let allPaths = [];
@@ -269,32 +324,36 @@ export default {
 
         let currentQuestion = questions[questionIndex];
         if (!currentQuestion.op || currentQuestion.op.length === 0) {
-          // אם אין אופציות, מוסיפים null וממשיכים לשאלה הבאה
           buildPath([...path, null], questionIndex + 1);
         } else {
           currentQuestion.op.forEach((option) => {
+            let newPath = [...path, option];
             if (option.NextQuestionId === null) {
-              // אם NextQuestionId הוא null, זהו סוף המסלול
-              allPaths.push([...path, option]);
+              allPaths.push(newPath);
             } else {
-              // מוצא את האינדקס של השאלה הבאה על פי NextQuestionId
               let nextIndex = questions.findIndex(
                 (q) => q.Id === option.NextQuestionId
               );
-              let newPath = [...path, option];
 
               // מוסיף null לכל השאלות שבין השאלה הנוכחית לשאלה הבאה
               for (let i = questionIndex + 1; i < nextIndex; i++) {
-                newPath.push(null);
+                newPath = [...newPath, null];
               }
 
               buildPath(newPath, nextIndex);
             }
           });
+
+          // במקרה של דילוג על השאלה הנוכחית
+          if (
+            currentQuestion.op.some((option) => option.NextQuestionId !== null)
+          ) {
+            buildPath([...path, null], questionIndex + 1);
+          }
         }
       };
 
-      buildPath([], 0); // מתחילים מהשאלה הראשונה
+      buildPath([], 0);
       return allPaths;
     },
     arraysEqual(arr1, arr2) {
@@ -333,6 +392,7 @@ export default {
       this.ModelInputL[`Model-${i}`] = text;
     },
     async DeleteScore(arrIds, Score, i) {
+      console.log({ arrIds, Score, i });
       this.LoadingButton = true;
       let { data } = await this.$ax.post(URL + "deleteScore", {
         arrIds,
@@ -343,20 +403,52 @@ export default {
       this.LoadingButton = false;
       if (data) {
         this.$message.success("נמחק בהצלחה");
-        ModelInputL[`Model-${i}`] = "";
+        this.ModelInputL[`Model-${i}`] = "";
       } else {
         this.$message.error("משהו השתבש");
       }
     },
-    EventChange(val, i) {
-      // this.arrsTheOP.forEach((e) => {
-      //   // console.log(Boolean(!e[i].Desc === val));
-      //   if (e[i] && e[i].Desc === val) {
-      //     // e.push();
-      //   }
-      //   console.log(e);
-      // });
-      // // console.log(this.arrsTheOP);
+    EventChange(val) {
+      this.ShowLomatz = false;
+      this.arrsTheOP = this.arrsTheOPG;
+      // console.log(this.ModelSelect);
+      if (val !== "ניתן ציון" || val !== "לא ניתן ציון" || val !== "הכל") {
+        val = this.ValRadio;
+      }
+      this.arrsTheOP = this.arrsTheOP.filter((e, i, arr) => {
+        if (val === "ניתן ציון") {
+          let i = e[e.length - 2];
+          return Boolean(this.ModelInputL[`Model-${i}`]);
+        } else if (val === "לא ניתן ציון") {
+          return !Boolean(this.ModelInputL[`Model-${i}`]);
+        } else {
+          return true;
+        }
+      });
+
+      for (const [key, value] of Object.entries(this.ModelSelect)) {
+        if (value) {
+          let i = key.split("-")[1];
+          // console.log({ key, value, i });
+          this.arrsTheOP = this.arrsTheOP.filter((e) => {
+            if (value === "ריק") {
+              return e[i] === null;
+            }
+            if (i !== e.length - 1 && i !== e.length - 2) {
+              // console.log(e);
+              return e[i] && e[i].Desc === value;
+            }
+          });
+        }
+      }
+      if (this.arrsTheOP.length === 0) {
+        let arr = [];
+        for (const key in this.ModelSelect) {
+          arr.push(this.ModelSelect[key]);
+        }
+        this.ShowLomatz = true;
+        this.ArrLoMatzanu = arr;
+      }
     },
   },
 };
@@ -367,15 +459,32 @@ export default {
   flex-direction: row;
   position: relative;
   left: 2%;
-  top: 140px;
+  top: 160px;
+  width: 99%;
+  background: rgba(0, 0, 0, 0.556);
+  padding: 15px;
+  border-radius: 20px;
+  padding-right: 0px;
 }
 .Selects {
   margin-right: 50px;
 }
+/* .Boxo {
+  width: auto;
+  border-radius: 20px;
+  background: rgb(204, 38, 246);
+  background: linear-gradient(to right, rgb(204, 38, 246), #c344f1, #b129ff);
+  margin-top: 10px;
+  text-align: right;
+  font-size: 13px;
+  transition: all 0.3s;
+  height: 50px;
+  padding: 5px;
+  margin-right: 20px;
+  color: rgb(0, 0, 0);
+} */
 .Boxo {
   width: auto;
-  /* border-radius: 20px; */
-  /* margin: 10px; */
   margin-top: 10px;
   text-align: right;
   font-size: 13px;
@@ -525,6 +634,47 @@ export default {
 }
 .Icnoc::before {
   font-size: 100px;
+}
+.Radioz {
+  position: relative;
+  left: 43%;
+  top: 110px;
+}
+.LoNimtzeou {
+  position: relative;
+  left: 17%;
+  top: 300px;
+  font-size: 23px;
+}
+.LoNimtzeou .title {
+  /* text-align: center; */
+  position: relative;
+  left: 26%;
+  font-size: 30px;
+  width: 240px;
+  border-bottom: 4px solid black;
+  text-align: center;
+}
+.LoNimtzeou .ValRadio {
+  /* text-align: center; */
+  position: relative;
+  left: 26%;
+  border-bottom: 3px solid black;
+  width: 200px;
+  text-align: center;
+  top: 100px;
+}
+.Haze {
+  display: flex;
+  flex-direction: row;
+  background: rgb(22, 115, 186);
+  width: calc(100% - 400px);
+  padding: 15px;
+  border-radius: 20px;
+}
+.Haze-item {
+  margin-right: 20px;
+  text-align: center;
 }
 </style>
 <style></style>

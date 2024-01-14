@@ -8,13 +8,17 @@
       @focus="showAutoComplited = true"
       @blur="blurInp"
       clearable
+      @clear="$emit('clear')"
     ></el-input>
     <div class="ParentsItemsComplited" v-if="showAutoComplited">
       <div
         class="Itemcomplited"
         v-for="(W, i) in itemsAutoComplited"
         :key="i"
-        @click="ModelAutoComplited = W.nameQuesinnare"
+        @click="
+          ModelAutoComplited = W.nameQuesinnare;
+          $emit('Inp');
+        "
       >
         {{ W.nameQuesinnare }}
       </div>
@@ -33,21 +37,38 @@ export default {
       ModelAutoComplited: "",
       itemsAutoComplited: [],
       showAutoComplited: false,
+      OldQ: "",
     };
   },
   async mounted() {
     let { data } = await this.$ax.get(URL + "GetallQuestions");
-    // console.log(data);
     this.ObjDataQuestions = data;
     let arr = [];
     for (const key in data) {
       arr.push({ nameQuesinnare: key, qustions: data[key] });
     }
-    // console.log(arr);
     this.responseData = arr;
     this.itemsAutoComplited = arr;
     await this.$nextTick();
     this.sortInput();
+  },
+  watch: {
+    wachtStore(val, old) {
+      // console.log(val);
+      if (!val) {
+        this.ModelAutoComplited = "";
+      } else {
+        this.ModelAutoComplited = this.OldQ;
+      }
+    },
+    ModelAutoComplited(val, old) {
+      this.OldQ = old;
+    },
+  },
+  computed: {
+    wachtStore() {
+      return this.$store.state.TogelAnimate;
+    },
   },
 
   methods: {

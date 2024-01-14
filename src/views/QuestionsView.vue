@@ -1,7 +1,10 @@
 <template>
   <div>
     <OpTable
-      @Changosy="FilterChange = $event"
+      @Changosy="
+        FilterChange = $event;
+        Sortable();
+      "
       @YeshLanu="YeshLanu"
       @LoadingTABLE="LoadingTable"
       @Sortable="Sortable"
@@ -17,6 +20,7 @@
         shows.showDivos = true;
         Component = $event;
       "
+      @SortTable="Sortable"
       @ParamsEditAddNewComponent="ParamsToRowEditAddComp"
       @IdOfDelq="ParamsDelQ = $event"
       @ParamsEditOption="ParamsEditO = $event"
@@ -168,6 +172,7 @@ export default {
       Component.loadingTABLE = val;
     },
     Sortable() {
+      // alert();
       let Component = this.$refs.CompoTable;
       setTimeout(() => {
         Component.SortTable();
@@ -183,7 +188,6 @@ export default {
   left: 29%;
   z-index: -1;
 }
-
 .AddNewAnswer {
   height: 300px;
   width: 400px;

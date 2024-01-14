@@ -8,7 +8,8 @@
       @visible-change="sort($event)"
       @change="$emit('change', { val, i })"
     >
-      <el-option value="ללא"></el-option>
+      <el-option value="ריק"></el-option>
+      <el-option label="ללא" value=""></el-option>
       <el-option
         ref="Op"
         v-for="(Op, i) in Option"

@@ -392,6 +392,9 @@ export default {
       this.SortTable();
 
       this.loadingTABLE = false;
+      setTimeout(() => {
+        this.SortTable();
+      }, 300);
     },
     Edit(row) {
       // this.idOfE = row.Id;
