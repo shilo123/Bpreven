@@ -1,15 +1,31 @@
 <template>
   <div>
     <div>
+      <OptionTable
+        class="OpTable"
+        :class="{ OpTableBig: watchStor }"
+        @NewData="NewData = $event"
+        @AddMessage="
+          showDivos = true;
+          Component = 'AddMessage';
+        "
+        @LoadingTABLE="LoadingTable"
+        @Noserch="serch = $event"
+      />
+    </div>
+    <div>
       <Table
+        ref="ComponnentsTable"
         :Dat="data"
         class="Tablos"
+        :class="{ TablosBig: watchStor }"
         @NewComponent="
           showDivos = true;
           Component = $event.Comp;
           params = $event.params;
         "
         v-if="Loadingoz"
+        v-show="!LoMaTznu"
       />
     </div>
     <div class="divos" v-if="showDivos">
@@ -19,10 +35,10 @@
           :class="{
             Upo: Component === 'UpdateMes',
             DeleteMes: Component === 'DeleteMes',
+            AddMessage: Component === 'AddMessage',
           }"
         >
           <!-- :class="{
-            newQ: Component === 'NewQustion',
             AddNewAnswer: Component === 'AddAnswer',
             EditOption: Component === 'EditOption',
             warning: Component === 'warning',
@@ -31,16 +47,21 @@
         </div>
       </transition>
     </div>
+    <div class="LoMatzanu" v-show="LoMaTznu">
+      "{{ serch }}" לא נמצאו תוצאות ל
+    </div>
   </div>
 </template>
 <script>
 import { URL } from "@/URL/url";
+import OptionTable from "@/components/Messages/OptionForTableComp.vue";
 import Table from "@/components/Messages/Table/TableComp.vue";
 import DeleteMes from "@/components/Messages/Divos/DeleteMesComp.vue";
 import UpdateMes from "@/components/Messages/Divos/UpdateMesComp.vue";
+import AddMessage from "@/components/Messages/Divos/AddMessageComp.vue";
 export default {
   name: "BprevenMessageView",
-  components: { Table, UpdateMes, DeleteMes },
+  components: { Table, UpdateMes, DeleteMes, AddMessage, OptionTable },
   data() {
     return {
       Loadingoz: false,
@@ -48,6 +69,9 @@ export default {
       Component: "",
       showDivos: false,
       params: {},
+      NewData: [],
+      LoMaTznu: false,
+      serch: "",
     };
   },
   watch: {
@@ -57,10 +81,25 @@ export default {
       }
       this.$store.commit("SgorDivos", false);
     },
+    NewData(val) {
+      let table = this.$refs.ComponnentsTable;
+      table.data = val;
+      setTimeout(() => {
+        table.SortTable();
+      }, 100);
+      this.LoMaTznu = Boolean(!val.length);
+      console.log(this.LoMaTznu);
+    },
+    watchStor(val) {
+      val;
+    },
   },
   computed: {
     wachtStoreShowDivos() {
       return this.$store.state.SgorDivos;
+    },
+    watchStor() {
+      return this.$store.state.TogelAnimate;
     },
   },
   async mounted() {
@@ -70,16 +109,36 @@ export default {
     this.Loadingoz = true;
   },
 
-  methods: {},
+  methods: {
+    LoadingTable(val) {
+      let table = this.$refs.ComponnentsTable;
+      table.LoadingTABLEZZ(val);
+    },
+  },
 };
 </script>
 <style scoped>
 .Tablos {
   width: 78%;
   position: absolute;
-  top: 100px;
+  top: 140px;
   margin-left: 80px;
   transition: all 0.3s;
+}
+.OpTable {
+  position: absolute;
+  top: 45px;
+  width: 78%;
+  margin-left: 80px;
+  transition: all 0.3s;
+}
+.OpTableBig {
+  /* background: #000; */
+  width: 88%;
+}
+.TablosBig {
+  /* background: #000; */
+  width: 88%;
 }
 .Upo {
   background: white;
@@ -90,5 +149,15 @@ export default {
   height: 260px;
   width: 420px;
   left: 31%;
+}
+.AddMessage {
+  background: linear-gradient(to right, #55ddff, #544bff, #59fcd6);
+  border-radius: 10px;
+}
+.LoMatzanu {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  font-size: 30px;
 }
 </style>

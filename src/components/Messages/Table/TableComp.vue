@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table :data="data" ref="Table" border>
+    <el-table :data="data" v-loading="loadingTABLE" ref="Table" border>
       <el-table-column label="אפשרויות">
         <template slot-scope="scope">
           <el-button
@@ -31,6 +31,7 @@ export default {
   data() {
     return {
       data: this.Dat,
+      loadingTABLE: false,
     };
   },
 
@@ -63,6 +64,10 @@ export default {
     },
     ShowDeleteMes(row) {
       this.$emit("NewComponent", { Comp: "DeleteMes", params: row });
+    },
+    LoadingTABLEZZ(val) {
+      //   alert();
+      this.loadingTABLE = val;
     },
   },
 };

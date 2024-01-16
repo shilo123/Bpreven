@@ -90,7 +90,6 @@ export default {
       }
     },
     serch(val) {
-      //   this.loadingTABLE = true;
       this.$emit("LoadingTABLE", true);
       if (this.TimeoutSerch) {
         clearTimeout(this.TimeoutSerch);

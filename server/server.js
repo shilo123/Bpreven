@@ -45,6 +45,10 @@ function SQL(query) {
     });
   });
 }
+function isNumeric(value) {
+  return !isNaN(value) && !isNaN(parseFloat(value));
+}
+
 async function SQLOS(q) {
   let data = await SQL(q);
 
@@ -52,7 +56,7 @@ async function SQLOS(q) {
   // console.log(res);
 }
 
-// const q = `SELECT * FROM Messages
+// const q = `SELECT * FROM Features
 // `;
 // SQLOS(q);
 app.get("/", async (req, res) => {
@@ -665,6 +669,69 @@ app.delete("/DeleteMes/:id", async (req, res) => {
   } catch (error) {
     res.json(false);
   }
+});
+app.post("/AddMes", async (req, res) => {
+  console.log(req.body);
+  let status = req.body.status ? 1 : 0;
+  let DescMes = req.body.DescMes;
+  let SymbolMes = req.body.SymbolMes;
+  try {
+    const query = `INSERT INTO Messages ([Desc],Symbol,StatusId) VALUES ('${DescMes}','${SymbolMes}',${status})`;
+    await SQL(query);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/serchMes", async (req, res) => {
+  // console.log(req.body);
+  let val = req.body.val;
+  const Colomn = req.body.ClumnSerch;
+
+  if (Colomn === "StatusId" || Colomn === "all") {
+    if (val === "פעיל") {
+      val = 1;
+    }
+    if (val === "לא פעיל") {
+      val = 0;
+    }
+  }
+  let Q = "";
+  if (Colomn === "all") {
+    Q = `SELECT * FROM Messages WHERE Symbol LIKE '${val}%' OR  [Desc] LIKE '${val}%' OR  StatusId LIKE '${val}%'`;
+  } else {
+    Q = `SELECT * FROM Messages WHERE ${Colomn} LIKE '${val}%'`;
+  }
+  let data = await SQL(Q);
+  // console.log(data);
+  res.json(data);
+});
+app.get("/GetFeatures", async (req, res) => {
+  try {
+    const q = `SELECT * FROM Features`;
+    let data = await SQL(q);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/serchFeach", async (req, res) => {
+  console.log(req.body);
+  const val = req.body.val;
+  const Clumn = req.body.ClumnSerch;
+  let Q;
+  if (Clumn === "all") {
+    if (!isNumeric(val)) {
+      Q = `SELECT * FROM Features WHERE Symbol LIKE '${val}%'  OR [Desc] LIKE '${val}%'`;
+    } else {
+      Q = `SELECT * FROM Features WHERE  Number = ${val}`;
+    }
+  } else {
+    Q = `SELECT * FROM Features WHERE ${Clumn} LIKE '${val}%'`;
+  }
+  let data = await SQL(Q);
+  // console.log(data);
+  res.json(data);
 });
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);

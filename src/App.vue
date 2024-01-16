@@ -21,48 +21,14 @@
       :class="{ closeMen: togelAnimate, openMen: !togelAnimate }"
     >
       <div class="Allmenu">
-        <div @click="$router.push('/')">
-          <el-row :class="{ row: true, active: $route.path === '/' }">
-            <el-col :span="24"><i class="el-icon-s-home"></i> דף הבית </el-col>
-          </el-row>
-        </div>
-        <div @click="$router.push('/queshtinnre')">
-          <el-row
-            :class="{ row: true, active: $route.path === '/queshtinnre' }"
-          >
-            <el-col :span="24"><i class="el-icon-question"></i> שאלונים</el-col>
-          </el-row>
-        </div>
-        <div @click="$router.push('/queshtins')">
-          <el-row :class="{ row: true, active: $route.path === '/queshtins' }">
-            <el-col :span="24"
-              ><i class="fa-regular fa-block-question"></i> שאלות</el-col
+        <div v-for="(o, i) in Oproute" :key="i" @click="$router.push(o.Route)">
+          <el-row>
+            <el-col
+              :span="24"
+              :class="{ row: true, active: $route.path === o.Route }"
             >
-          </el-row>
-        </div>
-        <div @click="$router.push('/Score')">
-          <el-row :class="{ row: true, active: $route.path === '/Score' }">
-            <el-col :span="24"
-              ><i class="fa-sharp fa-regular fa-hundred-points"></i>
-              ציונים</el-col
-            >
-          </el-row>
-        </div>
-        <div @click="$router.push('/Messages')">
-          <el-row :class="{ row: true, active: $route.path === '/Messages' }">
-            <el-col :span="24"
-              ><i class="fa-duotone fa-messages"></i> הודעות</el-col
-            >
-          </el-row>
-        </div>
-        <div @click="$router.push('/Users')">
-          <el-row :class="{ row: true, active: $route.path === '/Users' }">
-            <el-col :span="24"><i class="fa-solid fa-user"></i> משתמשים</el-col>
-          </el-row>
-        </div>
-        <div v-for="n in 16" :key="n">
-          <el-row :class="{ row: true }">
-            <el-col :span="24">{{ `item-${n}` }}</el-col>
+              {{ o.NameRoute }} <i :class="o.class"></i>
+            </el-col>
           </el-row>
         </div>
       </div>
@@ -93,6 +59,35 @@ export default {
         },
       ],
       Alldata: {},
+      Oproute: [
+        { Route: "/", NameRoute: "דף הבית", class: "el-icon-s-home" },
+        {
+          Route: "/queshtinnre",
+          NameRoute: "שאלונים",
+          class: "el-icon-question",
+        },
+        {
+          Route: "/queshtins",
+          NameRoute: "שאלות",
+          class: "fa-regular fa-block-question",
+        },
+        {
+          Route: "/Score",
+          NameRoute: "ציונים",
+          class: "fa-sharp fa-regular fa-hundred-points",
+        },
+        {
+          Route: "/Messages",
+          NameRoute: "הודעות",
+          class: "fa-duotone fa-messages",
+        },
+        {
+          Route: "/Features",
+          NameRoute: "פיצ'רים",
+          class: "fa-duotone fa-gears",
+        },
+        { Route: "/Users", NameRoute: "משתמשים", class: "fa-solid fa-user" },
+      ],
     };
   },
   computed: {
@@ -215,6 +210,7 @@ body {
 }
 .HazeSham.openMen {
   width: 200px;
+  z-index: 10;
 }
 .HazeSham.closeMen {
   width: 0;
