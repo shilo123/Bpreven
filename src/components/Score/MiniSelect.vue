@@ -55,6 +55,9 @@ export default {
         });
       }
     },
+    resizeTo() {
+      this.val = "";
+    },
   },
 };
 </script>

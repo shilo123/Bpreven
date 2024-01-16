@@ -5,6 +5,7 @@ import queshtinnre from "@/views/questionnaireView.vue";
 // import queshtins from "@/views/queshtinsView.vue";
 import queshtins from "@/views/QuestionsView.vue";
 import Score from "@/views/ScoreView.vue";
+import Messages from "@/views/MessageView.vue";
 import Users from "@/views/UsersView.vue";
 Vue.use(VueRouter);
 
@@ -28,6 +29,11 @@ const routes = [
     path: "/Score",
     name: "Score",
     component: Score,
+  },
+  {
+    path: "/Messages",
+    name: "Messages",
+    component: Messages,
   },
   {
     path: "/Users",

@@ -48,6 +48,13 @@
             >
           </el-row>
         </div>
+        <div @click="$router.push('/Messages')">
+          <el-row :class="{ row: true, active: $route.path === '/Messages' }">
+            <el-col :span="24"
+              ><i class="fa-duotone fa-messages"></i> הודעות</el-col
+            >
+          </el-row>
+        </div>
         <div @click="$router.push('/Users')">
           <el-row :class="{ row: true, active: $route.path === '/Users' }">
             <el-col :span="24"><i class="fa-solid fa-user"></i> משתמשים</el-col>
@@ -133,6 +140,9 @@ export default {
           this.togelAnimate = true;
         }, 500);
       }
+      if (path === "/Messages") {
+        document.body.style.background = "";
+      }
       if (path === "/Users") {
         document.body.style.background = "";
       }
@@ -158,6 +168,9 @@ export default {
       setTimeout(() => {
         this.togelAnimate = true;
       }, 500);
+    }
+    if (this.$route.path === "/Messages") {
+      document.body.style.background = "";
     }
     if (this.$route.path === "/Users") {
       document.body.style.background = "";

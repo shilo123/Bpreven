@@ -5,21 +5,21 @@
       <el-radio-button label="לא ניתן ציון"></el-radio-button>
       <el-radio-button label="הכל"></el-radio-button>
     </el-radio-group>
+    <el-button class="ButtonReset" @click="ResetSelects">אפס</el-button>
     <div class="parentsSelects">
-      <div v-for="(n, i) in RevereseQu" :key="i" class="Selects">
+      <div v-for="(n, i) in Questos" :key="i" class="Selects">
         <el-tooltip effect="dark" :content="n.Desc" placement="top">
           <miniSelect
+            :ref="`ComponentSelect${i}`"
             :i="i"
             :Option="n.op"
-            :placeholder="`אופציה-${RevereseQu.length - i}`"
-            :value="ModelSelect[`Model-${RevereseQu.length - (i + 1)}`]"
-            @value="
-              ModelSelect[`Model-${RevereseQu.length - (i + 1)}`] = $event
-            "
+            :placeholder="`אופציה-${i + 1}`"
+            :value="ModelSelect[`Model-${i}`]"
+            @value="ModelSelect[`Model-${i}`] = $event"
             @change="
-              ModelSelect[`Model-${RevereseQu.length - (i + 1)}`] = $event.val;
+              ModelSelect[`Model-${i}`] = $event.val;
               EventChange(
-                ModelSelect[`Model-${RevereseQu.length - (i + 1)}`],
+                ModelSelect[`Model-${i}`],
                 RevereseQu.length - ($event.i + 1)
               );
             "
@@ -33,6 +33,7 @@
         v-if="i < counteros"
         :class="{ YeshCvar: ModelInputL[`Model-${A[A.length - 2]}`] }"
       >
+        <div class="i">{{ A[A.length - 2] }}</div>
         <div class="inContainer">
           <div
             :class="{ BigScreen: wachtStore, col: !wachtStore }"
@@ -40,13 +41,28 @@
             :key="index"
           >
             <!-- {{ ObjFromIds(Op, i) }} -->
-            <div class="Boxo" :style="{ width, marginLeft }">
-              {{ Op ? Op.Desc : "" }}
+            <div
+              v-if="
+                index !== A.length - 1 &&
+                index !== A.length - 2 &&
+                Op.DescQustions
+              "
+            >
+              <el-tooltip
+                class="item"
+                effect="dark"
+                :content="Op.DescQustions"
+                placement="top-end"
+              >
+                <div class="Boxo" :style="{ width, marginLeft }">
+                  {{ Op.Desc ? Op.Desc : "" }}
+                </div>
+              </el-tooltip>
+              <i
+                class="fa-solid fa-arrow-right fa-rotate-180 fa-2xl icon"
+                style="color: #000"
+              ></i>
             </div>
-            <i
-              class="fa-solid fa-arrow-right fa-rotate-180 fa-2xl icon"
-              style="color: #000"
-            ></i>
           </div>
           <div class="inptut">
             <InitialInput
@@ -125,7 +141,7 @@
 </template>
 <script>
 import { URL } from "@/URL/url";
-import miniSelect from "@/components/ComponenetsCloly/MiniSelect.vue";
+import miniSelect from "@/components/Score/MiniSelect.vue";
 
 export default {
   props: ["activQushinnare"],
@@ -171,6 +187,7 @@ export default {
       // console.log(val);
     },
     dataQ(valu) {
+      this.ResetSelects();
       this.arrsTheOP = [];
       this.Questos = [];
       this.RevereseQu = [];
@@ -183,13 +200,8 @@ export default {
         el.op = Options;
         this.Questos.unshift(el);
       });
-      //   this.Questos.reverse();
-      // console.log(this.Questos);
       this.Questos.sort((a, b) => {
         return a.sek - b.sek;
-      });
-      this.Questos.forEach((element) => {
-        this.RevereseQu.unshift(element);
       });
       // this.RevereseQu.reverse();
 
@@ -300,8 +312,6 @@ export default {
       this.arrsTheOP.forEach((element, i) => {
         element.push(i);
       });
-      // this.arrsTheOP.forEach((element) => {
-      //   if (typeof element[element.length - 1] !== "object") {
       this.arrsTheOPG = this.arrsTheOP;
       this.arrsTheOP = this.addIdsArrayToEach(this.arrsTheOP);
       this.arrsTheOPG = this.addIdsArrayToEach(this.arrsTheOPG);
@@ -310,7 +320,7 @@ export default {
         // this.arrsTheOPG[i].splice(element.length - 1, 1);
       }); //   }
       // });
-      // console.log(this.arrsTheOP);
+      console.log(this.arrsTheOP);
       // console.log(this.arrsTheOPG);
     },
     generateOptionsPaths(questions) {
@@ -324,36 +334,76 @@ export default {
 
         let currentQuestion = questions[questionIndex];
         if (!currentQuestion.op || currentQuestion.op.length === 0) {
-          buildPath([...path, null], questionIndex + 1);
+          buildPath(
+            [
+              ...path,
+              {
+                Desc: null,
+                DescQustions: questions[questionIndex + 1]
+                  ? questions[questionIndex + 1].Desc
+                  : null,
+              },
+            ],
+            questionIndex + 1
+          );
         } else {
           currentQuestion.op.forEach((option) => {
+            option.DescQustions = currentQuestion.Desc;
             let newPath = [...path, option];
             if (option.NextQuestionId === null) {
+              newPath = [
+                ...newPath,
+                {
+                  Desc: null,
+                  DescQustions: questions[questionIndex + 1]
+                    ? questions[questionIndex + 1].Desc
+                    : null,
+                },
+              ];
               allPaths.push(newPath);
             } else {
               let nextIndex = questions.findIndex(
                 (q) => q.Id === option.NextQuestionId
               );
 
-              // מוסיף null לכל השאלות שבין השאלה הנוכחית לשאלה הבאה
               for (let i = questionIndex + 1; i < nextIndex; i++) {
-                newPath = [...newPath, null];
+                newPath = [
+                  ...newPath,
+                  {
+                    Desc: null,
+                    DescQustions: questions[questionIndex + 1]
+                      ? questions[questionIndex + 1].Desc
+                      : null,
+                  },
+                ];
               }
 
               buildPath(newPath, nextIndex);
             }
           });
 
-          // במקרה של דילוג על השאלה הנוכחית
           if (
             currentQuestion.op.some((option) => option.NextQuestionId !== null)
           ) {
-            buildPath([...path, null], questionIndex + 1);
+            buildPath(
+              [
+                ...path,
+                {
+                  Desc: null,
+                  DescQustions: questions[questionIndex + 1]
+                    ? questions[questionIndex + 1].Desc
+                    : null,
+                },
+              ],
+              questionIndex + 1
+            );
           }
         }
       };
 
       buildPath([], 0);
+
+      allPaths = allPaths.filter((e, i, arr) => e[0].Desc);
       return allPaths;
     },
     arraysEqual(arr1, arr2) {
@@ -428,11 +478,12 @@ export default {
 
       for (const [key, value] of Object.entries(this.ModelSelect)) {
         if (value) {
+          // console.log({ key, value });
           let i = key.split("-")[1];
           // console.log({ key, value, i });
           this.arrsTheOP = this.arrsTheOP.filter((e) => {
             if (value === "ריק") {
-              return e[i] === null;
+              return e[i].Desc === null;
             }
             if (i !== e.length - 1 && i !== e.length - 2) {
               // console.log(e);
@@ -450,13 +501,24 @@ export default {
         this.ArrLoMatzanu = arr;
       }
     },
+    ResetSelects() {
+      for (const key in this.ModelSelect) {
+        if (this.ModelSelect[key]) {
+          this.ModelSelect[key] = "";
+          let i = key.split("-")[1];
+          let el = this.$refs[`ComponentSelect${i}`];
+          el[0].resizeTo();
+        }
+      }
+      this.EventChange();
+    },
   },
 };
 </script>
 <style scoped>
 .parentsSelects {
   display: flex;
-  flex-direction: row;
+  flex-direction: row-reverse;
   position: relative;
   left: 2%;
   top: 160px;
@@ -519,7 +581,7 @@ export default {
   border-radius: 10px;
   /* padding-left: 100px; */
   box-shadow: 0 0 7px 3px rgb(171, 169, 148);
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 .BigScreen {
   position: relative;
@@ -675,6 +737,30 @@ export default {
 .Haze-item {
   margin-right: 20px;
   text-align: center;
+}
+.i {
+  position: absolute;
+  right: 1px;
+  top: 0;
+  background: rgb(27, 175, 255);
+  padding: 5px;
+  border-radius: 0px 0px 0 14px;
+}
+.ButtonReset {
+  background: rgb(169, 23, 236);
+  border: none;
+  color: black;
+  position: relative;
+  left: 73.5%;
+  top: 160px;
+  margin: 10px;
+  width: 110px;
+}
+.ButtonReset:hover {
+  background: rgb(142, 50, 185);
+  font-size: 23px;
+  top: 150px;
+  margin-right: 20px;
 }
 </style>
 <style></style>

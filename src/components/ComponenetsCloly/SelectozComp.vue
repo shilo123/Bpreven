@@ -47,7 +47,7 @@
         <input
           readonly
           type="text"
-          v-for="(n, i) in Option"
+          v-for="(n, i) in Ops"
           :key="i"
           :value="n"
           @click="
@@ -64,10 +64,9 @@
 <script>
 export default {
   name: "BprevenSelectozComp",
-  props: ["pleaceHolder"],
+  props: ["pleaceHolder", "Ops"],
   data() {
     return {
-      Option: ["Dany", "Yosy", "Itzick", "Dany", "Yosy", "Itzick"],
       OverIcon: false,
       clickAllTitle: false,
       OverAllSel: false,
@@ -87,7 +86,7 @@ export default {
   methods: {
     emitOs(val) {
       // console.log(val);
-      this.$emit("Baharty", val);
+      this.$emit("changez", val);
     },
   },
 };

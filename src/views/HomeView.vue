@@ -3,17 +3,19 @@
     <h1>היי</h1>
     <div class="content">שלום שלום שלום</div>
     <i class="fa-solid fa-paper-plane-top icon"></i>
-    <Select @Baharty="BodekTo($event)" :pleaceHolder="'בחר'" />
+    <!-- <Select @changez="BodekTo($event)" :pleaceHolder="'בחר'" :Ops="theOption" /> -->
   </div>
 </template>
 <script>
-import Select from "@/components/ComponenetsCloly/SelectozComp.vue";
+// import Select from "@/components/ComponenetsCloly/SelectozComp.vue";
 export default {
   name: "BprevenHomeView",
-  components: { Select },
+  // components: { Select },
 
   data() {
-    return {};
+    return {
+      theOption: ["היי", "שלום"],
+    };
   },
   watch: {},
   mounted() {},

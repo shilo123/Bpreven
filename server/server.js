@@ -10,6 +10,7 @@ const axios = require("axios");
 app.use(bodyParser.json());
 app.use(cors());
 const sql = require("mssql/msnodesqlv8");
+const { Promise } = require("mssql/msnodesqlv8");
 
 const config = {
   server: "MC58148\\SQLEXPRESS",
@@ -51,7 +52,7 @@ async function SQLOS(q) {
   // console.log(res);
 }
 
-// const q = `SELECT * FROM score
+// const q = `SELECT * FROM Messages
 // `;
 // SQLOS(q);
 app.get("/", async (req, res) => {
@@ -74,7 +75,7 @@ app.get("/GetOPtionForQuestion/:qushinnare", async (req, res) => {
     // console.log(questions);
     let arr = [];
     const Promises = questions.map(async (e) => {
-      let q = `SELECT * FROM QuestionsOptions WHERE QuestionsId = ${e.Id} ORDER BY sek`;
+      let q = `SELECT * FROM QuestionsOptions WHERE QuestionsId = ${e.Id} ORDER BY [Seq]`;
       let result = await SQL(q);
       arr.push({ [e.Desc]: result });
     });
@@ -88,14 +89,14 @@ app.get("/GetOPtionForQuestion/:qushinnare", async (req, res) => {
 });
 app.get("/GetallQuestions", async (req, res) => {
   try {
-    const q = `SELECT Id ,[Desc] FROM Questionnaire `;
+    const q = `SELECT Id ,[Desc] FROM Questionnaire`;
     let resultA = await SQL(q);
     let obj = {};
     const Promises = resultA.map(async (el) => {
       let propery = el.Desc;
       const QU = `SELECT Questions.*, DataTypes.[Desc] AS DescDateTypes FROM Questions 
       LEFT JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId
-       WHERE QuestionnaireId = ${el.Id} ORDER BY Questions.sek`;
+       WHERE QuestionnaireId = ${el.Id} ORDER BY Questions.[Seq]`;
       let val = await SQL(QU);
       // console.log(val);
       obj[propery] = val;
@@ -154,6 +155,19 @@ app.delete("/Delquen/:id", async (req, res) => {
     const id = req.params.id;
     const q = `DELETE FROM Questionnaire WHERE Id = ${id}`;
     await SQL(q);
+    const Query = `SELECT Id FROM Questions WHERE QuestionnaireId = ${id}`;
+    let IDS = await SQL(Query);
+    IDS = IDS.map((e) => {
+      return e.Id;
+    });
+    console.log(IDS);
+    const Promises = IDS.map(async (e) => {
+      let QuaQy = `DELETE FROM Questions WHERE Id = ${e}`;
+      await SQL(QuaQy);
+      let Querty = `DELETE FROM QuestionsOptions WHERE QuestionsId = ${e}`;
+      await SQL(Querty);
+    });
+    await Promise.all(Promises);
     res.json(true);
   } catch (error) {
     console.log(error);
@@ -194,7 +208,7 @@ app.get("/GetQuestions", async (req, res) => {
   // Questions.ScreenId,
   const q = `SELECT 
   Q1.Id,
-  Q1.sek,
+  Q1.[Seq],
   Q1.[Desc],
   Q1.StatusId,
   Q1.IsEnd,
@@ -204,7 +218,7 @@ app.get("/GetQuestions", async (req, res) => {
 FROM Questions AS Q1
 LEFT JOIN Questionnaire ON Questionnaire.Id = Q1.QuestionnaireId
 LEFT JOIN Questions AS Q2 ON Q1.NextQuestionId = Q2.Id
-LEFT JOIN DataTypes ON DataTypes.Id = Q1.DataTypesId ORDER BY Questionnaire.[Desc] Desc ,Q1.sek ASC;
+LEFT JOIN DataTypes ON DataTypes.Id = Q1.DataTypesId ORDER BY Questionnaire.[Desc] Desc ,Q1.[Seq] ASC;
 `;
   let result = await SQL(q);
   // console.log(result);
@@ -305,7 +319,7 @@ app.post("/AddQuestin", async (req, res) => {
     let IDdataTy = await SQL(qu);
     IDdataTy = IDdataTy[0].Id;
     // console.log(IDdataTy);
-    const que = `SELECT MAX(sek) AS LastSek FROM Questions WHERE QuestionnaireId = ${IDnameQ}`;
+    const que = `SELECT MAX([Seq]) AS LastSek FROM Questions WHERE QuestionnaireId = ${IDnameQ}`;
     let lsatSek = await SQL(que);
     lsatSek = lsatSek[0];
     if (!lsatSek) {
@@ -314,7 +328,7 @@ app.post("/AddQuestin", async (req, res) => {
       lsatSek = lsatSek.LastSek + 1;
     }
     // console.log("lsatSek", lsatSek);
-    const query = `INSERT INTO Questions (QuestionnaireId,DataTypesId,[Desc],IsEnd,StatusId,sek) VALUES 
+    const query = `INSERT INTO Questions (QuestionnaireId,DataTypesId,[Desc],IsEnd,StatusId,[Seq]) VALUES 
     (${IDnameQ},${IDdataTy},'${req.body.DescQ}',
     '${req.body.IsEnd}',${req.body.StatusId},${lsatSek}
     )`;
@@ -326,8 +340,12 @@ app.post("/AddQuestin", async (req, res) => {
 });
 app.delete("/DeleteQustions/:id", async (req, res) => {
   try {
-    const q = `DELETE FROM Questions WHERE Id = ${req.params.id}`;
+    let id = req.params.id;
+    // console.log(id);
+    const q = `DELETE FROM Questions WHERE Id = ${id}`;
     await SQL(q);
+    const Quer = `DELETE FROM QuestionsOptions WHERE QuestionsId = ${id}`;
+    await SQL(Quer);
     res.json(true);
   } catch (error) {
     res.json(false);
@@ -338,6 +356,7 @@ app.post("/FIndQustinnare", async (req, res) => {
   try {
     let query = `SELECT 
     Questions.Id,
+    Questions.[Seq],
     Questions.[Desc],
     Questions.StatusId,
     Questions.IsEnd,
@@ -421,7 +440,7 @@ app.get("/GetOption/:id", async (req, res) => {
     const q = `SELECT QuestionsOptions.[Desc], QuestionsOptions.Id, Questions.[Desc] AS Nextques
     FROM QuestionsOptions
     LEFT JOIN Questions ON QuestionsOptions.NextQuestionId = Questions.Id
-     WHERE QuestionsId = ${id} ORDER BY QuestionsOptions.sek`;
+     WHERE QuestionsId = ${id} ORDER BY QuestionsOptions.[Seq]`;
     let result = await SQL(q);
     // console.log(result);
     res.json(result);
@@ -433,7 +452,7 @@ app.get("/GetOption/:id", async (req, res) => {
 app.post("/AddAnswer", async (req, res) => {
   // console.log(req.body);
   try {
-    const query = `SELECT MAX(sek) AS maxSec FROM QuestionsOptions WHERE QuestionsId = ${req.body.id}`;
+    const query = `SELECT MAX([Seq]) AS maxSec FROM QuestionsOptions WHERE QuestionsId = ${req.body.id}`;
     let sek = await SQL(query);
     sek = sek[0].maxSec;
     // console.log(sek);
@@ -442,7 +461,7 @@ app.post("/AddAnswer", async (req, res) => {
     } else {
       sek++;
     }
-    const q = `INSERT INTO QuestionsOptions (QuestionsId,[Desc],sek) VALUES (${req.body.id},'${req.body.text}',${sek})`;
+    const q = `INSERT INTO QuestionsOptions (QuestionsId,[Desc],[Seq]) VALUES (${req.body.id},'${req.body.text}',${sek})`;
     let Request = await SQL(q);
     // console.log(Request);
     res.json(true);
@@ -540,7 +559,7 @@ app.post("/updateSek", async (req, res) => {
 
     const Promises = req.body.arr.map(async (e) => {
       let q = `UPDATE QuestionsOptions
-        SET sek = ${e.newSek}
+        SET [Seq] = ${e.newSek}
         WHERE Id = ${e.id}`;
       await SQL(q);
     });
@@ -614,6 +633,38 @@ app.get("/GetScore/:nameQueshenner", async (req, res) => {
   let data = await SQL(q);
   // console.log(data);
   res.json(data);
+});
+app.get("/GetMessages", async (req, res) => {
+  const Q = `SELECT * FROM Messages`;
+  let data = await SQL(Q);
+  res.json(data);
+});
+app.post("/UpdateMessage", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const Desc = req.body.Desc;
+    const Symbol = req.body.Symbol;
+    const StatusId = req.body.StatusId ? 1 : 0;
+    const id = req.body.ID;
+    // console.log({ Desc, Symbol, StatusId });
+    const Query = `UPDATE Messages
+    SET [Desc] = '${Desc}',Symbol = '${Symbol}',StatusId = ${StatusId}
+    WHERE Id = ${id}`;
+    await SQL(Query);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.delete("/DeleteMes/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const Q = `DELETE FROM Messages WHERE Id = ${id}`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
 });
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);

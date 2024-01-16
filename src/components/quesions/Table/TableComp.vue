@@ -116,7 +116,6 @@
                 }"
                 >כל האופציות</label
               >
-
               <el-select
                 v-model="DefoltSelsct"
                 placeholder="כל השאלות פה"
@@ -186,12 +185,12 @@
                             v-for="(q, i) in Alldata.questionsOnly"
                             :key="i"
                             :value="q.Desc"
-                            v-show="q.sek > activQ.sek"
+                            v-show="q.Seq > activQ.Seq"
                             :style="
                               bodek({
-                                q: q.sek,
-                                activQ: activQ.sek,
-                                BoolBool: q.sek > activQ.sek,
+                                q: q.Seq,
+                                activQ: activQ.Seq,
+                                BoolBool: q.Seq > activQ.Seq,
                               })
                             "
                           >
@@ -274,7 +273,6 @@
 <script>
 import { URL } from "@/URL/url";
 import draggable from "vuedraggable";
-
 export default {
   name: "BprevenTableComp",
   components: { draggable },
@@ -362,7 +360,7 @@ export default {
 
   methods: {
     bodek(val) {
-      console.log("val", val);
+      // console.log("val", val);
     },
     async GetOptions(row, expanded) {
       await this.$nextTick();
@@ -661,11 +659,9 @@ export default {
 <style scoped>
 .table {
   width: 78%;
-  /* width: 76%; */
   position: absolute;
   top: 100px;
   margin-left: 80px;
-  /* margin-left: 85px; */
   transition: all 0.3s;
 }
 .bigTable {
@@ -898,5 +894,22 @@ export default {
   width: 310px;
   font-size: 20px;
   transition: all 0.3s;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 10px;
+}
+
+/* עיצוב המגלגל (החלק שנע) */
+::-webkit-scrollbar-thumb {
+  background: rgb(158, 181, 255); /* צבע המגלגל */
+  border-radius: 5px; /* עיגול פינות המגלגל */
+  position: relative;
+  top: 40px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(87, 87, 87, 0.7); /* צבע המגלגל */
+  border-radius: 5px; /* עיגול פינות המגלגל */
 }
 </style>
