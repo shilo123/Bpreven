@@ -42,6 +42,11 @@
           }}
         </template>
       </el-table-column>
+      <el-table-column
+        label="סדר"
+        prop="Seq"
+        v-if="wachtStore"
+      ></el-table-column>
       <el-table-column label="אם אחרון">
         <template slot-scope="scope">
           {{ computedOfisEnd(scope.row.IsEnd) }}
@@ -321,9 +326,6 @@ export default {
       //   this.$refs.butnoc.$el.style.position = "absolute";
       // }
     },
-    LoadingOptionss(val) {
-      // console.log(" LoadingOptionss(val)", val);
-    },
     loadingTABLE(val) {
       if (!val && this.$store.state.theOption.length === 0) {
         this.SortTable();
@@ -331,6 +333,11 @@ export default {
     },
     WachLoadingTable(val) {
       this.loadingTABLE = val;
+    },
+    wachtStore(val) {
+      setTimeout(() => {
+        this.SortTable();
+      }, 400);
     },
   },
   async mounted() {
@@ -571,7 +578,7 @@ export default {
           let tds = table.children[2].children[0].children[1].children;
           //   console.log(tds);
           Array.from(tds).forEach((element, i) => {
-            let elco = element.children[7].children[0].children[0].children[0];
+            let elco = element.children[8].children[0].children[0].children[0];
             elco.classList = "el-icon-arrow-left";
             Array.from(element.children).forEach((el) => {
               el.style.textAlign = "right";

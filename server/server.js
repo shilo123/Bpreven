@@ -56,7 +56,7 @@ async function SQLOS(q) {
   // console.log(res);
 }
 
-// const q = `SELECT * FROM Features
+// const q = `SELECT * FROM Exercises
 // `;
 // SQLOS(q);
 app.get("/", async (req, res) => {
@@ -766,6 +766,40 @@ app.post("/UpFeacher", async (req, res) => {
     WHERE Id = ${id}`;
     await SQL(Q);
     res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.get("/GetExercises", async (req, res) => {
+  try {
+    const q = `SELECT Exercises.* ,ExercisesCategories.[Name] AS NameCategory FROM 
+    Exercises LEFT JOIN  ExercisesCategories ON ExercisesCategories.Id = Exercises.ExercisesCategoriesId
+    `;
+    let data = await SQL(q);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/serchExercises", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const col = req.body.ClumnSerch;
+    let val = req.body.val;
+    let Q;
+    if (col === "all") {
+      Q = `SELECT Exercises.* ,ExercisesCategories.[Name] AS NameCategory FROM 
+      Exercises LEFT JOIN  ExercisesCategories ON ExercisesCategories.Id = Exercises.ExercisesCategoriesId
+      WHERE ExercisesCategories.[Name] LIKE '${val}%' OR Exercises.About LIKE '${val}%' OR Exercises.StatusId LIKE '${val}'
+      OR  Exercises.Symbol LIKE '${val}%' OR Exercises.Title LIKE '${val}%'`;
+    } else {
+      Q = `SELECT Exercises.* ,ExercisesCategories.[Name] AS NameCategory FROM 
+     Exercises LEFT JOIN  ExercisesCategories ON ExercisesCategories.Id = Exercises.ExercisesCategoriesId
+     WHERE ${col} LIKE '${val}%'
+      `;
+    }
+    let data = await SQL(Q);
+    res.json(data);
   } catch (error) {
     res.json(false);
   }
