@@ -7,10 +7,10 @@
             type="primary"
             @click="ShowupdateMes(scope.row)"
             size="mini"
-            >עריכה</el-button
+            ><i class="fa-solid fa-message-pen"></i> עריכה</el-button
           >
           <el-button type="danger" size="mini" @click="ShowDeleteMes(scope.row)"
-            >מחיקה</el-button
+            ><i class="fa-solid fa-message-xmark"></i> מחיקה</el-button
           >
         </template>
       </el-table-column>

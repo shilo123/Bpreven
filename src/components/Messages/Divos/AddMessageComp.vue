@@ -8,7 +8,22 @@
           placeholder="שם ההודעה"
           class="w3-input"
           v-model="NewMes.DescMes"
+          v-show="!showTextArea"
+          @focus="
+            showTextArea = true;
+            FocusTexArea();
+          "
         />
+        <el-input
+          ref="textareaZ"
+          @blur="showTextArea = false"
+          v-show="showTextArea"
+          type="textarea"
+          :autosize="{ minRows: 2, maxRows: 4 }"
+          placeholder="שם ההודעה"
+          v-model="NewMes.DescMes"
+        >
+        </el-input>
       </div>
       <div class="inputSymbol">
         <input
@@ -48,10 +63,11 @@ export default {
   data() {
     return {
       NewMes: {
-        status: false,
+        status: true,
         DescMes: "",
         SymbolMes: "",
       },
+      showTextArea: false,
     };
   },
 
@@ -60,11 +76,18 @@ export default {
   methods: {
     async AddMessage(newMes) {
       let { data } = await this.$ax.post(URL + "AddMes", newMes);
-      if (data) {
-        this.$message.success("נוסף בהצלחה");
-        window.location.reload();
-      } else {
-        this.$message.error("משהו השתבש");
+      this.$Bool(data, "נוסף בהצלחה", "משהו השתבש", true);
+    },
+    FocusTexArea() {
+      if (this.$refs.textareaZ && this.$refs.textareaZ.$el) {
+        let inp = this.$refs.textareaZ.$el.children[0];
+        if (inp) {
+          setTimeout(() => {
+            inp.style.background = "none";
+            inp.style.color = "black";
+            inp.focus();
+          }, 0);
+        }
       }
     },
   },
@@ -89,8 +112,10 @@ label {
 }
 .InputName {
   width: 40%;
-  float: right;
+  /* float: right; */
   margin: 30px;
+  position: relative;
+  top: 100px;
 }
 .InputName .w3-input {
   background: rgba(126, 114, 114, 0.26);
@@ -113,18 +138,19 @@ label {
 }
 .Swichoz {
   position: relative;
-  top: 140px;
-  left: 50px;
+  top: -10px;
   width: 170px;
   height: 60px;
   padding: 10px;
   background: rgb(127, 116, 116);
   border-radius: 20px;
-  left: 33%;
+  left: 60%;
 }
 .Swichoz .el-switch {
   position: absolute;
-  bottom: 20px;
+  left: 14px;
+  top: 20px;
+  /* bottom: 20px; */
   /* left: 38%; */
 }
 .Swichoz label {

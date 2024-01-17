@@ -3,22 +3,32 @@
     <i class="el-icon-close" @click="$store.commit('SgorDivos', true)"></i>
     <div class="inUp">
       <div class="ItemUp">
-        <label v-if="false">שם חדש</label>
-        <input
-          type="text"
-          class="w3-input"
-          placeholder="הקלד שם חדש"
-          v-model="Desc"
-        />
-      </div>
-      <div class="ItemUp">
-        <label v-if="false">סימן חדש</label>
         <input
           type="text"
           class="w3-input"
           placeholder="הקלד סימן חדש"
           v-model="Symbol"
         />
+      </div>
+
+      <div class="ItemUp">
+        <input
+          type="text"
+          class="w3-input"
+          placeholder="הקלד שם חדש"
+          v-model="Desc"
+          v-show="!showTextarea"
+          @focus="showTextarea = true"
+        />
+        <el-input
+          @blur="showTextarea = false"
+          type="textarea"
+          :autosize="{ minRows: 2, maxRows: 4 }"
+          placeholder="הקלד שם חדש"
+          v-model="Desc"
+          v-show="showTextarea"
+        >
+        </el-input>
       </div>
       <div class="swichtoz">
         <el-switch
@@ -58,7 +68,7 @@ export default {
       Symbol: this.row.Symbol,
       StatusId: Boolean(this.row.StatusId),
       ID: this.row.Id,
-      // this.row.StatusId === 0 ? false : this.row.StatusId === 1 ? true : "",
+      showTextarea: false,
     };
   },
   computed: {},
@@ -99,16 +109,14 @@ export default {
 .ItemUp {
   display: flex;
   flex-direction: column;
-  float: right;
+  /* float: right; */
+  width: 40%;
   margin: 30px;
-}
-.ItemUp label {
-  text-align: right;
 }
 .swichtoz {
   position: relative;
-  left: 260px;
-  top: 60px;
+  left: 390px;
+  top: -60px;
 }
 .Buttons {
   position: absolute;

@@ -86,6 +86,11 @@ export default {
           NameRoute: "פיצ'רים",
           class: "fa-duotone fa-gears",
         },
+        {
+          Route: "/Exercises",
+          NameRoute: "תרגילים",
+          class: "fa-solid fa-person-walking",
+        },
         { Route: "/Users", NameRoute: "משתמשים", class: "fa-solid fa-user" },
       ],
     };
@@ -295,6 +300,9 @@ input {
   text-align: right;
 }
 input::placeholder {
+  text-align: right;
+}
+textarea {
   text-align: right;
 }
 textarea::placeholder {

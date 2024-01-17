@@ -716,7 +716,7 @@ app.get("/GetFeatures", async (req, res) => {
   }
 });
 app.post("/serchFeach", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const val = req.body.val;
   const Clumn = req.body.ClumnSerch;
   let Q;
@@ -732,6 +732,43 @@ app.post("/serchFeach", async (req, res) => {
   let data = await SQL(Q);
   // console.log(data);
   res.json(data);
+});
+app.post("/Addfeacher", async (req, res) => {
+  console.log(req.body);
+  try {
+    const Q = `INSERT INTO Features (Symbol,Number,[Desc]) VALUES ('${req.body.Symbol}',${req.body.number},'${req.body.Name}')`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.delete("/DeleteFeacher/:id", async (req, res) => {
+  let id = req.params.id;
+  // console.log(id);
+  try {
+    const Q = `DELETE FROM Features WHERE Id = ${id}`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    res.json(true);
+  }
+});
+app.post("/UpFeacher", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const id = req.body.id;
+    const Name = req.body.row.Name;
+    const Symbol = req.body.row.Symbol;
+    const number = req.body.row.number;
+    const Q = `UPDATE Features
+    SET Symbol = '${Symbol}',Number= ${number},[Desc] = '${Name}'
+    WHERE Id = ${id}`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
 });
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);

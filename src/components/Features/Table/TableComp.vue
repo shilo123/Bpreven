@@ -1,10 +1,24 @@
 <template>
   <div>
-    <el-table :data="data" border ref="Table">
+    <el-table :data="data" border ref="Table" v-loading="loadingTABLE">
       <el-table-column label="אפשרויות">
-        <template>
-          <el-button type="primary" size="mini">עריכה</el-button>
-          <el-button type="danger" size="mini">מחיקה</el-button>
+        <template slot-scope="scope">
+          <el-button
+            type="primary"
+            size="mini"
+            @click="
+              $emit('NewComponnent', { C: 'UpdateFeacher', params: scope.row })
+            "
+            ><i class="fa-solid fa-pen-to-square"></i> עריכה</el-button
+          >
+          <el-button
+            type="danger"
+            size="mini"
+            @click="
+              $emit('NewComponnent', { C: 'DeleteFeach', params: scope.row })
+            "
+            ><i class="fa-solid fa-trash-xmark"></i> מחיקה</el-button
+          >
         </template>
       </el-table-column>
       <el-table-column label="סימן" prop="Symbol"></el-table-column>
@@ -21,6 +35,7 @@ export default {
   data() {
     return {
       data: this.dat,
+      loadingTABLE: false,
     };
   },
 
@@ -45,6 +60,9 @@ export default {
           el.style.textAlign = "center";
         });
       });
+    },
+    loadingTABLEZ(val) {
+      this.loadingTABLE = val;
     },
   },
 };

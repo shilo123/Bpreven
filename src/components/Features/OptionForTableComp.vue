@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-button type="success" class="Add" @click="$emit('AddMessage')"
+    <el-button type="success" class="Add" @click="$emit('AddFeacher')"
       ><i class="fa-regular fa-plus-large"></i> הוסף פיצ'ר</el-button
     >
     <div class="serch">
@@ -82,11 +82,10 @@ export default {
         ClumnSerch = "all";
       }
       this.$ax.post(URL + "serchFeach", { val, ClumnSerch }).then((res) => {
-        console.log(res.data);
-        // this.$emit("NewData", res.data);
-        // let ifData = Boolean(res.data.length);
-        // !ifData ? this.$emit("Noserch", val) : "";
-        // this.$emit("LoadingTABLE", false);
+        // console.log(res.data);
+        this.$emit("NewData", res.data);
+        !Boolean(res.data.length) ? this.$emit("Noserch", val) : "";
+        this.$emit("LoadingTABLE", false);
       });
     },
   },

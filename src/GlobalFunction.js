@@ -39,26 +39,14 @@ export function findLargestArray(arrays) {
 
   return largest_array;
 }
-export function SortTable() {
-  try {
-    let table = this.$refs.Table.$el;
-    if (table.children[1].children[0].children[1].children[0].children) {
-      let TableHeader =
-        table.children[1].children[0].children[1].children[0].children;
-      Array.from(TableHeader).forEach((element) => {
-        element.style.textAlign = "center";
-      });
-      let tds = table.children[2].children[0].children[1].children;
-      //   console.log(tds);
-      Array.from(tds).forEach((element, i) => {
-        let elco = element.children[7].children[0].children[0].children[0];
-        elco.classList = "el-icon-arrow-left";
-        Array.from(element.children).forEach((el) => {
-          el.style.textAlign = "right";
-        });
-      });
+export function Bool(Boolian, succesMes, DefeatMes, ifReload) {
+  console.log({ Boolian, succesMes, DefeatMes, ifReload });
+  if (Boolian) {
+    this.$message.success(succesMes);
+    if (ifReload) {
+      window.location.reload();
     }
-  } catch (error) {
-    console.log(error);
+  } else {
+    this.$message.error(DefeatMes);
   }
 }

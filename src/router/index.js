@@ -7,6 +7,7 @@ import queshtins from "@/views/QuestionsView.vue";
 import Score from "@/views/ScoreView.vue";
 import Messages from "@/views/MessageView.vue";
 import Features from "@/views/FeaturesView.vue";
+import Exercises from "@/views/ExercisesView.vue";
 import Users from "@/views/UsersView.vue";
 Vue.use(VueRouter);
 
@@ -45,6 +46,11 @@ const routes = [
     path: "/Features",
     name: "Features",
     component: Features,
+  },
+  {
+    path: "/Exercises",
+    name: "Exercises",
+    component: Exercises,
   },
 ];
 
