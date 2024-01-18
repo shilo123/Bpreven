@@ -142,7 +142,6 @@
 <script>
 import { URL } from "@/URL/url";
 import miniSelect from "@/components/Score/MiniSelect.vue";
-
 export default {
   props: ["activQushinnare"],
   name: "BprevenCardsOfScoreComp",

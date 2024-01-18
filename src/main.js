@@ -4,7 +4,7 @@ import router from "./router";
 import ElementUI from "element-ui";
 import axios from "axios";
 import store from "@/store/index";
-import Input from "@/components/ComponenetsCloly/InitialInput.vue";
+import Input from "@/components/Score/InitialInput.vue";
 import * as GlobalFunction from "@/GlobalFunction";
 import "element-ui/lib/theme-chalk/index.css";
 import "./w3Style.css";
@@ -27,7 +27,6 @@ import "../FileTheFontAwemson/css/sharp-solid.min.css"; // סגנון נוסף �
 for (const [key, value] of Object.entries(GlobalFunction)) {
   Vue.prototype["$" + key] = value;
 }
-
 Vue.component("InitialInput", Input);
 Vue.use(ElementUI);
 // Vue.use(Quasar);

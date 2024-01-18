@@ -143,6 +143,9 @@ export default {
       if (path === "/Messages") {
         document.body.style.background = "";
       }
+      if (path === "/Exercises") {
+        document.body.style.background = "";
+      }
       if (path === "/Users") {
         document.body.style.background = "";
       }
@@ -170,6 +173,9 @@ export default {
       }, 500);
     }
     if (this.$route.path === "/Messages") {
+      document.body.style.background = "";
+    }
+    if (this.$route.path === "/Exercises") {
       document.body.style.background = "";
     }
     if (this.$route.path === "/Users") {

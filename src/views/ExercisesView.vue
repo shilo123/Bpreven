@@ -9,6 +9,10 @@
           serch = $event;
         "
         @LoadingTABLE="LoadingTable"
+        @newComponent="
+          Component = $event;
+          showDivos = true;
+        "
       />
     </div>
     <div>
@@ -20,23 +24,44 @@
         v-if="ComplitedData"
       />
     </div>
+    <div class="divos" v-if="showDivos">
+      <transition appear name="expand">
+        <div
+          class="indivos"
+          :class="{
+            AddEx: Component === 'AddEx',
+            EditEx: Component === 'EditEx',
+            DeleteEx: Component === 'DeleteEx',
+          }"
+        >
+          <component :is="Component" @Close="showDivos = false"></component>
+        </div>
+      </transition>
+    </div>
+
     <h1 v-show="nodata" class="LoMatz">"{{ serch }}" לא נמצאו תוצאות ל</h1>
   </div>
 </template>
 
 <script>
+"newComponent", "AddEx";
 import { URL } from "@/URL/url";
 import Tablos from "@/components/Exercises/Table/TableComp.vue";
 import OpTable from "@/components/Exercises/OptionForTableComp.vue";
+import AddEx from "@/components/Exercises/Divos/AddExercises.vue";
+import EditEx from "@/components/Exercises/Divos/EditExercises.vue";
+import DeleteEx from "@/components/Exercises/Divos/DeleteExercises.vue";
 export default {
   name: "BprevenExercisesView",
-  components: { Tablos, OpTable },
+  components: { Tablos, OpTable, AddEx },
   data() {
     return {
       data: [],
       ComplitedData: false,
       nodata: false,
       serch: "",
+      Component: "",
+      showDivos: false,
     };
   },
   watch: {
@@ -86,5 +111,13 @@ export default {
   position: absolute;
   left: 30%;
   top: 40%;
+}
+.AddEx {
+  background: white;
+  width: 1100px;
+  height: 570px;
+  left: 200px;
+  top: 80px;
+  border-radius: 20px;
 }
 </style>

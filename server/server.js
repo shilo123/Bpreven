@@ -804,6 +804,15 @@ app.post("/serchExercises", async (req, res) => {
     res.json(false);
   }
 });
+app.get("/GetCategiz", async (req, res) => {
+  try {
+    const Q = `SELECT * FROM ExercisesCategories`;
+    let data = await SQL(Q);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);
 });
