@@ -11,7 +11,13 @@ app.use(bodyParser.json());
 app.use(cors());
 const sql = require("mssql/msnodesqlv8");
 const { Promise } = require("mssql/msnodesqlv8");
-
+const path = require("path");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+app.use("/Upload", express.static("Upload"));
+const URL = `http://localhost:${port}`;
+// console.log(URL);
 const config = {
   server: "MC58148\\SQLEXPRESS",
   database: "Bpreven",
@@ -48,21 +54,109 @@ function SQL(query) {
 function isNumeric(value) {
   return !isNaN(value) && !isNaN(parseFloat(value));
 }
-
 async function SQLOS(q) {
   let data = await SQL(q);
 
   console.log(data);
   // console.log(res);
 }
+function deleteFileInFolder(folderName, fileName) {
+  const folderPath = path.join(__dirname, "Upload", folderName);
 
-// const q = `SELECT * FROM Exercises
-// `;
-// SQLOS(q);
-app.get("/", async (req, res) => {
-  const q = `SELECT * 
-FROM [Questionnaire]
+  // בדיקה אם התיקייה קיימת
+  if (!fs.existsSync(folderPath)) {
+    console.log("Folder does not exist");
+    return;
+  }
+
+  const filePath = path.join(folderPath, fileName);
+
+  // בדיקה אם הקובץ קיים
+  if (fs.existsSync(filePath)) {
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error("Error deleting the file:", err);
+      } else {
+        console.log(`File ${fileName} was deleted successfully`);
+      }
+    });
+  } else {
+    console.log("File does not exist");
+  }
+}
+function random(min, max) {
+  if (min > max) {
+    throw new Error("אחי אך המינימלי גדול מהמקמילי אחיי");
+  }
+
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+const q = `SELECT * FROM Questionnaire
 `;
+SQLOS(q);
+app.post("/postFilee/:Idcategory", upload.single("file"), async (req, res) => {
+  let Id = req.params.Idcategory;
+  let File = req.file;
+  const pathFloader = path.join(__dirname, "Upload", Id);
+  if (!fs.existsSync(pathFloader)) {
+    fs.mkdirSync(pathFloader, { recursive: true });
+  }
+
+  let nameFile = File.originalname;
+  if (File.originalname.split(" ")[0]) {
+    nameFile =
+      File.originalname.split(" ")[0] +
+      JSON.stringify(random(0, 1000)) +
+      ".mp4";
+  }
+  const filePath = path.join(pathFloader, nameFile);
+  fs.writeFile(filePath, req.file.buffer, (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Error saving the file.");
+    }
+    res.send(`${URL}/Upload/${Id}/${nameFile}`);
+  });
+});
+app.post(
+  "/postFileUpdate/:name/:idCategory",
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      const nameFilea = req.params.name;
+      const Id = req.params.idCategory;
+      deleteFileInFolder(Id, nameFilea);
+      let nameFile = "";
+      if (req.file.originalname.split(" ")[0]) {
+        nameFile =
+          req.file.originalname.split(" ")[0] +
+          JSON.stringify(random(0, 1000)) +
+          ".mp4";
+      } else {
+        nameFile = req.file.originalname;
+      }
+      const pathFloader = path.join(__dirname, "Upload", Id);
+      if (!fs.existsSync(pathFloader)) {
+        fs.mkdirSync(pathFloader, { recursive: true });
+      }
+      const filePath = path.join(pathFloader, nameFile);
+      fs.writeFile(filePath, req.file.buffer, (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Error saving the file.");
+        }
+        res.send(`${URL}/Upload/${Id}/${nameFile}`);
+      });
+    } catch (error) {
+      console.log("errFile", error);
+      res.send(false);
+    }
+  }
+);
+app.get("/", async (req, res) => {
+  const q = `SELECT *
+  FROM [Questionnaire]
+  `;
   let result = await SQL(q);
   // console.log(result);
   res.json(result);
@@ -142,11 +236,26 @@ app.get("/Getamudes", async (req, res) => {
   }
 });
 app.post("/newequen", async (req, res) => {
-  // console.log(req.body.Desc);
+  console.log(req.body);
+  const Desc = req.body.Desc;
+  const Symbol = req.body.Symbol;
+  const StartQuestion = req.body.StartQuestion;
+  const StatusId = req.body.StatusId ? 1 : 0;
+  const Date = req.body.Date;
+  const defaultId = req.body.default;
+  const monthi = req.body.monthi ? 1 : 0;
+  // console.log({
+  //   Desc,
+  //   Symbol,
+  //   StartQuestion,
+  //   StatusId,
+  //   Date,
+  //   defaultId,
+  //   monthi,
+  // });
   try {
-    const q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId) VALUES ('${req.body.Desc}', '${req.body.Symbol}', '${req.body.StartQuestion}', '${req.body.StatusId}')`;
-    // let qo = `'INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId) VALUES ('${req.body.Desc}', '${req.body.Symbol}', '${req.body.StartQuestion}', '${req.body.StatusId}');
-    // `
+    const q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId,Dayly,Monthly,DefaultId)
+     VALUES ('${Desc}', '${Symbol}', '${StartQuestion}', '${StatusId}','${Date}',${monthi},${defaultId})`;
     await SQL(q);
     res.json(true);
   } catch (error) {
@@ -181,17 +290,48 @@ app.delete("/Delquen/:id", async (req, res) => {
 app.post("/EditOfquen", async (req, res) => {
   try {
     // console.log(req.body);
-    let id = req.body.Id;
-    const q = `
+    const Desc = req.body.Desc;
+    const Symbol = req.body.Symbol;
+    const StartQuestion = req.body.StartQuestion.replace(/'/g, "''");
+    const StatusId = req.body.StatusId ? 1 : 0;
+    const Monthly = req.body.Monthly ? 1 : 0;
+    const Dayly = req.body.Dayly ? req.body.Dayly : null;
+    const DefaultId = req.body.DefaultId;
+    const id = req.body.Id;
+    // console.log({
+    //   Desc,
+    //   Symbol,
+    //   StartQuestion,
+    //   StatusId,
+    //   Monthly,
+    //   Dayly,
+    //   DefaultId,
+    //   id,
+    // });
+    let q = `
     UPDATE Questionnaire
-    SET [Desc] = '${req.body.Desc}',Symbol = '${req.body.Symbol}',StartQuestion = '${req.body.StartQuestion}',StatusId = ${req.body.StatusId} 
+    SET 
+       [Desc] = '${Desc}',
+        Symbol = '${Symbol}',
+        StartQuestion = '${StartQuestion}',
+        StatusId = ${StatusId},
+        Monthly = ${Monthly},
+        DefaultId = ${DefaultId}
+  `;
+    if (Dayly) {
+      q += `,Dayly = '${Dayly}'
     WHERE Id = ${id}
-    `;
+  `;
+    } else {
+      q += `,Dayly = NULL WHERE Id = ${id}`;
+    }
+    console.log(q);
     await SQL(q);
+
     res.json(true);
   } catch (error) {
+    res.json(false);
     console.log(error);
-    res.json(true);
   }
 });
 app.post("/SerchQushinnere", async (req, res) => {
@@ -208,8 +348,6 @@ app.post("/SerchQushinnere", async (req, res) => {
   }
 });
 app.get("/GetQuestions", async (req, res) => {
-  // Questions.NextQuestionId,
-  // Questions.ScreenId,
   const q = `SELECT 
   Q1.Id,
   Q1.[Seq],
@@ -224,6 +362,7 @@ LEFT JOIN Questionnaire ON Questionnaire.Id = Q1.QuestionnaireId
 LEFT JOIN Questions AS Q2 ON Q1.NextQuestionId = Q2.Id
 LEFT JOIN DataTypes ON DataTypes.Id = Q1.DataTypesId ORDER BY Questionnaire.[Desc] Desc ,Q1.[Seq] ASC;
 `;
+  // let result = [];
   let result = await SQL(q);
   // console.log(result);
   res.json(result);
@@ -249,16 +388,18 @@ app.get("/GetData", async (req, res) => {
 });
 app.post("/Updata", async (req, res) => {
   let body = req.body;
+  let UpdateOption = false;
+  // console.log(body);
+  body.StatusId = body.StatusId ? 1 : 0;
   try {
     let nextQuestionId = null;
-
     // חיפוש מספר הזיהוי של השאלה הבאה, אם קיימת
-    if (body.NextQuestionDesc && body.NextQuestionDesc !== "ללא שאלה הבאה") {
-      const nextQuestionQuery = `SELECT Id FROM Questions WHERE [Desc] = '${body.NextQuestionDesc}'`;
-      const nextQuestionResult = await SQL(nextQuestionQuery);
-      if (nextQuestionResult[0]) {
-        nextQuestionId = nextQuestionResult[0].Id;
-      }
+    if (
+      body.NextQuestionDesc &&
+      body.NextQuestionDesc !== "שאלה אחרונה" &&
+      body.NextQuestionDesc !== "לפי האופציה"
+    ) {
+      nextQuestionId = body.NextQuestionDesc;
     }
 
     let questionnaireId = null;
@@ -299,6 +440,7 @@ app.post("/Updata", async (req, res) => {
     }
     if (nextQuestionId !== null) {
       updateQuery += `, NextQuestionId = ${nextQuestionId}`;
+      UpdateOption = true;
     } else {
       updateQuery += `, NextQuestionId = NULL`;
     }
@@ -306,6 +448,15 @@ app.post("/Updata", async (req, res) => {
     updateQuery += ` WHERE Id = ${body.Id}`;
 
     await SQL(updateQuery);
+    if (body.NextQuestionDesc !== "לפי האופציה") {
+      if (UpdateOption) {
+        let queryTue = `UPDATE QuestionsOptions SET NextQuestionId = ${nextQuestionId} WHERE QuestionsId = ${body.Id}`;
+        await SQL(queryTue);
+      } else {
+        let queryTue1 = ` UPDATE QuestionsOptions SET NextQuestionId = NULL WHERE QuestionsId = ${body.Id}`;
+        await SQL(queryTue1);
+      }
+    }
     res.json(true);
   } catch (error) {
     console.log(error);
@@ -339,6 +490,54 @@ app.post("/AddQuestin", async (req, res) => {
     await SQL(query);
     res.json(true);
   } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/UpNextQuestion", async (req, res) => {
+  try {
+    const val = req.body.val;
+    const idQ = req.body.id;
+    // console.log(val);
+    // let qo = `SELECT IsEnd FROM Questions WHERE Id = ${idQ}`;
+    // let data = await SQL(qo);
+    // data = data[0].IsEnd;
+
+    if (val === "ללא שאלה הבאה") {
+      let qourtoz = `UPDATE Questions
+      SET IsEnd = 1
+      WHERE Id = ${idQ}`;
+      await SQL(qourtoz);
+    } else {
+      let qourtoz2 = `UPDATE Questions
+      SET IsEnd = 0
+      WHERE Id = ${idQ}`;
+      await SQL(qourtoz2);
+    }
+    if (val !== "לפי האופציה" && val !== "ללא שאלה הבאה") {
+      let q = `SELECT Id FROM Questions WHERE [Desc] = '${val}'`;
+      let data = await SQL(q);
+      let id = data[0].Id;
+      const query = `UPDATE  QuestionsOptions
+      SET NextQuestionId = ${id}
+      WHERE QuestionsId = ${idQ}`;
+      await SQL(query);
+      const qu = `UPDATE  Questions
+      SET NextQuestionId = ${id}
+      WHERE Id = ${idQ}`;
+      await SQL(qu);
+    } else {
+      const query2 = `UPDATE QuestionsOptions
+      SET NextQuestionId = NULL
+      WHERE QuestionsId = ${idQ}`;
+      await SQL(query2);
+      const qu2 = `UPDATE  Questions
+      SET NextQuestionId = NULL
+      WHERE Id = ${idQ}`;
+      await SQL(qu2);
+    }
+    res.json(true);
+  } catch (error) {
+    console.log(error);
     res.json(false);
   }
 });
@@ -809,6 +1008,110 @@ app.get("/GetCategiz", async (req, res) => {
     const Q = `SELECT * FROM ExercisesCategories`;
     let data = await SQL(Q);
     res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/AddNewExires", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const Title = req.body.Title;
+    const Symbol = req.body.Symbol;
+    const descrip = req.body.descrip;
+    const categityId = req.body.categityId;
+    const stuts = req.body.stuts ? 1 : 0;
+    const link = req.body.link;
+    // console.log({ Title, Symbol, descrip, categityId, stuts, link });
+    const Q = `INSERT INTO Exercises (ExercisesCategoriesId,Symbol,Link,Title,About,StatusId)
+    VALUES (${categityId},'${Symbol}','${link}','${Title}','${descrip}',${stuts})`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.delete("/delEx/:id/:nameFile", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const nameFile = req.params.nameFile;
+    const query = `DELETE FROM Exercises WHERE Id = ${id}`;
+    await SQL(query);
+    if (nameFile !== "none") {
+      Delfile(nameFile);
+    }
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/AddCategory", async (req, res) => {
+  try {
+    let val = req.body.val;
+    // console.log(val);
+    const q = `INSERT INTO ExercisesCategories (Name,StatusId) VALUES ('${val}',1)`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/EditCategory", async (req, res) => {
+  try {
+    const id = req.body.id;
+    const val = req.body.val;
+    const q = `UPDATE ExercisesCategories
+             SET Name = '${val}' WHERE Id = ${id}`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.delete("/DeeteCategory/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const q = `DELETE FROM ExercisesCategories WHERE Id = ${id}`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/UpdateEx", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const id = req.body.id;
+    const Title = req.body.Title;
+    const Symbol = req.body.Symbol;
+    const descrip = req.body.descrip;
+    const categityId = req.body.categityId;
+    const stuts = req.body.stuts ? 1 : 0;
+    const link = req.body.link;
+    console.log({
+      All: { id, Title, Symbol, descrip, categityId, stuts, link },
+    });
+    const query = `UPDATE Exercises
+SET ExercisesCategoriesId = ${categityId} ,Symbol = '${Symbol}'
+,Link = '${link}',Title = '${Title}',About = '${descrip}',
+StatusId = ${stuts} WHERE Id = ${id}`;
+    await SQL(query);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.delete("/deleFile/:name/:f", async (req, res) => {
+  // console.log("sdfsdfs");
+  try {
+    // console.log(req.params.name);
+    if (req.params.name !== "none") {
+      deleteFileInFolder(req.params.f, req.params.name);
+    }
+    res.json(true);
   } catch (error) {
     res.json(false);
   }

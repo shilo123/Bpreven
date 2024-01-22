@@ -87,10 +87,6 @@ export default {
   name: "BprevenQueshtinsView",
 
   data() {
-    /*return {
-      data: [],
-      theOption: [],
-    }; */
     return {
       Component: "",
       shows: {
@@ -109,9 +105,6 @@ export default {
     };
   },
   watch: {
-    Component(val) {
-      console.log(val);
-    },
     "shows.showDivos"(val) {
       if (val) {
         this.$store.commit("Setmessage", true);
@@ -120,8 +113,6 @@ export default {
       }
     },
     wachtStoreShowDivos(val) {
-      //   console.log(val);
-
       if (val) {
         this.shows.showDivos = false;
       }

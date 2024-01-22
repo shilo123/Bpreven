@@ -1,11 +1,17 @@
 <template>
   <div class="container">
-    <el-button type="primary" class="AddCategory">הוסף קטגוריה</el-button>
+    <el-button
+      type="primary"
+      class="AddCategory"
+      @click="$emit('newComponent', 'Category')"
+    >
+      קטגוריות</el-button
+    >
     <el-button
       type="primary"
       class="AddEx"
       @click="$emit('newComponent', 'AddEx')"
-      >הוסף תרגיל</el-button
+      ><i class="fa-solid fa-square-plus"></i> הוסף תרגיל</el-button
     >
     <div class="inputzim">
       <el-select v-model="filterOf" placeholder="" size="medium">

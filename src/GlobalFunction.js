@@ -40,7 +40,7 @@ export function findLargestArray(arrays) {
   return largest_array;
 }
 export function Bool(Boolian, succesMes, DefeatMes, ifReload) {
-  console.log({ Boolian, succesMes, DefeatMes, ifReload });
+  // console.log({ Boolian, succesMes, DefeatMes, ifReload });
   if (Boolian) {
     this.$message.success(succesMes);
     if (ifReload) {
@@ -49,4 +49,11 @@ export function Bool(Boolian, succesMes, DefeatMes, ifReload) {
   } else {
     this.$message.error(DefeatMes);
   }
+}
+export function random(min, max) {
+  if (min > max) {
+    throw new Error("אחי אך המינימלי גדול מהמקמילי אחיי");
+  }
+
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }

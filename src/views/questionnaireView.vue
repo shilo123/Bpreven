@@ -70,7 +70,12 @@
           >
         </template>
       </el-table-column>
-      <el-table-column label="סטטוס" prop="StatusId"></el-table-column>
+      <el-table-column label="סטטוס" prop="StatusId">
+        <template slot-scope="scope">
+          <!-- {{ console.log(scope.row.StatusId) }} -->
+          <div>{{ Booleano(scope.row.StatusId) ? "פעיל" : "לא פעיל" }}</div>
+        </template>
+      </el-table-column>
 
       <el-table-column
         label="שאלה ראשונית"
@@ -78,7 +83,6 @@
       ></el-table-column>
 
       <el-table-column label="סימן" prop="Symbol"></el-table-column>
-
       <el-table-column label="שם" prop="Desc"></el-table-column>
     </el-table>
     <div class="divos" v-if="shows.SHdivos">
@@ -98,48 +102,83 @@
           <i class="el-icon-close" @click="shows.SHdivos = false"></i>
           <div v-show="shows.SHdivos && shows.SHnewquestionnaire">
             <div class="afterTable w3-card-4">
-              <!-- <div class="title" v-if="active !== 4">{{ titleFornewquen }}</div> -->
-              <label>שם שאלון</label>
-              <input
-                key="input-0"
-                type="text"
-                class="w3-input"
-                dir="auto"
-                v-model="newquen.Desc"
-                placeholder="שם שאלון"
-              />
-              <!-- v-if="active === 0" -->
-              <label>סימן</label>
-              <input
-                key="input-1"
-                type="text"
-                class="w3-input"
-                dir="auto"
-                v-model="newquen.Symbol"
-                placeholder="שם סימן "
-              />
-              <!-- v-if="active === 1" -->
-              <label>שאלה ראשונית</label>
-              <el-input
-                key="input-2"
-                type="textarea"
-                dir="auto"
-                :autosize="{ minRows: 4, maxRows: 34 }"
-                v-model="newquen.StartQuestion"
-                placeholder="שאלה ראשונית "
-              >
-                <!-- v-if="active === 2" -->
-              </el-input>
-              <label>סטטוס</label>
-              <input
-                key="input-3"
-                type="text"
-                class="w3-input"
-                dir="auto"
-                v-model="newquen.StatusId"
-                placeholder="סטטוס"
-              />
-              <!-- v-if="active === 3" -->
+              <div class="rowA">
+                <div class="nameQuest">
+                  <label>שם שאלון</label>
+                  <input
+                    key="input-0"
+                    type="text"
+                    class="w3-input"
+                    dir="auto"
+                    v-model="newquen.Desc"
+                    placeholder="שם שאלון"
+                  />
+                </div>
+                <div class="symbolQuest">
+                  <label>סימן</label>
+                  <input
+                    key="input-1"
+                    type="text"
+                    class="w3-input"
+                    dir="auto"
+                    v-model="newquen.Symbol"
+                    placeholder="שם סימן "
+                  />
+                </div>
+                <div class="statusQues">
+                  <label>סטטוס</label>
+                  <el-switch
+                    class="stutus"
+                    v-model="newquen.StatusId"
+                    active-text="פעיל"
+                    inactive-text="לא פעיל"
+                  ></el-switch>
+                </div>
+              </div>
+              <div class="rowB">
+                <div class="Questorind">
+                  <label>שאלה ראשונית</label>
+                  <el-input
+                    key="input-2"
+                    type="textarea"
+                    dir="auto"
+                    :autosize="{ minRows: 2, maxRows: 34 }"
+                    v-model="newquen.StartQuestion"
+                    placeholder="שאלה ראשונית "
+                  >
+                  </el-input>
+                </div>
+                <div class="DateQuest">
+                  <label>בחר תאריך</label>
+                  <el-date-picker
+                    v-model="newquen.Date"
+                    type="date"
+                    placeholder="בחר תאריך"
+                    format="yyyy/MM/dd"
+                    value-format="yyyy-MM-dd"
+                  >
+                  </el-date-picker>
+                </div>
+                <div class="MonthyQuen">
+                  <label>שאלון חודשי</label>
+                  <el-switch
+                    v-model="newquen.monthi"
+                    active-text="כן"
+                    inactive-text="לא"
+                  ></el-switch>
+                </div>
+              </div>
+              <div class="rowC">
+                <div class="defaultQuen">
+                  <label>ערך דפולטיבי</label>
+                  <input
+                    placeholder="ערך דיפלוטיבי"
+                    type="number"
+                    class="w3-input"
+                    v-model="newquen.default"
+                  />
+                </div>
+              </div>
             </div>
             <div class="buttons" v-show="true">
               <el-button
@@ -177,7 +216,7 @@
             >
           </div>
           <div v-show="shows.SHdivos && shows.showeditQuen">
-            <el-table :data="rowEdit">
+            <el-table :data="rowEdit" v-if="false">
               <el-table-column label="שם" prop="Desc"></el-table-column>
               <el-table-column label="סימן" prop="Symbol"></el-table-column>
               <el-table-column
@@ -187,8 +226,8 @@
               <el-table-column label="סטטוס" prop="StatusId"></el-table-column>
             </el-table>
             <div class="inEditQuen w3-card-4">
-              <el-row>
-                <el-col :span="12">
+              <div class="rowEA">
+                <div class="newName">
                   <label>שם חדש</label>
                   <input
                     type="text"
@@ -196,8 +235,8 @@
                     v-model="newqunto.Desc"
                     dir="auto"
                   />
-                </el-col>
-                <el-col :span="12">
+                </div>
+                <div class="newSymbol">
                   <label class="labelBayaB">סימן חדש</label>
                   <input
                     type="text"
@@ -205,22 +244,19 @@
                     dir="auto"
                     v-model="newqunto.Symbol"
                   />
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col :span="12" style="position: relative; left: 140px">
+                </div>
+                <div class="newStat">
                   <label class="labelBayaB">סטטוס חדש</label>
-                  <input
-                    type="text"
-                    class="w3-input"
-                    dir="auto"
+                  <el-switch
                     v-model="newqunto.StatusId"
-                  />
-                </el-col>
-              </el-row>
-              <el-row style="position: relative; left: 140px">
-                <el-col :span="12">
-                  <label class="labelBaya">שאלה ראשונית חדשה</label>
+                    active-text="פעיל"
+                    inactive-text="לא פעיל"
+                  ></el-switch>
+                </div>
+              </div>
+              <div class="rowEB">
+                <div class="startQuesh">
+                  <label class="LabelAkshan">שאלה ראשונית חדשה</label>
                   <el-input
                     placeholder="שאלה ראשונית חדשה"
                     type="textarea"
@@ -229,8 +265,34 @@
                     dir="auto"
                     v-model="newqunto.StartQuestion"
                   />
-                </el-col>
-              </el-row>
+                </div>
+                <div class="Date">
+                  <label>תאריך חדש</label>
+                  <el-date-picker
+                    v-model="newqunto.Dayly"
+                    placeholder="תאריך חדש"
+                  ></el-date-picker>
+                </div>
+                <div class="ifMonthi">
+                  <label>אם שאלון חודשי</label>
+                  <el-switch
+                    v-model="newqunto.Monthly"
+                    active-text="כן"
+                    inactive-text="לא"
+                  ></el-switch>
+                </div>
+              </div>
+              <div class="rowEC">
+                <div class="Number">
+                  <label>מספר</label>
+                  <input
+                    type="text"
+                    class="w3-input"
+                    placeholder="מספר"
+                    v-model="newqunto.DefaultId"
+                  />
+                </div>
+              </div>
             </div>
             <div class="bottonsInD">
               <el-button
@@ -258,6 +320,7 @@ import { URL } from "@/URL/url";
 export default {
   data() {
     return {
+      console,
       data: [],
       data2: [],
       serch: "",
@@ -270,7 +333,10 @@ export default {
         Desc: "",
         Symbol: "",
         StartQuestion: "",
-        StatusId: "",
+        StatusId: true,
+        Date: "",
+        default: "",
+        monthi: false,
       },
       shows: {
         SHdivos: false,
@@ -398,8 +464,13 @@ export default {
     },
     Edit(row) {
       // this.idOfE = row.Id;
+      console.log(row);
       this.rowEdit = [row];
+      let stat = row.StatusId;
+      let M = row.Monthly;
       this.newqunto = row;
+      this.newqunto.Monthly = Boolean(M);
+      this.newqunto.StatusId = Boolean(stat);
       this.newquen.Desc = row.Desc;
       this.newquen.Symbol = row.Symbol;
       this.newquen.StartQuestion = row.StartQuestion;
@@ -409,12 +480,6 @@ export default {
     },
     async EditQuen() {
       // let id = this.idOfE;
-      this.newqunto.StatusId = this.newqunto.StatusId;
-      if (!this.isNumeric(this.newqunto.StatusId)) {
-        this.$message.error("תגיד אחי מה אתה משוגע חייב מספרים");
-        this.loadingButton = false;
-        return;
-      }
       this.loadingButton = true;
       let { data } = await this.$ax.post(URL + "EditOfquen", this.newqunto);
       if (data) {
@@ -459,11 +524,6 @@ export default {
     async Inserquen() {
       this.loadingButton = true;
       // console.log(typeof +this.newquen.StatusId);
-      if (!this.isNumeric(this.newquen.StatusId)) {
-        this.$message.error("תגיד אחי מה אתה משוגע חייב מספרים");
-        this.loadingButton = false;
-        return;
-      }
       let { data } = await this.$ax.post(URL + "newequen", this.newquen);
       this.loadingButton = false;
       if (data) {
@@ -485,6 +545,9 @@ export default {
     isNumeric(str) {
       if (typeof str !== "string") return false;
       return !isNaN(str) && !isNaN(parseFloat(str));
+    },
+    Booleano(val) {
+      return Boolean(val);
     },
   },
 };
@@ -553,7 +616,6 @@ export default {
   top: 0;
   right: 0;
 }
-
 .table {
   width: 70%;
   position: absolute;
@@ -587,6 +649,8 @@ export default {
 .queshens {
   background: white;
   height: 600px;
+  width: 990px;
+  left: 200px;
   top: 60px;
   padding: 40px;
   border: 13px solid rgb(55, 55, 216);
@@ -609,6 +673,7 @@ export default {
   height: 450px;
   border-radius: 10px;
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 .afterTable label {
   float: right;
@@ -647,11 +712,13 @@ export default {
   /* border-radius: 20px; */
 }
 .EditQuen {
+  width: 1040px;
   background: rgba(255, 255, 255, 0.547);
-  height: 630px;
-  top: 50px;
+  height: 640px;
+  top: 30px;
   border: 10px solid rgba(206, 215, 164, 0.586);
   padding-bottom: 50px;
+  left: 240px;
 }
 .inEditQuen {
   border: 3px solid black;
@@ -690,6 +757,7 @@ export default {
 .inputTextarea {
   position: relative;
   top: 25px;
+  width: 280px;
 }
 .bottonsInD {
   position: relative;
@@ -699,6 +767,132 @@ export default {
   position: absolute;
   top: 30%;
   left: 30%;
+}
+.DateQuest {
+  margin: 13px;
+  position: relative;
+  right: 10px;
+  top: 30px;
+}
+.DateQuest label {
+  position: absolute;
+  top: -40px;
+  text-align: right;
+  right: 0;
+}
+.stutus {
+  position: relative;
+  right: 45px;
+  top: 50px;
+}
+.statusQues label {
+  position: absolute;
+}
+.rowA {
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 15px;
+}
+.rowB {
+  position: absolute;
+  display: flex;
+  flex-direction: row-reverse;
+  right: 0;
+  margin: 45px;
+}
+.rowC {
+  position: absolute;
+  display: flex;
+  flex-direction: row-reverse;
+  right: -80px;
+  margin: 35px;
+  top: 200px;
+}
+.symbolQuest {
+  margin-right: 40px;
+}
+.defaultQuen {
+  width: 140px;
+  position: relative;
+  right: 390px;
+  top: 70px;
+}
+.MonthyQuen {
+  position: absolute;
+  top: 40px;
+  left: -180px;
+}
+.MonthyQuen label {
+  position: absolute;
+  top: -40px;
+  right: -10px;
+}
+.rowEA {
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 25px;
+  position: relative;
+}
+.rowEB {
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 25px;
+  position: absolute;
+  right: 70px;
+}
+.rowEC {
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 25px;
+  position: absolute;
+  right: 70px;
+  top: 300px;
+}
+.newSymbol {
+  margin-right: 60px;
+}
+.newStat {
+  margin-right: 140px;
+  position: relative;
+  top: 25px;
+}
+.newStat label {
+  position: absolute;
+  top: -30px;
+  left: 40px;
+}
+.LabelAkshan {
+  position: absolute;
+  top: -80px;
+  left: 64% !important;
+}
+.Date {
+  position: relative;
+  top: 20px;
+  left: 60px;
+}
+.Date .el-input {
+  position: relative;
+  left: 30px;
+}
+.Date label {
+  position: absolute !important;
+  top: -40px;
+  right: -60px !important;
+}
+.ifMonthi {
+  position: relative;
+  right: 34px;
+  top: 30px;
+}
+.ifMonthi label {
+  position: absolute;
+  top: -40px;
+  left: 100px !important;
+}
+.Number {
+  position: relative;
+  right: 350px;
 }
 </style>
 <style></style>

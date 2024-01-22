@@ -18,13 +18,11 @@ export default {
     };
   },
   watch: {},
-  mounted() {},
-
-  methods: {
-    BodekTo(e) {
-      console.log(e);
-    },
+  mounted() {
+    // console.log(this.$random(1, 20));
   },
+
+  methods: {},
 };
 </script>
 <style scoped>

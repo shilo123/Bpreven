@@ -72,11 +72,6 @@ export default {
           class: "fa-regular fa-block-question",
         },
         {
-          Route: "/Score",
-          NameRoute: "ציונים",
-          class: "fa-sharp fa-regular fa-hundred-points",
-        },
-        {
           Route: "/Messages",
           NameRoute: "הודעות",
           class: "fa-duotone fa-messages",
@@ -88,10 +83,16 @@ export default {
         },
         {
           Route: "/Exercises",
-          NameRoute: "תרגילים",
+          NameRoute: "ספריית פריבנצ'ר",
           class: "fa-solid fa-person-walking",
         },
-        { Route: "/Users", NameRoute: "משתמשים", class: "fa-solid fa-user" },
+        {
+          Route: "/Score",
+          NameRoute: "ציונים",
+          class: "fa-sharp fa-regular fa-hundred-points",
+        },
+
+        // { Route: "/Users", NameRoute: "משתמשים", class: "fa-solid fa-user" },
       ],
     };
   },
@@ -313,5 +314,13 @@ textarea {
 }
 textarea::placeholder {
   text-align: right;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 </style>

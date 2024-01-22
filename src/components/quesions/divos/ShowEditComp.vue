@@ -1,5 +1,21 @@
 <template>
   <div class="Edito">
+    <button v-show="false" ref="ButtonStam"></button>
+    <!-- <el-dialog
+      title="Tips"
+      :visible.sync="showWarningOp"
+      width="30%"
+      ref="Dialog"
+    >
+      <span>This is a message</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showWarningOp = false">Cancel</el-button>
+        <el-button type="primary" @click="showWarningOp = false"
+          >Confirm</el-button
+        >
+      </span>
+    </el-dialog> -->
+
     <i class="el-icon-close" @click="$store.commit('SgorDivos', true)"></i>
 
     <el-table :data="[rowEdit]">
@@ -61,26 +77,35 @@
 
         <div class="iteminEditSelct Last">
           <label>השאלה הבאה</label>
+          <!-- :disabled="rowEdit.DescDataType === 'OptionId'" -->
           <el-select
-            :disabled="rowEdit.DescDataType === 'OptionId'"
+            slot="reference"
             v-model="rowEdit.NextQuestionDesc"
             placeholder="שאלה הבאה"
+            @input="rowEdit.DescDataType === 'OptionId' ? warnningOp() : ''"
           >
-            <!-- <el-option value="ללא שאלה הבאה"></el-option> -->
+            <el-option
+              value="לפי האופציה"
+              v-show="rowEdit.DescDataType === 'OptionId' && !rowEdit.IsEnd"
+            ></el-option>
             <el-option
               v-for="(a, i) in Alldata.Allquestions[rowEdit.DescQuestionnaire]"
               :key="i"
               :value="a.Id"
               :label="a.Desc"
-              v-show="a.Desc !== rowEdit.Desc"
+              v-show="
+                a.Desc !== rowEdit.Desc &&
+                rowEdit.DescDataType === 'OptionId' &&
+                !rowEdit.IsEnd
+              "
             ></el-option>
           </el-select>
         </div>
 
         <div class="itemEditisEnd">
           <label>אם אחרון</label>
+          <!-- :disabled="rowEdit.DescDataType === 'OptionId' && !rowEdit.IsEnd" -->
           <el-switch
-            :disabled="rowEdit.DescDataType === 'OptionId' && !rowEdit.IsEnd"
             v-model="rowEdit.IsEnd"
             active-text="כן"
             inactive-text="לא"
@@ -105,7 +130,28 @@
         @click="$store.commit('SgorDivos', true)"
         >סגור</el-button
       >
+      <el-popconfirm
+        confirm-button-text="בסדר"
+        cancel-button-text="לא תודה"
+        icon="el-icon-info"
+        icon-color="red"
+        title="אם תשנה כאן זה ישנה את כל האופציות"
+        @confirm="
+          EditQ();
+          $store.commit('SgorDivos', true);
+        "
+      >
+        <el-button
+          slot="reference"
+          type="success"
+          class="sgorTo"
+          :loading="LoadingButton"
+          v-show="rowEdit.DescDataType === 'OptionId'"
+          >שמור</el-button
+        >
+      </el-popconfirm>
       <el-button
+        v-show="rowEdit.DescDataType !== 'OptionId'"
         type="success"
         class="sgorTo"
         @click="
@@ -132,12 +178,11 @@ export default {
         DataType: [],
         NameQuen: [],
       },
+      showWarningOp: false,
+      oldNextQ: "",
     };
   },
   computed: {
-    // data: [],
-    // AllData: {},
-    // theOption: [],
     wachtData() {
       return this.$store.state.data;
     },
@@ -150,6 +195,20 @@ export default {
     },
   },
   watch: {
+    "rowEdit.IsEnd"(val) {
+      if (val) {
+        this.rowEdit.NextQuestionDesc = "שאלה אחרונה";
+      } else {
+        this.rowEdit.NextQuestionDesc = this.oldNextQ;
+      }
+    },
+    "rowEdit.NextQuestionDesc"(val, old) {
+      this.oldNextQ = old;
+    },
+    showWarningOp(val) {
+      if (val) {
+      }
+    },
     wachtData(val) {
       this.data = val;
     },
@@ -160,6 +219,7 @@ export default {
     this.Alldata.questionsOnly = this.$store.state.AllData.questionsOnly;
     this.Alldata.DataType = this.$store.state.AllData.DataType;
     this.Alldata.NameQuen = this.$store.state.AllData.NameQuen;
+    // console.log(this.paramsEdit);
   },
 
   methods: {
@@ -197,11 +257,7 @@ export default {
       }
     },
     async EditQ() {
-      if (this.rowEdit.StatusId) {
-        this.rowEdit.StatusId = 1;
-      } else if (!this.rowEdit.StatusId) {
-        this.rowEdit.StatusId = 0;
-      }
+      console.log(this.rowEdit);
       let { data } = await this.$ax.post(URL + "Updata", this.rowEdit);
       console.log(data);
       if (data) {
@@ -211,6 +267,9 @@ export default {
         this.$message.error("משהו השתבש אחינו");
         this.LoadingButton = false;
       }
+    },
+    warnningOp() {
+      this.showWarningOp = true;
     },
   },
 };
@@ -306,5 +365,8 @@ export default {
   flex-direction: column;
   position: relative;
   top: 30px;
+}
+.el-dialog {
+  z-index: 999999;
 }
 </style>

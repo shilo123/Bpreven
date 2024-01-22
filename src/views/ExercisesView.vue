@@ -22,6 +22,11 @@
         :dat="data"
         class="TableComponent"
         v-if="ComplitedData"
+        @newComponent="
+          Component = $event.C;
+          params = $event.params;
+          showDivos = true;
+        "
       />
     </div>
     <div class="divos" v-if="showDivos">
@@ -32,9 +37,14 @@
             AddEx: Component === 'AddEx',
             EditEx: Component === 'EditEx',
             DeleteEx: Component === 'DeleteEx',
+            addCategory: Component === 'Category',
           }"
         >
-          <component :is="Component" @Close="showDivos = false"></component>
+          <component
+            :is="Component"
+            :params="params"
+            @Close="showDivos = false"
+          ></component>
         </div>
       </transition>
     </div>
@@ -44,16 +54,16 @@
 </template>
 
 <script>
-"newComponent", "AddEx";
 import { URL } from "@/URL/url";
 import Tablos from "@/components/Exercises/Table/TableComp.vue";
 import OpTable from "@/components/Exercises/OptionForTableComp.vue";
 import AddEx from "@/components/Exercises/Divos/AddExercises.vue";
 import EditEx from "@/components/Exercises/Divos/EditExercises.vue";
 import DeleteEx from "@/components/Exercises/Divos/DeleteExercises.vue";
+import Category from "@/components/Exercises/Divos/Category.vue";
 export default {
   name: "BprevenExercisesView",
-  components: { Tablos, OpTable, AddEx },
+  components: { Tablos, OpTable, AddEx, DeleteEx, EditEx, Category },
   data() {
     return {
       data: [],
@@ -62,6 +72,7 @@ export default {
       serch: "",
       Component: "",
       showDivos: false,
+      params: {},
     };
   },
   watch: {
@@ -113,6 +124,25 @@ export default {
   top: 40%;
 }
 .AddEx {
+  background: white;
+  width: 1100px;
+  height: 570px;
+  left: 200px;
+  top: 80px;
+  border-radius: 20px;
+}
+.DeleteEx {
+  background: rgb(255, 126, 126);
+  border-radius: 20px;
+  width: 480px;
+  height: 290px;
+}
+.addCategory {
+  background: white;
+  width: 480px;
+  overflow-y: auto;
+}
+.EditEx {
   background: white;
   width: 1100px;
   height: 570px;

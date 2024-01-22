@@ -1,10 +1,26 @@
 <template>
   <div>
-    <el-table :data="data" ref="Table" border v-loading="LoadingTABLE">
+    <el-table
+      :data="data"
+      ref="Table"
+      border
+      v-loading="LoadingTABLE"
+      height="600px"
+    >
       <el-table-column label="אפשרויות">
-        <template>
-          <el-button type="primary" size="mini">עריכה</el-button>
-          <el-button type="danger" size="mini">מחיקה</el-button>
+        <template slot-scope="scope">
+          <el-button
+            type="primary"
+            size="mini"
+            @click="$emit('newComponent', { C: 'EditEx', params: scope.row })"
+            >עריכה</el-button
+          >
+          <el-button
+            type="danger"
+            size="mini"
+            @click="$emit('newComponent', { C: 'DeleteEx', params: scope.row })"
+            >מחיקה</el-button
+          >
         </template>
       </el-table-column>
 

@@ -7,6 +7,8 @@ import store from "@/store/index";
 import Input from "@/components/Score/InitialInput.vue";
 import * as GlobalFunction from "@/GlobalFunction";
 import "element-ui/lib/theme-chalk/index.css";
+import locale from "element-ui/lib/locale/lang/en";
+
 import "./w3Style.css";
 import "./transInput.css";
 import "./claly.css";
@@ -28,7 +30,7 @@ for (const [key, value] of Object.entries(GlobalFunction)) {
   Vue.prototype["$" + key] = value;
 }
 Vue.component("InitialInput", Input);
-Vue.use(ElementUI);
+Vue.use(ElementUI, { locale });
 // Vue.use(Quasar);
 Vue.prototype.$ax = axios;
 Vue.prototype.$eventB = new Vue();

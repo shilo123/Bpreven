@@ -7,15 +7,17 @@
           :background="'#67C23A'"
           :placeHolder="'כותרת התרגיל'"
           class="CompInput"
+          @value="NewE.Title = $event"
         />
         <InitialInput
           :background="'#67C23A'"
           :placeHolder="'הקלד סימן'"
           class="CompInput"
+          @value="NewE.Symbol = $event"
         />
         <div class="SwichStatus">
           <el-switch
-            v-model="value1"
+            v-model="NewE.stuts"
             active-text="פעיל"
             inactive-text="לא פעיל"
           ></el-switch>
@@ -26,10 +28,12 @@
             :placeHolder="'תיאור התרגיל'"
             class="item-rowB Textarea"
             v-show="!showArea"
+            @value="NewE.descrip = $event"
             @focus="
               showArea = true;
               FocusArea();
             "
+            :val="NewE.descrip"
           />
           <el-input
             @blur="showArea = false"
@@ -38,14 +42,15 @@
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 4 }"
             placeholder="תיאור התרגיל"
-            v-model="textarea2"
+            v-model="NewE.descrip"
             class="item-rowB"
           >
           </el-input>
           <el-select
             placeholder="בחר קטגוריה"
             class="Select"
-            v-model="Category"
+            v-model="NewE.categityId"
+            @input="AlowUp = true"
           >
             <el-option
               v-for="(c, i) in cateGory"
@@ -56,17 +61,45 @@
           </el-select>
         </div>
         <el-upload
+          v-show="AlowUp"
           class="upload-demo"
           ref="upload"
-          :action="URL + 'postFile'"
-          :auto-upload="true"
+          :action="URLaction"
+          :on-success="GetFile"
         >
-          <el-button slot="trigger" type="primary"
-            ><i class="fa-duotone fa-up-from-bracket"></i> העלה קובץ</el-button
+          <div
+            :class="{
+              Upload: !afterUp,
+              noUpload: afterUp,
+            }"
           >
-          <div class="el-upload__tip" slot="tip">העלה קובץ</div>
+            <i class="fa-duotone fa-up-from-bracket fa-2xl"></i>
+          </div>
         </el-upload>
+        <video
+          v-show="afterUp"
+          class="video"
+          v-if="afterUp"
+          width="540"
+          height="210"
+          controls
+          :src="NewE.link"
+        ></video>
       </div>
+    </div>
+    <div class="botons">
+      <el-button type="success" class="su" @click="AddEx(NewE)"
+        >צור תרגיל חדש
+      </el-button>
+      <el-button
+        type="danger"
+        class="da"
+        @click="
+          $emit('Close');
+          DeleteFile(NewE.categityId, GetNameFile);
+        "
+        >סגור</el-button
+      >
     </div>
   </div>
 </template>
@@ -80,17 +113,33 @@ export default {
 
   data() {
     return {
-      value1: true,
+      URL: URL,
       showArea: false,
-      textarea2: "",
       cateGory: [],
-      Category: "",
+      afterUp: false,
+      NewE: {
+        Title: "",
+        Symbol: "",
+        descrip: "",
+        categityId: "",
+        stuts: true,
+        link: "",
+      },
+      AlowUp: false,
     };
   },
-
+  computed: {
+    URLaction() {
+      return `${URL}postFilee/${this.NewE.categityId}`;
+    },
+    GetNameFile() {
+      return this.NewE.link
+        ? this.NewE.link.split("/")[this.NewE.link.split("/").length - 1]
+        : "none";
+    },
+  },
   async mounted() {
     let { data } = await this.$ax.get(URL + "GetCategiz");
-    // console.log(data);
     this.cateGory = data;
   },
 
@@ -100,6 +149,19 @@ export default {
       setTimeout(() => {
         inp.focus();
       }, 0);
+    },
+    GetFile(res) {
+      this.NewE.link = res;
+      this.afterUp = true;
+    },
+    async AddEx(newE) {
+      let { data } = await this.$ax.post(URL + "AddNewExires", newE);
+      this.$Bool(data, "התרגיל נוסף בהצלחה", "משהו השתבש", true);
+    },
+    async DeleteFile(floader, name) {
+      if (floader && name) {
+        await this.$ax.delete(URL + "deleFile/" + name + "/" + floader);
+      }
     },
   },
 };
@@ -152,7 +214,96 @@ export default {
 }
 .upload-demo {
   position: absolute;
-  bottom: 70px;
-  right: 280px;
+  bottom: 30px;
+  right: 90px;
+}
+.Upload {
+  border: 3px solid black;
+  width: 250px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(110, 107, 107);
+  transition: all 0.3s;
+  border-radius: 10px;
+}
+.Upload:hover {
+  border: 4px dashed #000000;
+  border-radius: 15px;
+  /* background: linear-gradient(to right, #808080, #352929); */
+  animation: bacgroundU 1s infinite;
+}
+.Upload:active {
+  border: 4px dashed #000000;
+  border-radius: 15px;
+  background: linear-gradient(to right, #808080, #352929);
+}
+.noUpload {
+  pointer-events: none;
+  border: 3px solid black;
+  width: 250px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(156, 193, 169);
+  transition: all 0.3s;
+  position: absolute;
+  right: 10px;
+  bottom: 25px;
+  border-radius: 10px;
+}
+.noUpload::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(89, 89, 89, 0.49);
+  z-index: 1;
+}
+.noUpload:hover {
+  cursor: not-allowed;
+}
+@keyframes bacgroundU {
+  0% {
+    background-color: #808080;
+  }
+  50% {
+    background-color: #9fa9af;
+  }
+  100% {
+    background-color: #808080;
+  }
+}
+.video {
+  position: absolute;
+  bottom: 20px;
+  left: 60px;
+  border: 2px solid black;
+}
+.botons {
+  position: absolute;
+  right: 30px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 20px;
+}
+.su {
+  font-size: 20px;
+  box-shadow: 0 0 7px 3px #544c4c;
+}
+.da {
+  font-size: 20px;
+  margin-right: 20px;
+  box-shadow: 0 0 7px 3px #544c4c;
+}
+.su:hover,
+.da:hover {
+  box-shadow: 0 0 4px 0;
+  font-size: 22px;
 }
 </style>

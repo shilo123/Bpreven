@@ -11,7 +11,11 @@
       @expand-change="GetOptions"
       v-show="showTable"
     >
-      <el-table-column label="אופציות" ref="Clumn">
+      <el-table-column
+        label="אופציות"
+        ref="Clumn"
+        :row-style="{ background: 'red' }"
+      >
         <template slot-scope="scope">
           <div class="buttons">
             <el-button
@@ -33,13 +37,7 @@
       </el-table-column>
       <el-table-column label="אם פעיל">
         <template slot-scope="scope">
-          {{
-            scope.row.StatusId === 1 || scope.row.StatusId
-              ? "כן"
-              : scope.row.StatusId === 0 || !scope.row.StatusId
-              ? "לא"
-              : ""
-          }}
+          {{ scope.row.StatusId === 1 ? "כן" : "לא" }}
         </template>
       </el-table-column>
       <el-table-column
@@ -65,7 +63,6 @@
           >
             זאת שאלה אחרונה
           </div>
-
           <div v-show="!scope.row.IsEnd">
             {{ TextOfNewqusetions(scope.row) }}
             <div v-show="showHosef[`item-${scope.row.Id}`]">
@@ -136,6 +133,7 @@
                   v-for="(q, i) in Alldata.questionsOnly"
                   :key="i"
                   :value="q.Desc"
+                  v-show="q.Seq > activQ.Seq"
                 ></el-option>
               </el-select>
               <div class="parentsheaderOFAnswers">
@@ -294,6 +292,9 @@ export default {
       activQ: {},
       showSelectOfNextQuestion: {},
       ModelOfNewNextQuestion: {},
+      rowEdit: {},
+      IdShinuy: {},
+      AllnextQuestion: "לפי האופציה",
       ModelInputDivAnswer: "",
       IdniFtah: "",
       DefoltSelsct: "לפי האופציה",
@@ -339,6 +340,9 @@ export default {
         this.SortTable();
       }, 400);
     },
+    DefoltSelsct(val) {
+      this.AllnextQuestion = val;
+    },
   },
   async mounted() {
     try {
@@ -350,13 +354,6 @@ export default {
       this.Alldata.NameQuen = this.$store.state.AllData.NameQuen;
       this.data = this.$store.state.data;
       this.loadingTABLE = false;
-      // let { data } = await this.$ax(URL + "GetQuestions");
-      // this.data = data;
-      // let res = await this.$ax.get(URL + "GetData");
-      // this.Alldata.DataType = res.data.DataType;
-      // this.Alldata.NameQuen = res.data.NameQuen;
-      // let allquestions = await this.$ax.get(URL + "GetallQuestions");
-      // this.Alldata.Allquestions = allquestions.data;
       await this.$nextTick();
       this.SortTable();
     } catch (error) {
@@ -368,6 +365,7 @@ export default {
   methods: {
     bodek(val) {
       // console.log("val", val);
+      // return "c";
     },
     async GetOptions(row, expanded) {
       await this.$nextTick();
@@ -380,6 +378,8 @@ export default {
           this.theOption = [];
           this.ModelInputDivAnswer = "";
           this.SortTable();
+          this.RafreseTable();
+          this.IdShinuy[`Item-${row.Id}`] = this.DefoltSelsct;
         } else if (expanded.length !== 0) {
           this.loadingTABLE = true;
           this.LoadingOptionss = false;
@@ -415,6 +415,7 @@ export default {
       const boolian = values.every((val) => val === values[0]);
       if (boolian) {
         this.DefoltSelsct = values[0];
+        this.AllnextQuestion = values[0];
       }
 
       // console.log(data);
@@ -425,22 +426,19 @@ export default {
       this.$emit("newComponent", "warning");
     },
     Edit(row) {
+      console.log(row);
+      let status = row.StatusId;
       this.rowEdit = row;
-      //   this.shows.showDivos = true;
-      //   this.shows.showEdit = true;
+      this.rowEdit.StatusId = Boolean(status);
       if (
         this.rowEdit.DescDataType === "OptionId" ||
         this.rowEdit.DescDataType === "אופציות "
       ) {
-        setTimeout(() => {
-          this.rowEdit.NextQuestionDesc = "לפי אופציה";
-        }, 300);
       }
-      if (this.rowEdit.StatusId) {
-        this.rowEdit.StatusId = 1;
-      } else if (!this.rowEdit.StatusId) {
-        this.rowEdit.StatusId = 0;
+      if (!this.rowEdit.NextQuestionDesc) {
+        this.rowEdit.NextQuestionDesc = this.DefoltSelsct;
       }
+      console.log(this.rowEdit, this.DefoltSelsct);
       this.$emit("ParamsEditAddNewComponent", this.rowEdit);
       this.$emit("newComponent", "Edit");
     },
@@ -465,10 +463,21 @@ export default {
       const boolian = values.every((val) => val === values[0]);
       if (boolian) {
         this.DefoltSelsct = values[0];
+        if (values[0] === "ללא שאלה הבאה") {
+          let IactivRow = this.data.findIndex((e) => e.Id === IdQuestion);
+          this.data[IactivRow].IsEnd = true;
+        }
       } else {
         this.DefoltSelsct = "לפי האופציה";
+        let IactivRow = this.data.findIndex((e) => e.Id === IdQuestion);
+        this.data[IactivRow].IsEnd = false;
       }
+      await this.$ax.post(URL + "UpNextQuestion", {
+        val: this.DefoltSelsct,
+        id: IdQuestion,
+      });
       const params = { idOfOption, nextQusions, IdQuestion };
+      // console.log(params);
       this.LoadingButton = true;
 
       let { data } = await this.$ax.post(URL + "addNewQustionsId", params);
@@ -479,6 +488,7 @@ export default {
         this.$message.error("משהו השתבש אחי");
       }
       this.OptheOption[`showButton-${idOfOption}`] = false;
+      this.AllnextQuestion = this.DefoltSelsct;
     },
     changeEventOptions(val, id) {
       this.OptheOption[`showButton-${id}`] = true;
@@ -509,8 +519,8 @@ export default {
       }
     },
     SelectFromAll(val, id, row) {
+      this.beforModelQestions = this.ModelQestions;
       if (val !== "לפי אופציה") {
-        this.beforModelQestions = this.ModelQestions;
       }
       if (val !== "שאלה אחרונה" && val !== "לפי אופציה") {
         for (const key in this.ModelQestions) {
@@ -529,11 +539,14 @@ export default {
         for (const key in this.ModelQestions) {
           this.ModelQestions[key] = "ללא שאלה הבאה";
         }
+        let IactivRow = this.data.findIndex((e) => e.Id === id);
+        this.data[IactivRow].IsEnd = true;
+      } else {
+        let IactivRow = this.data.findIndex((e) => e.Id === id);
+        this.data[IactivRow].IsEnd = false;
       }
-      // console.log(this.ModelQestions);
 
       const IdofQuestions = id;
-      console.log(this.ModelQestions);
       for (const key in this.ModelQestions) {
         let idofOpt = key.split("-")[1];
         let valTheOp = this.ModelQestions[key];
@@ -541,15 +554,18 @@ export default {
           this.AddNewQuestion(idofOpt, valTheOp, IdofQuestions);
         }, 500);
       }
-
       this.LoadingOptionss = false;
       setTimeout(() => {
         this.LoadingOptionss = true;
       }, 100);
     },
     TextOfNewqusetions(row) {
-      // console.log(row);
-      if (row.DescDataType === "OptionId") {
+      if (this.IdShinuy[`Item-${row.Id}`] && row.DescDataType === "OptionId") {
+        if (this.IdShinuy[`Item-${row.Id}`] !== "ללא שאלה הבאה") {
+          return this.IdShinuy[`Item-${row.Id}`];
+        }
+      }
+      if (!row.NextQuestionDesc && row.DescDataType === "OptionId") {
         return "לפי אופציה";
       } else if (row.NextQuestionDesc) {
         return row.NextQuestionDesc;
@@ -578,7 +594,12 @@ export default {
           let tds = table.children[2].children[0].children[1].children;
           //   console.log(tds);
           Array.from(tds).forEach((element, i) => {
-            let elco = element.children[8].children[0].children[0].children[0];
+            let elco;
+            if (this.wachtStore) {
+              elco = element.children[8].children[0].children[0].children[0];
+            } else {
+              elco = element.children[7].children[0].children[0].children[0];
+            }
             elco.classList = "el-icon-arrow-left";
             Array.from(element.children).forEach((el) => {
               el.style.textAlign = "right";
