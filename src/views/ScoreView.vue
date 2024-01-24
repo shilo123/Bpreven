@@ -1,6 +1,20 @@
 <template>
   <div>
-    <!-- <div :style="{ width: `${Screen}px` }" class="D"></div> -->
+    <div class="divos" v-if="showDivos">
+      <transition appear name="expand">
+        <div class="indivos">
+          <TablePopap
+            @SgorDivos="
+              showDivos = false;
+              SgorSham();
+            "
+            :Params="Params[Params.length - 1]"
+            :NameOfScore="NameOfScore"
+          />
+        </div>
+      </transition>
+    </div>
+
     <InputAutoComplitade
       :class="{ inlineInput: !wachtStore, BigScreen: wachtStore }"
       @nivhar="
@@ -54,6 +68,7 @@
         </el-row>
       </div>
       <Cardos
+        ref="Cardos"
         :activQushinnare="activQushinnare"
         :width="width"
         v-show="
@@ -62,22 +77,33 @@
             : null && activQushinnare !== ''
         "
         v-if="IfComponents && activQushinnare"
+        @showPopUp="
+          showDivos = true;
+          Params = $event;
+        "
+        @newParams="NameOfScore = $event"
       />
     </div>
   </div>
 </template>
 <script>
 import { URL } from "@/URL/url";
-import InputAutoComplitade from "@/components/Score/inputAutoComp.vue";
+import InputAutoComplitade from "@/components/Score/Elenents/inputAutoComp.vue";
 import Cardos from "@/components/Score/CardsOfScoreComp.vue";
+import TablePopap from "@/components/Score/PopPap/TableInyonim.vue";
+import "../claly.css";
 export default {
   components: {
     InputAutoComplitade,
     Cardos,
+    TablePopap,
   },
   name: "BprevenScoreView",
   data() {
     return {
+      NameOfScore: "",
+      Params: {},
+      showDivos: false,
       ObjDataQuestions: [],
       arrOptions: [],
       activQushinnare: "",
@@ -96,6 +122,9 @@ export default {
     },
   },
   watch: {
+    showDivos(val) {
+      // console.log("showDivos", val);
+    },
     activQushinnare(val, Old) {
       if (val) {
         this.FunctionActiveQushinnare(val);
@@ -123,6 +152,16 @@ export default {
   },
 
   methods: {
+    Al() {
+      this.$alert("content", "title", {
+        confirmButtonText: "confirm",
+        callback: (action) => {},
+      });
+    },
+    SgorSham() {
+      let cardos = this.$refs.Cardos;
+      cardos.showPopAp = false;
+    },
     FuncafterClear() {
       this.FunctionActiveQushinnare(this.activQushinnare);
     },
@@ -394,5 +433,13 @@ export default {
   /* position: relative;
   top: -130px;
   z-index: 3; */
+}
+.indivos {
+  background: white;
+  height: 630px;
+  width: 1140px;
+  left: 210px;
+  top: 30px;
+  border-radius: 20px;
 }
 </style>

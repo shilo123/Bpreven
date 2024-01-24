@@ -4,11 +4,10 @@ import router from "./router";
 import ElementUI from "element-ui";
 import axios from "axios";
 import store from "@/store/index";
-import Input from "@/components/Score/InitialInput.vue";
+import Input from "@/components/Score/Elenents/InitialInput.vue";
 import * as GlobalFunction from "@/GlobalFunction";
 import "element-ui/lib/theme-chalk/index.css";
 import locale from "element-ui/lib/locale/lang/en";
-
 import "./w3Style.css";
 import "./transInput.css";
 import "./claly.css";

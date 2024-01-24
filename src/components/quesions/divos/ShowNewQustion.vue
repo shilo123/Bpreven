@@ -262,4 +262,7 @@ export default {
   right: 26px;
   margin: 10px;
 }
+.sgorTo {
+  margin-right: 10px;
+}
 </style>

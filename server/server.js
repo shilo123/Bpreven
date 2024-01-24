@@ -91,9 +91,18 @@ function random(min, max) {
 
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-const q = `SELECT * FROM Questionnaire
-`;
-SQLOS(q);
+// const q = `SELECT
+// SA.Id,
+// E.Title AS ExercisesT,
+// F.[Desc] AS DescFeacher,
+// M.[Desc] AS DescMes
+// FROM ScoreActions SA
+// LEFT JOIN Exercises E ON E.Id = SA.ExercisesId
+// LEFT JOIN Features F ON F.Id = SA.FeaturesId
+// LEFT JOIN Messages M ON M.Id = SA.MessagesId
+// WHERE SA.ScoreId = 5
+// `;
+// SQLOS(q);
 app.post("/postFilee/:Idcategory", upload.single("file"), async (req, res) => {
   let Id = req.params.Idcategory;
   let File = req.file;
@@ -497,11 +506,6 @@ app.post("/UpNextQuestion", async (req, res) => {
   try {
     const val = req.body.val;
     const idQ = req.body.id;
-    // console.log(val);
-    // let qo = `SELECT IsEnd FROM Questions WHERE Id = ${idQ}`;
-    // let data = await SQL(qo);
-    // data = data[0].IsEnd;
-
     if (val === "ללא שאלה הבאה") {
       let qourtoz = `UPDATE Questions
       SET IsEnd = 1
@@ -517,19 +521,11 @@ app.post("/UpNextQuestion", async (req, res) => {
       let q = `SELECT Id FROM Questions WHERE [Desc] = '${val}'`;
       let data = await SQL(q);
       let id = data[0].Id;
-      const query = `UPDATE  QuestionsOptions
-      SET NextQuestionId = ${id}
-      WHERE QuestionsId = ${idQ}`;
-      await SQL(query);
       const qu = `UPDATE  Questions
       SET NextQuestionId = ${id}
       WHERE Id = ${idQ}`;
       await SQL(qu);
     } else {
-      const query2 = `UPDATE QuestionsOptions
-      SET NextQuestionId = NULL
-      WHERE QuestionsId = ${idQ}`;
-      await SQL(query2);
       const qu2 = `UPDATE  Questions
       SET NextQuestionId = NULL
       WHERE Id = ${idQ}`;
@@ -1116,6 +1112,158 @@ app.delete("/deleFile/:name/:f", async (req, res) => {
     res.json(false);
   }
 });
+app.get("/GetScoreAction/:arrIds", async (req, res) => {
+  try {
+    let arrIds = req.params.arrIds;
+    const q = `SELECT Id FROM Score WHERE QuestionsAnswersIds = '${arrIds}'`;
+    let id = await SQL(q);
+    id = id[0].Id;
+    const Query = `SELECT 
+    E.Title AS ExercisesT,
+    F.[Desc] AS DescFeacher,
+    M.[Desc] AS DescMes 
+    FROM ScoreActions SA 
+    LEFT JOIN Exercises E ON E.Id = SA.ExercisesId
+    LEFT JOIN Features F ON F.Id = SA.FeaturesId
+    LEFT JOIN Messages M ON M.Id = SA.MessagesId
+    WHERE SA.ScoreId = ${id} 
+    `;
+    let data = await SQL(Query);
+
+    let Newdata = [];
+    let exercisesTSet = new Set(
+      data.map((item) => item.ExercisesT).filter((item) => item !== null)
+    );
+    let descFeacherSet = new Set(
+      data.map((item) => item.DescFeacher).filter((item) => item !== null)
+    );
+    let descMesSet = new Set(
+      data.map((item) => item.DescMes).filter((item) => item !== null)
+    );
+    for (
+      let i = 0;
+      i < Math.max(exercisesTSet.size, descFeacherSet.size, descMesSet.size);
+      i++
+    ) {
+      Newdata.push({
+        ExercisesT: Array.from(exercisesTSet)[i] || null,
+        DescFeacher: Array.from(descFeacherSet)[i] || null,
+        DescMes: Array.from(descMesSet)[i] || null,
+      });
+    }
+    // console.log(Newdata);
+    res.json(Newdata);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/GetDataForTableScoreAction", async (req, res) => {
+  // console.log(req.body);
+  try {
+    let obj = {};
+    let itemsE = req.body.map((e) => `'${e.ExercisesT}'`).filter((e) => e);
+    itemsE = itemsE.join(",");
+    let Q = `SELECT Title,Id FROM Exercises`;
+    if (req.body.length > 0) {
+      Q += ` WHERE Title NOT IN (${itemsE})`;
+    }
+    // const Q = `SELECT Title,Id FROM Exercises WHERE Title NOT IN (${itemsE}) `;
+    let Exercises = await SQL(Q);
+    // console.log(Exercises);
+    obj.Exercises = Exercises;
+    //
+    //
+    let itemsF = req.body.map((e) => `'${e.DescFeacher}'`).filter((e) => e);
+    itemsF = itemsF.join(",");
+    let QU = `SELECT [Desc], Id FROM Features `;
+
+    if (req.body.length > 0) {
+      QU += ` WHERE [Desc] NOT IN (${itemsF})`;
+    }
+    let DescFeacher = await SQL(QU);
+    obj.DescFeacher = DescFeacher;
+    //
+    //
+    let itemsM = req.body.map((e) => `'${e.DescMes}'`).filter((e) => e);
+    itemsM = itemsM.join(",");
+    let QUE = `SELECT [Desc], Id FROM Messages `;
+
+    if (req.body.length > 0) {
+      QUE += `WHERE [Desc] NOT IN (${itemsM})`;
+    }
+    let DescMes = await SQL(QUE);
+    obj.DescMes = DescMes;
+    // console.log(obj);
+    res.json(obj);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/AddActionScore", async (req, res) => {
+  // console.log(req.body);
+  try {
+    let arrIds = req.body.arrIDS;
+    const q = `SELECT Id FROM Score WHERE QuestionsAnswersIds = '${arrIds}'`;
+    let id = await SQL(q);
+    id = id[0].Id;
+    let Colomn = "";
+    const val = req.body.val;
+    if (req.body.Colomn === "Exercises") {
+      Colomn = "ExercisesId";
+    }
+    if (req.body.Colomn === "DescMes") {
+      Colomn = "MessagesId";
+    }
+    if (req.body.Colomn === "DescFeacher") {
+      Colomn = "FeaturesId";
+    }
+    // console.log(Colomn, val);
+    const Q = `INSERT INTO ScoreActions (${Colomn},ScoreId) VALUES ('${val}',${id})`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.delete("/DeleteScoreAction", async (req, res) => {
+  try {
+    let arrIds = req.query.arrIdso;
+    let Desco = req.query.Desco;
+    let Colomn = req.query.Colomn;
+    // console.log({ arrIds, Desco, Colomn });
+    const q = `SELECT Id FROM Score WHERE QuestionsAnswersIds = '${arrIds}'`;
+    let id = await SQL(q);
+    id = id[0].Id;
+    let TableNAme = "";
+    let haze = "";
+    if (Colomn === "FeaturesId") {
+      TableNAme = "Features";
+      haze = "[Desc]";
+    } else if (Colomn === "ExercisesId") {
+      TableNAme = "Exercises";
+      haze = "Title";
+    } else if (Colomn === "MessagesId") {
+      TableNAme = "Messages";
+      haze = "[Desc]";
+    }
+    const qu = `SELECT Id FROM ${TableNAme} WHERE ${haze} = '${Desco}'`;
+    let ID = await SQL(qu);
+    if (ID) {
+      ID = ID[0].Id;
+    }
+    const query = `UPDATE ScoreActions
+    SET ${Colomn} = NULL
+    WHERE ScoreId = ${id} AND ${Colomn} = ${ID}`;
+    await SQL(query);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+// console.log(Newdata);
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);
 });

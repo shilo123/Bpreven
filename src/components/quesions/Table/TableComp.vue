@@ -281,6 +281,7 @@ export default {
   components: { draggable },
   data() {
     return {
+      StutSelectAll: false,
       data: [],
       loadingTABLE: false,
       LoadingButton: false,
@@ -426,7 +427,7 @@ export default {
       this.$emit("newComponent", "warning");
     },
     Edit(row) {
-      console.log(row);
+      // console.log(row);
       let status = row.StatusId;
       this.rowEdit = row;
       this.rowEdit.StatusId = Boolean(status);
@@ -438,7 +439,10 @@ export default {
       if (!this.rowEdit.NextQuestionDesc) {
         this.rowEdit.NextQuestionDesc = this.DefoltSelsct;
       }
-      console.log(this.rowEdit, this.DefoltSelsct);
+      if (this.rowEdit.IsEnd) {
+        this.rowEdit.NextQuestionDesc = "שאלה אחרונה";
+      }
+      // console.log(this.rowEdit, this.DefoltSelsct);
       this.$emit("ParamsEditAddNewComponent", this.rowEdit);
       this.$emit("newComponent", "Edit");
     },
@@ -457,7 +461,7 @@ export default {
       // console.log(OptionOfUp);
       //UpdateOption
     },
-    async AddNewQuestion(idOfOption, nextQusions, IdQuestion) {
+    async AddNewQuestion(idOfOption, nextQusions, IdQuestion, bool) {
       this.beforModelQestions = this.ModelQestions;
       let values = Object.values(this.ModelQestions);
       const boolian = values.every((val) => val === values[0]);
@@ -483,8 +487,12 @@ export default {
       let { data } = await this.$ax.post(URL + "addNewQustionsId", params);
       this.LoadingButton = false;
       if (data) {
-        this.$message.success("השאלה הבאה עודכנה");
+        if (!bool) {
+          this.$message.success("השאלה הבאה עודכנה");
+        }
+        this.StutSelectAll = true;
       } else {
+        this.StutSelectAll = false;
         this.$message.error("משהו השתבש אחי");
       }
       this.OptheOption[`showButton-${idOfOption}`] = false;
@@ -550,8 +558,17 @@ export default {
       for (const key in this.ModelQestions) {
         let idofOpt = key.split("-")[1];
         let valTheOp = this.ModelQestions[key];
+        let counter = 0;
         setTimeout(() => {
-          this.AddNewQuestion(idofOpt, valTheOp, IdofQuestions);
+          counter++;
+          this.AddNewQuestion(idofOpt, valTheOp, IdofQuestions, true);
+          setTimeout(() => {
+            if (this.StutSelectAll) {
+              this.$message.success("השאלות הבאות עודכנו בהצלחה");
+            } else {
+              this.$message.success("משהו השתבש אחינו");
+            }
+          }, 100);
         }, 500);
       }
       this.LoadingOptionss = false;

@@ -1,29 +1,16 @@
 <template>
   <div class="Edito">
     <button v-show="false" ref="ButtonStam"></button>
-    <!-- <el-dialog
-      title="Tips"
-      :visible.sync="showWarningOp"
-      width="30%"
-      ref="Dialog"
-    >
-      <span>This is a message</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="showWarningOp = false">Cancel</el-button>
-        <el-button type="primary" @click="showWarningOp = false"
-          >Confirm</el-button
-        >
-      </span>
-    </el-dialog> -->
 
     <i class="el-icon-close" @click="$store.commit('SgorDivos', true)"></i>
 
-    <el-table :data="[rowEdit]">
+    <el-table :data="[rowEdit]" border>
       <el-table-column
+        align="center"
         label="NextQuestionId"
         prop="NextQuestionId"
       ></el-table-column>
-      <el-table-column label="אם פעיל">
+      <el-table-column label="אם פעיל" align="center">
         <template slot-scope="scope">
           {{
             scope.row.StatusId === 1 || scope.row.StatusId
@@ -34,18 +21,26 @@
           }}
         </template>
       </el-table-column>
-      <el-table-column label="אם אחרון">
+      <el-table-column label="אם אחרון" align="center">
         <template slot-scope="scope">
           {{ computedOfisEnd(scope.row.IsEnd) }}
         </template>
       </el-table-column>
-      <el-table-column label="שאלון" prop="DescQuestionnaire"></el-table-column>
-      <el-table-column label="סוג התשובה">
+      <el-table-column
+        label="שאלון"
+        prop="DescQuestionnaire"
+        align="center"
+      ></el-table-column>
+      <el-table-column label="סוג התשובה" align="center">
         <template slot-scope="scope">
           {{ computedData(scope.row.DescDataType) }}
         </template>
       </el-table-column>
-      <el-table-column label="שאלה" prop="Desc"></el-table-column>
+      <el-table-column
+        label="שאלה"
+        prop="Desc"
+        align="center"
+      ></el-table-column>
     </el-table>
     <div class="inEdito w3-card-4">
       <div class="iteminEdit">
@@ -153,7 +148,7 @@
       <el-button
         v-show="rowEdit.DescDataType !== 'OptionId'"
         type="success"
-        class="sgorTo"
+        class="shmorTO"
         @click="
           EditQ();
           $store.commit('SgorDivos', true);
@@ -284,7 +279,7 @@ export default {
   height: 630px;
   /* top: 50px; */
   top: 30px;
-  border-radius: 4px;
+  border-radius: 24px;
   padding-bottom: 60px;
 }
 .inEdito {
@@ -318,6 +313,7 @@ export default {
 .butonas {
   position: relative;
   top: 29px;
+  right: 20px;
 }
 .iteminEditSelct {
   margin-bottom: 80px;
@@ -368,5 +364,8 @@ export default {
 }
 .el-dialog {
   z-index: 999999;
+}
+.sgorTo {
+  margin-right: 20px;
 }
 </style>

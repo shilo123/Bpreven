@@ -112,6 +112,14 @@
             </el-popconfirm>
           </div>
         </div>
+        <el-button
+          @click="Addinyonim(A)"
+          v-show="ModelInputL[`Model-${A[A.length - 2]}`]"
+          type="success"
+          size="mini"
+          class="ButtonInyonim"
+          >הוסף עינייונים</el-button
+        >
       </div>
     </div>
     <div
@@ -141,7 +149,7 @@
 </template>
 <script>
 import { URL } from "@/URL/url";
-import miniSelect from "@/components/Score/MiniSelect.vue";
+import miniSelect from "@/components/Score/Elenents/MiniSelect.vue";
 export default {
   props: ["activQushinnare"],
   name: "BprevenCardsOfScoreComp",
@@ -163,9 +171,19 @@ export default {
       LoadingButton: false,
       ValRadio: "הכל",
       ShowLomatz: false,
+      showPopAp: false,
+      paramsPop: [],
     };
   },
   watch: {
+    showPopAp(val) {
+      if (val) {
+        this.$emit("showPopUp", this.paramsPop);
+      }
+      let i = this.paramsPop[this.paramsPop.length - 2];
+      let newParams = this.ModelInputL[`Model-${i}`];
+      this.$emit("newParams", newParams);
+    },
     ValRadio(val) {
       // if (!this.filter) {
       //   this.arrsTheOP = this.arrsTheOPG;
@@ -319,7 +337,7 @@ export default {
         // this.arrsTheOPG[i].splice(element.length - 1, 1);
       }); //   }
       // });
-      console.log(this.arrsTheOP);
+      // console.log(this.arrsTheOP);
       // console.log(this.arrsTheOPG);
     },
     generateOptionsPaths(questions) {
@@ -511,6 +529,11 @@ export default {
       }
       this.EventChange();
     },
+    Addinyonim(A) {
+      // console.log(A);
+      this.paramsPop = A;
+      this.showPopAp = true;
+    },
   },
 };
 </script>
@@ -530,20 +553,6 @@ export default {
 .Selects {
   margin-right: 50px;
 }
-/* .Boxo {
-  width: auto;
-  border-radius: 20px;
-  background: rgb(204, 38, 246);
-  background: linear-gradient(to right, rgb(204, 38, 246), #c344f1, #b129ff);
-  margin-top: 10px;
-  text-align: right;
-  font-size: 13px;
-  transition: all 0.3s;
-  height: 50px;
-  padding: 5px;
-  margin-right: 20px;
-  color: rgb(0, 0, 0);
-} */
 .Boxo {
   width: auto;
   margin-top: 10px;
@@ -760,6 +769,13 @@ export default {
   font-size: 23px;
   top: 150px;
   margin-right: 20px;
+}
+.ButtonInyonim {
+  position: absolute;
+  /* left: -410px;
+  top: -10px; */
+  left: 0;
+  top: 0;
 }
 </style>
 <style></style>

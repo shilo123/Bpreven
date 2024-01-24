@@ -712,20 +712,24 @@ export default {
   /* border-radius: 20px; */
 }
 .EditQuen {
-  width: 1040px;
+  width: 1020px;
+  /* width: 880px; */
   background: rgba(255, 255, 255, 0.547);
-  height: 640px;
+  /* height: 640px; */
+  height: 550px;
   top: 30px;
   border: 10px solid rgba(206, 215, 164, 0.586);
   padding-bottom: 50px;
   left: 240px;
+  border-radius: 20px;
 }
 .inEditQuen {
   border: 3px solid black;
   height: 400px;
   width: 90%;
   display: block;
-  margin: 30px;
+  /* margin: 30px; */
+  margin: 40px;
   border-radius: 20px;
   overflow-y: auto;
   overflow-x: hidden;
