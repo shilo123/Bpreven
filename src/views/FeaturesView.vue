@@ -2,6 +2,10 @@
   <div>
     <OpTable
       class="OpTable"
+      :class="{
+        OpTable: !watchtogelAnimate,
+        OpTableBigscreen: watchtogelAnimate,
+      }"
       @NewData="
         data = $event;
         showLoMatzanu = false;
@@ -21,7 +25,10 @@
         v-show="!showLoMatzanu"
         :dat="data"
         ref="Table"
-        class="TableComponent"
+        :class="{
+          TableComponent: !watchtogelAnimate,
+          TableComponentBigscreen: watchtogelAnimate,
+        }"
         v-if="ComplitedData"
         @NewComponnent="
           Component = $event.C;
@@ -99,6 +106,11 @@ export default {
     this.data = data;
     this.ComplitedData = true;
   },
+  computed: {
+    watchtogelAnimate() {
+      return this.$store.state.TogelAnimate;
+    },
+  },
 
   methods: {
     loadingTABLO(val) {
@@ -117,10 +129,24 @@ export default {
   margin-left: 80px;
   transition: all 0.3s;
 }
+.TableComponentBigscreen {
+  width: 88%;
+  position: absolute;
+  top: 120px;
+  margin-left: 80px;
+  transition: all 0.3s;
+}
 .OpTable {
   position: absolute;
   top: 45px;
   width: 78%;
+  margin-left: 80px;
+  transition: all 0.3s;
+}
+.OpTableBigscreen {
+  position: absolute;
+  top: 45px;
+  width: 88%;
   margin-left: 80px;
   transition: all 0.3s;
 }

@@ -92,15 +92,7 @@ function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 // const q = `SELECT
-// SA.Id,
-// E.Title AS ExercisesT,
-// F.[Desc] AS DescFeacher,
-// M.[Desc] AS DescMes
-// FROM ScoreActions SA
-// LEFT JOIN Exercises E ON E.Id = SA.ExercisesId
-// LEFT JOIN Features F ON F.Id = SA.FeaturesId
-// LEFT JOIN Messages M ON M.Id = SA.MessagesId
-// WHERE SA.ScoreId = 5
+// *FROM QuestionsOptions
 // `;
 // SQLOS(q);
 app.post("/postFilee/:Idcategory", upload.single("file"), async (req, res) => {
@@ -169,6 +161,14 @@ app.get("/", async (req, res) => {
   let result = await SQL(q);
   // console.log(result);
   res.json(result);
+});
+app.get("/GetQueshianaire", async (req, res) => {
+  try {
+    const q = `SELECT * FROM Questionnaire`;
+    res.json(await SQL(q));
+  } catch (error) {
+    res.json(false);
+  }
 });
 app.get("/GetOPtionForQuestion/:qushinnare", async (req, res) => {
   try {
@@ -246,9 +246,9 @@ app.get("/Getamudes", async (req, res) => {
 });
 app.post("/newequen", async (req, res) => {
   console.log(req.body);
-  const Desc = req.body.Desc;
-  const Symbol = req.body.Symbol;
-  const StartQuestion = req.body.StartQuestion;
+  const Desc = req.body.Desc.replace(/'/g, "''");
+  const Symbol = req.body.Symbol.replace(/'/g, "''");
+  const StartQuestion = req.body.StartQuestion.replace(/'/g, "''");
   const StatusId = req.body.StatusId ? 1 : 0;
   const Date = req.body.Date;
   const defaultId = req.body.default;
@@ -298,25 +298,52 @@ app.delete("/Delquen/:id", async (req, res) => {
 });
 app.post("/EditOfquen", async (req, res) => {
   try {
-    // console.log(req.body);
-    const Desc = req.body.Desc;
-    const Symbol = req.body.Symbol;
+    // console.log("req", req.body);
+    async function DalayRe() {
+      const addDayAndFormat = (dateStr) => {
+        let date = new Date(dateStr);
+        date.setDate(date.getDate() + 1);
+        return date.toISOString();
+      };
+      let Dayl = req.body.Dayly ? req.body.Dayly : null;
+      if (Dayl) {
+        if (req.body.AddYom) {
+          return addDayAndFormat(Dayl);
+        } else {
+          return Dayl;
+        }
+      } else {
+        return null;
+      }
+      // let qur;
+      // let DalayData;
+      // if (Dayl) {
+      //   qur = `SELECT * FROM Questionnaire WHERE  CONVERT(date, Dayly) = CONVERT(date, '${Dayl}') AND Id = ${req.body.Id} `;
+      //   DalayData = await SQL(qur);
+      // } else {
+      //   DalayData = 0;
+      // }
+      // let Bool = Boolean(DalayData.length);
+      // if (Dayl) {
+      //   if (!req.body.AddYom || Bool) {
+      //     return Dayl;
+      //   } else {
+      //     return addDayAndFormat(Dayl);
+      //   }
+      // } else {
+      //   return null;
+      // }
+    }
+
+    const Desc = req.body.Desc.replace(/'/g, "''");
+    const Symbol = req.body.Symbol.replace(/'/g, "''");
     const StartQuestion = req.body.StartQuestion.replace(/'/g, "''");
     const StatusId = req.body.StatusId ? 1 : 0;
     const Monthly = req.body.Monthly ? 1 : 0;
-    const Dayly = req.body.Dayly ? req.body.Dayly : null;
+    const Dayly = await DalayRe();
     const DefaultId = req.body.DefaultId;
     const id = req.body.Id;
-    // console.log({
-    //   Desc,
-    //   Symbol,
-    //   StartQuestion,
-    //   StatusId,
-    //   Monthly,
-    //   Dayly,
-    //   DefaultId,
-    //   id,
-    // });
+    console.log(Dayly);
     let q = `
     UPDATE Questionnaire
     SET 
@@ -334,7 +361,7 @@ app.post("/EditOfquen", async (req, res) => {
     } else {
       q += `,Dayly = NULL WHERE Id = ${id}`;
     }
-    console.log(q);
+    // console.log(q);
     await SQL(q);
 
     res.json(true);
@@ -395,10 +422,25 @@ app.get("/GetData", async (req, res) => {
     res.json(false);
   }
 });
+app.get("/GetQuestinsFromQueshennaire/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = `SELECT * FROM Questions WHERE QuestionnaireId = ${id} ORDER BY Seq`;
+    let data = await SQL(query);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
 app.post("/Updata", async (req, res) => {
   let body = req.body;
   let UpdateOption = false;
   // console.log(body);
+  for (const key in body) {
+    if (typeof body[key] === "string") {
+      body[key] = body[key].replace(/'/g, "''");
+    }
+  }
   body.StatusId = body.StatusId ? 1 : 0;
   try {
     let nextQuestionId = null;
@@ -475,7 +517,10 @@ app.post("/Updata", async (req, res) => {
 app.post("/AddQuestin", async (req, res) => {
   // console.log(req.body);
   try {
-    const q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${req.body.NameQ}'`;
+    const q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${req.body.NameQ.replace(
+      /'/g,
+      "''"
+    )}'`;
     let IDnameQ = await SQL(q);
     IDnameQ = IDnameQ[0].Id;
     // console.log(IDnameQ);
@@ -493,7 +538,7 @@ app.post("/AddQuestin", async (req, res) => {
     }
     // console.log("lsatSek", lsatSek);
     const query = `INSERT INTO Questions (QuestionnaireId,DataTypesId,[Desc],IsEnd,StatusId,[Seq]) VALUES 
-    (${IDnameQ},${IDdataTy},'${req.body.DescQ}',
+    (${IDnameQ},${IDdataTy},'${req.body.DescQ.replace(/'/g, "''")}',
     '${req.body.IsEnd}',${req.body.StatusId},${lsatSek}
     )`;
     await SQL(query);
@@ -504,7 +549,7 @@ app.post("/AddQuestin", async (req, res) => {
 });
 app.post("/UpNextQuestion", async (req, res) => {
   try {
-    const val = req.body.val;
+    const val = req.body.val.replace(/'/g, "''");
     const idQ = req.body.id;
     if (val === "ללא שאלה הבאה") {
       let qourtoz = `UPDATE Questions
@@ -685,7 +730,7 @@ app.put("/UpdateOP", async (req, res) => {
   // console.log(req.body);
   try {
     const q = `UPDATE  QuestionsOptions 
-    SET [Desc] = '${req.body.text}'
+    SET [Desc] = '${req.body.text.replace(/'/g, "''")}'
     WHERE Id = ${req.body.id}`;
     await SQL(q);
     res.json(true);
@@ -697,11 +742,17 @@ app.put("/UpdateOP", async (req, res) => {
 app.post("/GetQestion", async (req, res) => {
   // console.log(req.body);
   try {
-    const query = `SELECT Id FROM Questionnaire WHERE [Desc] = '${req.body.DescQuestionnaire}'`;
+    const query = `SELECT Id FROM Questionnaire WHERE [Desc] = '${req.body.DescQuestionnaire.replace(
+      /'/g,
+      "''"
+    )}'`;
     let id = await SQL(query);
     id = id[0].Id;
     const query2 = `SELECT * FROM Questions 
-    WHERE QuestionnaireId = ${id} AND [Desc] != '${req.body.Desc}'
+    WHERE QuestionnaireId = ${id} AND [Desc] != '${req.body.Desc.replace(
+      /'/g,
+      "''"
+    )}'
     `;
     let data = await SQL(query2);
     // console.log("data", data);
@@ -716,7 +767,10 @@ app.post("/GetQestion", async (req, res) => {
 app.post("/addNewQustionsId", async (req, res) => {
   try {
     // console.log(req.body);
-    const query = `SELECT Id FROM Questions WHERE [Desc] = '${req.body.nextQusions}'`;
+    const query = `SELECT Id FROM Questions WHERE [Desc] = '${req.body.nextQusions.replace(
+      /'/g,
+      "''"
+    )}'`;
     let id = await SQL(query);
     if (req.body.nextQusions !== "ללא שאלה הבאה") {
       id = id[0].Id;
@@ -752,6 +806,46 @@ app.post("/AddnewNextquestionNoOption", async (req, res) => {
     res.json(false);
   }
 });
+app.post("/UpdateSeqTheQuestions", async (req, res) => {
+  let body = req.body;
+  const idQ = body.Idq;
+  try {
+    const Promises = body.arr.map(async (e, i) => {
+      const Q = `UPDATE Questions
+      SET Seq = ${e.newSeq} WHERE Id = ${e.id} AND QuestionnaireId = ${idQ}`;
+      await SQL(Q);
+    });
+    await Promise.all(Promises);
+    const query = `UPDATE QuestionsOptions
+    SET QuestionsOptions.NextQuestionId = NULL
+    FROM Questions
+    WHERE QuestionsOptions.QuestionsId = Questions.Id AND QuestionnaireId = ${idQ}
+    AND QuestionsOptions.NextQuestionId IS NOT NULL
+    AND Questions.Seq >= (SELECT Seq FROM Questions WHERE Id = QuestionsOptions.NextQuestionId)`;
+    await SQL(query);
+    // const Q = `SELECT Seq S FROM Questions WHERE Id = ${body.newI.Id} AND QuestionnaireId = ${idQ}`;
+    // let seq = await SQL(Q);
+    // if (seq[0]) {
+    //   seq = seq[0].S;
+    // }
+    // const q = `SELECT Id,Seq,[Desc] FROM Questions WHERE Seq < ${seq} AND QuestionnaireId = ${idQ}`;
+    // let data = await SQL(q);
+    // console.log(data);
+    // // data = data.map((obj) => obj.Id);
+    // let arr = [];
+    // const priomiso = data.map(async (obj) => {
+    //   const Q = `SELECT * FROM QuestionsOptions WHERE QuestionsId = ${obj.Id} AND NextQuestionId <= ${id}`;
+    //   let data = await SQL(Q);
+    //   console.log(data);
+    // });
+    // await Promise.all(priomiso);
+    // console.log(arr);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
 app.post("/updateSek", async (req, res) => {
   try {
     // console.log(req.body);
@@ -772,9 +866,9 @@ app.post("/updateSek", async (req, res) => {
 app.post("/AddScore", async (req, res) => {
   try {
     // console.log(req.body);
-    const Score = req.body.Score;
+    const Score = req.body.Score.replace(/'/g, "''");
     const arrIds = req.body.arrIds;
-    const QushinnareName = req.body.Qushinnare;
+    const QushinnareName = req.body.Qushinnare.replace(/'/g, "''");
     const Q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${QushinnareName}' `;
     let id = await SQL(Q);
     if (id) {
@@ -806,8 +900,8 @@ app.post("/AddScore", async (req, res) => {
 app.post("/deleteScore", async (req, res) => {
   // console.log("req.body", req.body);
   try {
-    const Score = req.body.Score;
-    const QushinnareName = req.body.Qushinnare;
+    const Score = req.body.Score.replace(/'/g, "''");
+    const QushinnareName = req.body.Qushinnare.replace(/'/g, "''");
     const arrIds = req.body.arrIds.join();
     const Q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${QushinnareName}' `;
     let id = await SQL(Q);
@@ -841,8 +935,8 @@ app.get("/GetMessages", async (req, res) => {
 app.post("/UpdateMessage", async (req, res) => {
   // console.log(req.body);
   try {
-    const Desc = req.body.Desc;
-    const Symbol = req.body.Symbol;
+    const Desc = req.body.Desc.replace(/'/g, "''");
+    const Symbol = req.body.Symbol.replace(/'/g, "''");
     const StatusId = req.body.StatusId ? 1 : 0;
     const id = req.body.ID;
     // console.log({ Desc, Symbol, StatusId });
@@ -866,10 +960,10 @@ app.delete("/DeleteMes/:id", async (req, res) => {
   }
 });
 app.post("/AddMes", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   let status = req.body.status ? 1 : 0;
-  let DescMes = req.body.DescMes;
-  let SymbolMes = req.body.SymbolMes;
+  let DescMes = req.body.DescMes.replace(/'/g, "''");
+  let SymbolMes = req.body.SymbolMes.replace(/'/g, "''");
   try {
     const query = `INSERT INTO Messages ([Desc],Symbol,StatusId) VALUES ('${DescMes}','${SymbolMes}',${status})`;
     await SQL(query);
@@ -931,7 +1025,10 @@ app.post("/serchFeach", async (req, res) => {
 app.post("/Addfeacher", async (req, res) => {
   console.log(req.body);
   try {
-    const Q = `INSERT INTO Features (Symbol,Number,[Desc]) VALUES ('${req.body.Symbol}',${req.body.number},'${req.body.Name}')`;
+    const Q = `INSERT INTO Features (Symbol,Number,[Desc]) VALUES ('${req.body.Symbol.replace(
+      /'/g,
+      "''"
+    )}',${req.body.number},'${req.body.Name.replace(/'/g, "''")}')`;
     await SQL(Q);
     res.json(true);
   } catch (error) {
@@ -953,8 +1050,8 @@ app.post("/UpFeacher", async (req, res) => {
   // console.log(req.body);
   try {
     const id = req.body.id;
-    const Name = req.body.row.Name;
-    const Symbol = req.body.row.Symbol;
+    const Name = req.body.row.Name.replace(/'/g, "''");
+    const Symbol = req.body.row.Symbol.replace(/'/g, "''");
     const number = req.body.row.number;
     const Q = `UPDATE Features
     SET Symbol = '${Symbol}',Number= ${number},[Desc] = '${Name}'
@@ -1011,12 +1108,12 @@ app.get("/GetCategiz", async (req, res) => {
 app.post("/AddNewExires", async (req, res) => {
   // console.log(req.body);
   try {
-    const Title = req.body.Title;
-    const Symbol = req.body.Symbol;
-    const descrip = req.body.descrip;
+    const Title = req.body.Title.replace(/'/g, "''");
+    const Symbol = req.body.Symbol.replace(/'/g, "''");
+    const descrip = req.body.descrip.replace(/'/g, "''");
     const categityId = req.body.categityId;
     const stuts = req.body.stuts ? 1 : 0;
-    const link = req.body.link;
+    const link = req.body.link.replace(/'/g, "''");
     // console.log({ Title, Symbol, descrip, categityId, stuts, link });
     const Q = `INSERT INTO Exercises (ExercisesCategoriesId,Symbol,Link,Title,About,StatusId)
     VALUES (${categityId},'${Symbol}','${link}','${Title}','${descrip}',${stuts})`;
@@ -1027,23 +1124,25 @@ app.post("/AddNewExires", async (req, res) => {
     res.json(false);
   }
 });
-app.delete("/delEx/:id/:nameFile", async (req, res) => {
+app.delete("/delEx/:id/:nameFile/:floader", async (req, res) => {
   try {
+    const floader = req.params.floader;
     const id = req.params.id;
     const nameFile = req.params.nameFile;
     const query = `DELETE FROM Exercises WHERE Id = ${id}`;
     await SQL(query);
     if (nameFile !== "none") {
-      Delfile(nameFile);
+      deleteFileInFolder(floader, nameFile);
     }
     res.json(true);
   } catch (error) {
+    console.log(error);
     res.json(false);
   }
 });
 app.post("/AddCategory", async (req, res) => {
   try {
-    let val = req.body.val;
+    let val = req.body.val.replace(/'/g, "''");
     // console.log(val);
     const q = `INSERT INTO ExercisesCategories (Name,StatusId) VALUES ('${val}',1)`;
     await SQL(q);
@@ -1056,7 +1155,7 @@ app.post("/AddCategory", async (req, res) => {
 app.post("/EditCategory", async (req, res) => {
   try {
     const id = req.body.id;
-    const val = req.body.val;
+    const val = req.body.val.replace(/'/g, "''");
     const q = `UPDATE ExercisesCategories
              SET Name = '${val}' WHERE Id = ${id}`;
     await SQL(q);
@@ -1080,12 +1179,12 @@ app.post("/UpdateEx", async (req, res) => {
   // console.log(req.body);
   try {
     const id = req.body.id;
-    const Title = req.body.Title;
-    const Symbol = req.body.Symbol;
-    const descrip = req.body.descrip;
+    const Title = req.body.Title.replace(/'/g, "''");
+    const Symbol = req.body.Symbol.replace(/'/g, "''");
+    const descrip = req.body.descrip.replace(/'/g, "''");
     const categityId = req.body.categityId;
     const stuts = req.body.stuts ? 1 : 0;
-    const link = req.body.link;
+    const link = req.body.link.replace(/'/g, "''");
     console.log({
       All: { id, Title, Symbol, descrip, categityId, stuts, link },
     });
@@ -1158,12 +1257,17 @@ app.get("/GetScoreAction/:arrIds", async (req, res) => {
   }
 });
 app.post("/GetDataForTableScoreAction", async (req, res) => {
-  // console.log(req.body);
+  console.log(req.body);
+  req.body.forEach((el) => {
+    for (const key in el) {
+      el[key] = el[key].replace(/'/g, "''");
+    }
+  });
   try {
     let obj = {};
     let itemsE = req.body.map((e) => `'${e.ExercisesT}'`).filter((e) => e);
     itemsE = itemsE.join(",");
-    let Q = `SELECT Title,Id FROM Exercises`;
+    let Q = `SELECT * FROM Exercises`;
     if (req.body.length > 0) {
       Q += ` WHERE Title NOT IN (${itemsE})`;
     }
@@ -1175,7 +1279,7 @@ app.post("/GetDataForTableScoreAction", async (req, res) => {
     //
     let itemsF = req.body.map((e) => `'${e.DescFeacher}'`).filter((e) => e);
     itemsF = itemsF.join(",");
-    let QU = `SELECT [Desc], Id FROM Features `;
+    let QU = `SELECT * FROM Features `;
 
     if (req.body.length > 0) {
       QU += ` WHERE [Desc] NOT IN (${itemsF})`;
@@ -1186,7 +1290,7 @@ app.post("/GetDataForTableScoreAction", async (req, res) => {
     //
     let itemsM = req.body.map((e) => `'${e.DescMes}'`).filter((e) => e);
     itemsM = itemsM.join(",");
-    let QUE = `SELECT [Desc], Id FROM Messages `;
+    let QUE = `SELECT * FROM Messages `;
 
     if (req.body.length > 0) {
       QUE += `WHERE [Desc] NOT IN (${itemsM})`;
@@ -1263,7 +1367,6 @@ app.delete("/DeleteScoreAction", async (req, res) => {
     res.json(false);
   }
 });
-// console.log(Newdata);
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);
 });

@@ -33,7 +33,7 @@
         v-if="i < counteros"
         :class="{ YeshCvar: ModelInputL[`Model-${A[A.length - 2]}`] }"
       >
-        <div class="i">{{ A[A.length - 2] }}</div>
+        <div class="i">{{ A[A.length - 2] + 1 }}</div>
         <div class="inContainer">
           <div
             :class="{ BigScreen: wachtStore, col: !wachtStore }"
@@ -41,13 +41,9 @@
             :key="index"
           >
             <!-- {{ ObjFromIds(Op, i) }} -->
-            <div
-              v-if="
-                index !== A.length - 1 &&
-                index !== A.length - 2 &&
-                Op.DescQustions
-              "
-            >
+            <!-- // Op.DescQustions -->
+            <div v-if="index !== A.length - 1 && index !== A.length - 2">
+              <!-- v-show="index !== A.length - 3" -->
               <el-tooltip
                 class="item"
                 effect="dark"
@@ -129,7 +125,7 @@
     >
       <i class="el-icon-more Icnoc"></i>
     </div>
-    <div class="LoNimtzeou" v-show="ShowLomatz">
+    <div class="LoNimtzeou" v-show="ShowLomatz || arrsTheOP.length">
       <div class="title">לא מצאנו אחי</div>
       <br />
       <div class="Haze">
@@ -197,11 +193,9 @@ export default {
     Elall(val) {
       if (val) {
         this.width = val.children[0].children[0].style.width;
+        // console.log(this.width);
         this.marginLeft = val.children[0].children[0].style.marginRight;
       }
-    },
-    ModelInputL(val) {
-      // console.log(val);
     },
     dataQ(valu) {
       this.ResetSelects();
@@ -306,7 +300,6 @@ export default {
           }
         });
       });
-      // console.log("arr", arr);
     });
   },
 
@@ -325,6 +318,8 @@ export default {
       return arrs;
     },
     compData() {
+      // this.$ax.post(URL + "J", this.Questos);
+      // console.log(this.Questos);
       this.arrsTheOP = this.generateOptionsPaths(this.Questos);
       this.arrsTheOP.forEach((element, i) => {
         element.push(i);
@@ -334,93 +329,145 @@ export default {
       this.arrsTheOPG = this.addIdsArrayToEach(this.arrsTheOPG);
       this.arrsTheOPG.forEach((element, i) => {
         element.splice(element.length - 1, 1);
-        // this.arrsTheOPG[i].splice(element.length - 1, 1);
       }); //   }
       // });
       // console.log(this.arrsTheOP);
       // console.log(this.arrsTheOPG);
     },
+    // generateOptionsPaths(questions) {
+    //   let allPaths = [];
+
+    //   const buildPath = (path, questionIndex) => {
+    //     if (questionIndex >= questions.length) {
+    //       allPaths.push(path);
+    //       return;
+    //     }
+
+    //     let currentQuestion = questions[questionIndex];
+    //     if (!currentQuestion.op || currentQuestion.op.length === 0) {
+    //       buildPath(
+    //         [
+    //           ...path,
+    //           {
+    //             Desc: null,
+    //             DescQustions: questions[questionIndex + 1]
+    //               ? questions[questionIndex + 1].Desc
+    //               : null,
+    //           },
+    //         ],
+    //         questionIndex + 1
+    //       );
+    //     } else {
+    //       currentQuestion.op.forEach((option) => {
+    //         option.DescQustions = currentQuestion.Desc;
+    //         let newPath = [...path, option];
+    //         if (option.NextQuestionId === null) {
+    //           newPath = [
+    //             ...newPath,
+    //             {
+    //               Desc: null,
+    //               DescQustions: questions[questionIndex + 1]
+    //                 ? questions[questionIndex + 1].Desc
+    //                 : null,
+    //             },
+    //           ];
+    //           allPaths.push(newPath);
+    //         } else {
+    //           let nextIndex = questions.findIndex(
+    //             (q) => q.Id === option.NextQuestionId
+    //           );
+
+    //           for (let i = questionIndex + 1; i < nextIndex; i++) {
+    //             newPath = [
+    //               ...newPath,
+    //               {
+    //                 Desc: null,
+    //                 DescQustions: questions[questionIndex + 1]
+    //                   ? questions[questionIndex + 1].Desc
+    //                   : null,
+    //               },
+    //             ];
+    //           }
+
+    //           buildPath(newPath, nextIndex);
+    //         }
+    //       });
+
+    //       if (
+    //         currentQuestion.op.some((option) => option.NextQuestionId !== null)
+    //       ) {
+    //         buildPath(
+    //           [
+    //             ...path,
+    //             {
+    //               Desc: null,
+    //               DescQustions: questions[questionIndex + 1]
+    //                 ? questions[questionIndex + 1].Desc
+    //                 : null,
+    //             },
+    //           ],
+    //           questionIndex + 1
+    //         );
+    //       }
+    //     }
+    //   };
+
+    //   buildPath([], 0);
+
+    //   allPaths = allPaths.filter((e, i, arr) => e[0].Desc);
+    //   return allPaths;
+    // },
+    //..
+    //..
+    //..
+    //..
+    //..
+    //
     generateOptionsPaths(questions) {
       let allPaths = [];
 
-      const buildPath = (path, questionIndex) => {
-        if (questionIndex >= questions.length) {
-          allPaths.push(path);
+      function buildPath(currentPath, currentQuestionId) {
+        let question = questions.find((q) => q.Id === currentQuestionId);
+        if (!question) {
+          allPaths.push(currentPath);
           return;
         }
 
-        let currentQuestion = questions[questionIndex];
-        if (!currentQuestion.op || currentQuestion.op.length === 0) {
-          buildPath(
-            [
-              ...path,
-              {
-                Desc: null,
-                DescQustions: questions[questionIndex + 1]
-                  ? questions[questionIndex + 1].Desc
-                  : null,
-              },
-            ],
-            questionIndex + 1
-          );
-        } else {
-          currentQuestion.op.forEach((option) => {
-            option.DescQustions = currentQuestion.Desc;
-            let newPath = [...path, option];
-            if (option.NextQuestionId === null) {
-              newPath = [
-                ...newPath,
-                {
-                  Desc: null,
-                  DescQustions: questions[questionIndex + 1]
-                    ? questions[questionIndex + 1].Desc
-                    : null,
-                },
-              ];
-              allPaths.push(newPath);
-            } else {
-              let nextIndex = questions.findIndex(
-                (q) => q.Id === option.NextQuestionId
-              );
-
-              for (let i = questionIndex + 1; i < nextIndex; i++) {
-                newPath = [
-                  ...newPath,
-                  {
-                    Desc: null,
-                    DescQustions: questions[questionIndex + 1]
-                      ? questions[questionIndex + 1].Desc
-                      : null,
-                  },
-                ];
-              }
-
-              buildPath(newPath, nextIndex);
-            }
-          });
-
-          if (
-            currentQuestion.op.some((option) => option.NextQuestionId !== null)
-          ) {
-            buildPath(
-              [
-                ...path,
-                {
-                  Desc: null,
-                  DescQustions: questions[questionIndex + 1]
-                    ? questions[questionIndex + 1].Desc
-                    : null,
-                },
-              ],
-              questionIndex + 1
-            );
-          }
+        if (!question.op || question.op.length === 0) {
+          allPaths.push([
+            ...currentPath,
+            { Desc: null, DescQustions: question.Desc },
+          ]);
+          return;
         }
-      };
 
-      buildPath([], 0);
+        question.op.forEach((option) => {
+          let newPath = [
+            ...currentPath,
+            { ...option, DescQustions: question.Desc },
+          ];
+          let nextQuestionIndex = questions.findIndex(
+            (q) => q.Id === option.NextQuestionId
+          );
 
-      allPaths = allPaths.filter((e, i, arr) => e[0].Desc);
+          // Add { Desc: null, DescQustions: Description of the skipped question } for each skipped question
+          for (
+            let i = questions.indexOf(question) + 1;
+            i < nextQuestionIndex;
+            i++
+          ) {
+            newPath.push({ Desc: null, DescQustions: questions[i].Desc });
+          }
+
+          if (option.NextQuestionId === null) {
+            allPaths.push(newPath);
+          } else {
+            buildPath(newPath, option.NextQuestionId);
+          }
+        });
+      }
+
+      buildPath([], 1); // Start from the first question
       return allPaths;
     },
     arraysEqual(arr1, arr2) {
@@ -459,7 +506,7 @@ export default {
       this.ModelInputL[`Model-${i}`] = text;
     },
     async DeleteScore(arrIds, Score, i) {
-      console.log({ arrIds, Score, i });
+      // console.log({ arrIds, Score, i });
       this.LoadingButton = true;
       let { data } = await this.$ax.post(URL + "deleteScore", {
         arrIds,

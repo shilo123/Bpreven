@@ -77,6 +77,7 @@
           </div>
         </el-upload>
         <video
+          autoplay
           v-show="afterUp"
           class="video"
           v-if="afterUp"

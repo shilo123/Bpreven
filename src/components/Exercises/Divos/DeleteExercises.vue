@@ -28,7 +28,9 @@ export default {
     };
   },
 
-  mounted() {},
+  mounted() {
+    // console.log(this.params);
+  },
 
   methods: {
     async DeleteExar(id) {
@@ -40,7 +42,7 @@ export default {
       } else {
         nameFile = "none";
       }
-      const URI = `${URL}delEx/${id}/${nameFile}`;
+      const URI = `${URL}delEx/${id}/${nameFile}/${this.params.ExercisesCategoriesId}`;
       console.log(URI);
       let { data } = await this.$ax.delete(URI);
       this.$Bool(data, "נמחק בהצלחה", "משהו השתבש", true);

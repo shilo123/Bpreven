@@ -58,6 +58,7 @@
                 :key="i"
                 class="Item-content"
                 ref="ItemContent"
+                :style="{ width }"
               >
                 <span>
                   {{ s.Desc }}
@@ -435,7 +436,8 @@ export default {
   z-index: 3; */
 }
 .indivos {
-  background: white;
+  background: rgba(255, 255, 255, 0.792);
+  /* height: 760px; */
   height: 630px;
   width: 1140px;
   left: 210px;

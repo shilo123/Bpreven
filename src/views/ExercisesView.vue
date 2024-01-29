@@ -2,7 +2,7 @@
   <div>
     <div>
       <OpTable
-        class="OpTable"
+        :class="{ OpTable: !watchtogelAnimate, OpTableBig: watchtogelAnimate }"
         @NewData="data = $event"
         @Noserch="
           nodata = true;
@@ -20,7 +20,10 @@
         v-show="!nodata"
         ref="Table"
         :dat="data"
-        class="TableComponent"
+        :class="{
+          TableComponent: !watchtogelAnimate,
+          TableComponentBig: watchtogelAnimate,
+        }"
         v-if="ComplitedData"
         @newComponent="
           Component = $event.C;
@@ -75,6 +78,12 @@ export default {
       params: {},
     };
   },
+  computed: {
+    watchtogelAnimate() {
+      return this.$store.state.TogelAnimate;
+    },
+  },
+
   watch: {
     data(val) {
       if (Boolean(val.length)) {
@@ -111,10 +120,24 @@ export default {
   margin-left: 80px;
   transition: all 0.3s;
 }
+.TableComponentBig {
+  width: 88%;
+  position: absolute;
+  top: 120px;
+  margin-left: 80px;
+  transition: all 0.3s;
+}
 .OpTable {
   position: absolute;
   top: 45px;
   width: 78%;
+  margin-left: 80px;
+  transition: all 0.3s;
+}
+.OpTableBig {
+  position: absolute;
+  top: 45px;
+  width: 88%;
   margin-left: 80px;
   transition: all 0.3s;
 }

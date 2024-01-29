@@ -45,7 +45,7 @@
           :key="i"
           :label="computedDat(d)"
           :value="d"
-          v-show="d !== 'Id'"
+          v-show="d !== 'Id' && computedDat(d)"
         ></el-option>
       </el-select>
     </div>
@@ -59,6 +59,7 @@
       border
       v-loading="loadingTABLE"
       v-show="data.length > 0"
+      @row-dblclick="Edit"
     >
       <el-table-column label="אפשרויות">
         <template slot-scope="scope">
@@ -266,7 +267,7 @@
                     v-model="newqunto.StartQuestion"
                   />
                 </div>
-                <div class="Date">
+                <div class="Date" v-show="newqunto.Monthly">
                   <label>תאריך חדש</label>
                   <el-date-picker
                     v-model="newqunto.Dayly"
@@ -348,10 +349,22 @@ export default {
       loadingButton: false,
       idOfDel: "",
       showeditQuen: "",
-      // idOfE: "",
+      WachDate: false,
+      DateZ: "",
     };
   },
   watch: {
+    "newqunto.Dayly"(val, Old) {
+      console.log(Boolean(Old));
+      if (Old) {
+        let date = new Date(val);
+        date.setDate(date.getDate() + 1);
+        this.DateZ = date;
+      } else {
+        this.DateZ = val;
+      }
+    },
+    // "newqunto.Monthly"(val) {},
     "shows.SHdivos"(val) {
       if (val) {
         this.$store.commit("Setmessage", true);
@@ -412,8 +425,7 @@ export default {
       } else if (val === "StatusId") {
         return "סטטוס";
       }
-
-      return "val";
+      return null;
     },
     SortTable() {
       let table = this.$refs.Table.$el;
@@ -479,15 +491,35 @@ export default {
       this.shows.showeditQuen = true;
     },
     async EditQuen() {
-      // let id = this.idOfE;
-      this.loadingButton = true;
-      let { data } = await this.$ax.post(URL + "EditOfquen", this.newqunto);
-      if (data) {
-        this.$message.success("עודכן בהצלחה");
-        location.reload();
+      // console.log(this.WachDate);
+      if (
+        (this.newqunto.Monthly && Boolean(this.newqunto.Dayly)) ||
+        !this.newqunto.Monthly
+      ) {
+        let AddYom;
+        if (this.WachDate) {
+          AddYom = true;
+        } else {
+          AddYom = false;
+        }
+        this.newqunto.Dayly = this.DateZ;
+        this.newqunto.AddYom = AddYom;
+        if (!this.newqunto.Monthly) {
+          this.newqunto.Dayly = null;
+        }
+        // console.log({ ...this.newqunto });
+        this.loadingButton = true;
+        let { data } = await this.$ax.post(URL + "EditOfquen", this.newqunto);
+        if (data) {
+          this.$message.success("עודכן בהצלחה");
+          location.reload();
+          this.loadingButton = false;
+        } else {
+          this.$message.error("משהו השתבש");
+          this.loadingButton = false;
+        }
       } else {
-        this.$message.error("משהו השתבש");
-        this.loadingButton = false;
+        this.$message.error("כתוב תאריך");
       }
     },
     DELETE(row) {
@@ -888,6 +920,7 @@ export default {
   position: relative;
   right: 34px;
   top: 30px;
+  transition: all 0.3s;
 }
 .ifMonthi label {
   position: absolute;

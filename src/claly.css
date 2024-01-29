@@ -4,6 +4,8 @@
   width: 100%;
   height: 100%;
   z-index: 550;
+  top: 0;
+  left: 0;
 }
 .indivos {
   width: 720px;

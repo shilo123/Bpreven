@@ -31,6 +31,7 @@
       </div>
       <div :class="{ File: true, fileUp: afterUp }">
         <video
+          autoplay
           :src="NewData.link"
           width="380"
           height="220"

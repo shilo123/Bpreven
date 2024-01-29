@@ -1,6 +1,12 @@
 <template>
   <div>
-    <el-table :data="data" border ref="Table" v-loading="loadingTABLE">
+    <el-table
+      :data="data"
+      border
+      ref="Table"
+      v-loading="loadingTABLE"
+      @row-dblclick="UPmos"
+    >
       <el-table-column label="אפשרויות">
         <template slot-scope="scope">
           <el-button
@@ -38,7 +44,11 @@ export default {
       loadingTABLE: false,
     };
   },
-
+  computed: {
+    watchtogelAnimate() {
+      return this.$store.state.TogelAnimate;
+    },
+  },
   async mounted() {
     await this.$nextTick();
     this.SortTable();
@@ -63,6 +73,9 @@ export default {
     },
     loadingTABLEZ(val) {
       this.loadingTABLE = val;
+    },
+    UPmos(row) {
+      this.$emit("NewComponnent", { C: "UpdateFeacher", params: row });
     },
   },
 };

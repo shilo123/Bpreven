@@ -6,6 +6,7 @@
       border
       v-loading="LoadingTABLE"
       height="600px"
+      @row-dblclick="UPE"
     >
       <el-table-column label="אפשרויות">
         <template slot-scope="scope">
@@ -47,6 +48,11 @@ export default {
       LoadingTABLE: false,
     };
   },
+  computed: {
+    watchtogelAnimate() {
+      return this.$store.state.TogelAnimate;
+    },
+  },
 
   mounted() {
     // console.log(this.data);
@@ -81,6 +87,9 @@ export default {
       setTimeout(() => {
         this.SortTable();
       }, 200);
+    },
+    UPE(row) {
+      this.$emit("newComponent", { C: "EditEx", params: row });
     },
   },
 };

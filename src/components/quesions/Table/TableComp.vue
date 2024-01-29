@@ -9,13 +9,10 @@
       v-loading="loadingTABLE"
       v-if="RafreshTable"
       @expand-change="GetOptions"
+      @row-dblclick="Edit"
       v-show="showTable"
     >
-      <el-table-column
-        label="אופציות"
-        ref="Clumn"
-        :row-style="{ background: 'red' }"
-      >
+      <el-table-column label="אופציות" ref="Clumn" width="180">
         <template slot-scope="scope">
           <div class="buttons">
             <el-button
@@ -43,8 +40,9 @@
       <el-table-column
         label="סדר"
         prop="Seq"
-        v-if="wachtStore"
+        :width="wachtStore ? 150 : 80"
       ></el-table-column>
+      <!-- v-if="wachtStore" -->
       <el-table-column label="אם אחרון">
         <template slot-scope="scope">
           {{ computedOfisEnd(scope.row.IsEnd) }}
@@ -612,11 +610,8 @@ export default {
           //   console.log(tds);
           Array.from(tds).forEach((element, i) => {
             let elco;
-            if (this.wachtStore) {
-              elco = element.children[8].children[0].children[0].children[0];
-            } else {
-              elco = element.children[7].children[0].children[0].children[0];
-            }
+
+            elco = element.children[8].children[0].children[0].children[0];
             elco.classList = "el-icon-arrow-left";
             Array.from(element.children).forEach((el) => {
               el.style.textAlign = "right";

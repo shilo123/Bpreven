@@ -1,6 +1,12 @@
 <template>
   <div>
-    <el-table :data="data" v-loading="loadingTABLE" ref="Table" border>
+    <el-table
+      :data="data"
+      v-loading="loadingTABLE"
+      ref="Table"
+      @row-dblclick="ShowupdateMes"
+      border
+    >
       <el-table-column label="אפשרויות">
         <template slot-scope="scope">
           <el-button
@@ -58,7 +64,6 @@ export default {
         });
       });
     },
-
     ShowupdateMes(row) {
       this.$emit("NewComponent", { Comp: "UpdateMes", params: row });
     },
