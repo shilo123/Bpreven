@@ -92,7 +92,7 @@ export default {
           class: "fa-sharp fa-regular fa-hundred-points",
         },
 
-        // { Route: "/Users", NameRoute: "משתמשים", class: "fa-solid fa-user" },
+        { Route: "/Users", NameRoute: "פרוטוקולים", class: "fa-solid fa-user" },
       ],
     };
   },
@@ -153,7 +153,6 @@ export default {
     },
   },
   async mounted() {
-    // console.log(this.$store.state.message);
     if (this.$route.path === "/") {
       document.body.style.background = "";
     }
@@ -243,6 +242,16 @@ body {
   border-radius: 20px 0 0 20px;
   padding: 10px;
   z-index: 1;
+  white-space: nowrap;
+  width: 200px;
+  /* overflow-x: auto; */
+}
+.row::-webkit-scrollbar-thumb {
+  background: darkgrey;
+  border-radius: 10px;
+}
+.row::-webkit-scrollbar-track {
+  background: #000;
 }
 .row:hover {
   background: rgba(249, 218, 218, 0.53);

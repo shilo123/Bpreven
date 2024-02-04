@@ -1,7 +1,6 @@
 <template>
   <div class="newQ">
     <i class="el-icon-close" @click="$store.commit('SgorDivos', true)"></i>
-
     <div class="innewQ w3-card-4">
       <div class="itemNewQA">
         <label>שם השאלה</label>
@@ -81,7 +80,6 @@
 </template>
 <script>
 import { URL } from "@/URL/url";
-
 export default {
   data() {
     return {
@@ -182,7 +180,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .newQ {
   background: rgba(255, 255, 255, 0.879);
   border: 11px solid rgba(171, 192, 167, 0.645);
@@ -191,6 +189,12 @@ export default {
   width: 800px;
   left: 280px;
   top: 60px;
+  .butonas {
+    position: relative;
+    top: 50px;
+    right: 26px;
+    margin: 10px;
+  }
 }
 .innewQ {
   border: 3px solid black;
@@ -204,63 +208,60 @@ export default {
   overflow-y: hidden;
   display: flex;
   flex-direction: row-reverse;
-}
-.itemNewQA label {
-  position: relative;
-  left: 125px;
-}
-.itemNewQA .w3-input {
-  width: 200px;
-  background: none;
-}
-.itemNewQA {
-  position: relative;
-  right: 20px;
-  top: 20px;
-}
-.itemNewQB {
-  position: relative;
-  right: 130px;
-  top: 40px;
-}
-.itemNewQB label,
-.itemNewQC label {
-  position: relative;
-  left: 80px;
-  bottom: 20px;
-}
-.itemNewQC {
-  position: relative;
-  right: -25px;
-  top: 160px;
-}
-.itemNewQG {
-  position: relative;
-  top: 160px;
-  left: 440px;
-}
-.itemNewQG label {
-  position: relative;
-  left: 17px;
-  bottom: 10px;
-}
-.itemNewQD {
-  position: absolute;
-  bottom: 60px;
-  right: 75px;
-}
-.itemNewQD label {
-  position: absolute;
-  width: 50px;
-  bottom: 30px;
-  /* right: 31px; */
-  right: 16px;
-}
-.newQ .butonas {
-  position: relative;
-  top: 50px;
-  right: 26px;
-  margin: 10px;
+
+  .itemNewQA {
+    position: relative;
+    right: 20px;
+    top: 20px;
+    label {
+      position: relative;
+      left: 125px;
+    }
+    .w3-input {
+      width: 200px;
+      background: none;
+    }
+  }
+  .itemNewQB {
+    position: relative;
+    right: 130px;
+    top: 40px;
+  }
+  .itemNewQB,
+  .itemNewQC {
+    label {
+      position: relative;
+      left: 80px;
+      bottom: 20px;
+    }
+  }
+  .itemNewQC {
+    position: relative;
+    right: -25px;
+    top: 160px;
+  }
+  .itemNewQG {
+    position: relative;
+    top: 160px;
+    left: 440px;
+    label {
+      position: relative;
+      left: 17px;
+      bottom: 10px;
+    }
+  }
+  .itemNewQD {
+    position: absolute;
+    bottom: 60px;
+    right: 75px;
+    label {
+      position: absolute;
+      width: 50px;
+      bottom: 30px;
+      /* right: 31px; */
+      right: 16px;
+    }
+  }
 }
 .sgorTo {
   margin-right: 10px;

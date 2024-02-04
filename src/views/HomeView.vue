@@ -2,28 +2,44 @@
   <div class="all">
     <h1>היי</h1>
     <div class="content">שלום שלום שלום</div>
-    <i class="fa-solid fa-paper-plane-top icon"></i>
-    <!-- <Select @changez="BodekTo($event)" :pleaceHolder="'בחר'" :Ops="theOption" /> -->
+    <!-- <i class="fa-solid fa-paper-plane-top icon"></i> -->
+    <!-- <el-button ref="elButton" slot="reference" @click="Func"
+      >Hover to activate</el-button
+    > -->
   </div>
 </template>
 <script>
-// import Select from "@/components/ComponenetsCloly/SelectozComp.vue";
 export default {
   name: "BprevenHomeView",
-  // components: { Select },
 
   data() {
     return {
       visible: false,
       theOption: ["היי", "שלום"],
+      over: false,
     };
   },
-  watch: {},
-  mounted() {
-    // console.log(this.$random(1, 20));
+  watch: {
+    over(val) {
+      console.log(val);
+    },
+    visible(val) {
+      console.log(this.$refs.elButton.$slots);
+    },
   },
 
-  methods: {},
+  methods: {
+    Asyncvisible() {
+      console.log("sdf");
+      setTimeout(() => {
+        this.visible = false;
+      }, 500);
+    },
+    Func() {
+      const x = [""];
+      console.log(Boolean(x.length));
+    },
+  },
 };
 </script>
 <style scoped>

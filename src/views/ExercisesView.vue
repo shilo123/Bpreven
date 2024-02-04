@@ -112,20 +112,20 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .TableComponent {
   width: 78%;
   position: absolute;
   top: 120px;
   margin-left: 80px;
   transition: all 0.3s;
-}
-.TableComponentBig {
-  width: 88%;
-  position: absolute;
-  top: 120px;
-  margin-left: 80px;
-  transition: all 0.3s;
+  &Big {
+    width: 88%;
+    position: absolute;
+    top: 120px;
+    margin-left: 80px;
+    transition: all 0.3s;
+  }
 }
 .OpTable {
   position: absolute;
@@ -133,13 +133,13 @@ export default {
   width: 78%;
   margin-left: 80px;
   transition: all 0.3s;
-}
-.OpTableBig {
-  position: absolute;
-  top: 45px;
-  width: 88%;
-  margin-left: 80px;
-  transition: all 0.3s;
+  &Big {
+    position: absolute;
+    top: 45px;
+    width: 88%;
+    margin-left: 80px;
+    transition: all 0.3s;
+  }
 }
 .LoMatz {
   position: absolute;

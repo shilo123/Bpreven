@@ -73,7 +73,6 @@
       </el-table-column>
       <el-table-column label="סטטוס" prop="StatusId">
         <template slot-scope="scope">
-          <!-- {{ console.log(scope.row.StatusId) }} -->
           <div>{{ Booleano(scope.row.StatusId) ? "פעיל" : "לא פעיל" }}</div>
         </template>
       </el-table-column>
@@ -149,7 +148,15 @@
                   >
                   </el-input>
                 </div>
-                <div class="DateQuest">
+                <div class="MonthyQuen">
+                  <label>שאלון יומי</label>
+                  <el-switch
+                    v-model="ifYom"
+                    active-text="כן"
+                    inactive-text="לא"
+                  ></el-switch>
+                </div>
+                <div class="DateQuest" v-show="ifYom">
                   <label>בחר תאריך</label>
                   <el-date-picker
                     v-model="newquen.Date"
@@ -160,22 +167,52 @@
                   >
                   </el-date-picker>
                 </div>
-                <div class="MonthyQuen">
+              </div>
+              <div class="rowC">
+                <div class="SwichIfMonthy">
                   <label>שאלון חודשי</label>
                   <el-switch
-                    v-model="newquen.monthi"
+                    v-model="Ifmonthil"
                     active-text="כן"
                     inactive-text="לא"
                   ></el-switch>
                 </div>
-              </div>
-              <div class="rowC">
-                <div class="defaultQuen">
-                  <label>ערך דפולטיבי</label>
+                <div class="defaultQuen" v-show="Ifmonthil">
+                  <label>חודש</label>
                   <input
-                    placeholder="ערך דיפלוטיבי"
+                    placeholder="חודש"
                     type="number"
                     class="w3-input"
+                    v-model="newquen.monthi"
+                  />
+                </div>
+                <el-select
+                  placeholder="סוג שאלון"
+                  class="ElSELECTZ1"
+                  v-model="newquen.type"
+                >
+                  <el-option
+                    v-for="(o, i) in Optoz"
+                    :key="i"
+                    :label="o.Name"
+                    :value="o.Id"
+                  ></el-option>
+                </el-select>
+              </div>
+              <div class="rowD">
+                <div class="swichIfMonchly">
+                  <label>ערך דפולטיבי</label>
+                  <el-switch
+                    v-model="ifDefault"
+                    active-text="כן"
+                    inactive-text="לא"
+                  ></el-switch>
+                </div>
+                <div class="Default" v-show="ifDefault">
+                  <label>ערך דפולטיבי</label>
+                  <input
+                    type="text"
+                    class="w3-input Inptutozy"
                     v-model="newquen.default"
                   />
                 </div>
@@ -217,16 +254,38 @@
             >
           </div>
           <div v-show="shows.SHdivos && shows.showeditQuen">
-            <el-table :data="rowEdit" v-if="false">
-              <el-table-column label="שם" prop="Desc"></el-table-column>
-              <el-table-column label="סימן" prop="Symbol"></el-table-column>
-              <el-table-column
-                label="שאלה ראשונית"
-                prop="StartQuestion"
-              ></el-table-column>
-              <el-table-column label="סטטוס" prop="StatusId"></el-table-column>
-            </el-table>
             <div class="inEditQuen w3-card-4">
+              <div
+                class="Date MaSHkaym"
+                v-show="IfYomy && newqunto.QuestionnaireTypesId === 1"
+              >
+                <label>תאריך יומי</label>
+                <el-date-picker
+                  v-model="newqunto.Dayly"
+                  placeholder="תאריך חדש"
+                ></el-date-picker>
+              </div>
+              <div
+                class="Number MaSHkaym"
+                v-show="MonthiVal && newqunto.QuestionnaireTypesId === 1"
+              >
+                <label>חודש</label>
+                <el-input
+                  placeholder="מספר"
+                  v-model="newqunto.Monthly"
+                ></el-input>
+              </div>
+              <div
+                class="DefaultId MaSHkaym"
+                v-show="IFdefaultE && newqunto.QuestionnaireTypesId === 1"
+              >
+                <label>דפולט</label>
+                <el-input
+                  placeholder="מספר"
+                  v-model="newqunto.DefaultId"
+                ></el-input>
+              </div>
+
               <div class="rowEA">
                 <div class="newName">
                   <label>שם חדש</label>
@@ -267,31 +326,53 @@
                     v-model="newqunto.StartQuestion"
                   />
                 </div>
-                <div class="Date" v-show="newqunto.Monthly">
-                  <label>תאריך חדש</label>
-                  <el-date-picker
-                    v-model="newqunto.Dayly"
-                    placeholder="תאריך חדש"
-                  ></el-date-picker>
-                </div>
-                <div class="ifMonthi">
-                  <label>אם שאלון חודשי</label>
+                <div
+                  class="ifMonthio"
+                  v-show="newqunto.QuestionnaireTypesId === 1"
+                >
+                  <label>אם שאלון יומי</label>
                   <el-switch
-                    v-model="newqunto.Monthly"
+                    v-model="IfYomy"
                     active-text="כן"
                     inactive-text="לא"
                   ></el-switch>
                 </div>
               </div>
               <div class="rowEC">
-                <div class="Number">
-                  <label>מספר</label>
-                  <input
-                    type="text"
-                    class="w3-input"
-                    placeholder="מספר"
-                    v-model="newqunto.DefaultId"
-                  />
+                <div class="QTYpe">
+                  <label>סוג שאלון</label>
+                  <el-select
+                    placeholder="סוג שאלון"
+                    class="ElSELECTZ"
+                    v-model="newqunto.QuestionnaireTypesId"
+                  >
+                    <el-option
+                      v-for="(o, i) in Optoz"
+                      :key="i"
+                      :label="o.Name"
+                      :value="o.Id"
+                    ></el-option>
+                  </el-select>
+                </div>
+                <div
+                  class="ifMonthi"
+                  v-show="newqunto.QuestionnaireTypesId === 1"
+                >
+                  <label>אם שאלון חודשי</label>
+                  <el-switch
+                    v-model="MonthiVal"
+                    active-text="כן"
+                    inactive-text="לא"
+                  ></el-switch>
+                </div>
+                <div class="rowED">
+                  <el-switch
+                    v-show="newqunto.QuestionnaireTypesId === 1"
+                    class="SwitchDefaultId"
+                    v-model="IFdefaultE"
+                    active-text="כן"
+                    inactive-text="לא"
+                  ></el-switch>
                 </div>
               </div>
             </div>
@@ -321,6 +402,12 @@ import { URL } from "@/URL/url";
 export default {
   data() {
     return {
+      IFdefaultE: false,
+      MonthiVal: false,
+      ifDefault: false,
+      ifYom: false,
+      IfYomy: false,
+      Ifmonthil: false,
       console,
       data: [],
       data2: [],
@@ -337,7 +424,8 @@ export default {
         StatusId: true,
         Date: "",
         default: "",
-        monthi: false,
+        monthi: "",
+        type: 1,
       },
       shows: {
         SHdivos: false,
@@ -346,6 +434,7 @@ export default {
       },
       rowEdit: [],
       newqunto: {},
+      Optoz: {},
       loadingButton: false,
       idOfDel: "",
       showeditQuen: "",
@@ -353,7 +442,76 @@ export default {
       DateZ: "",
     };
   },
+  computed: {
+    Monthi() {
+      return this.newquen.Monthly;
+    },
+
+    pleace() {
+      return `סנן לפי ${this.computedDat(this.selcto)}...`;
+    },
+    wachtStore() {
+      return this.$store.state.TogelAnimate;
+    },
+  },
+
   watch: {
+    ifYom(val) {
+      //newquen.Date
+      if (val) {
+        this.Ifmonthil = false;
+        this.ifDefault = false;
+        this.newquen.default = null;
+        this.newquen.monthi = null;
+      }
+    },
+    Ifmonthil(val) {
+      //newquen.monthi
+      if (val) {
+        this.ifYom = false;
+        this.ifDefault = false;
+        this.newquen.Date = null;
+        this.newquen.default = null;
+      }
+    },
+    ifDefault(val) {
+      //newquen.default
+      if (val) {
+        this.ifYom = false;
+        this.Ifmonthil = false;
+        this.newquen.Date = null;
+        this.newquen.monthi = null;
+      }
+    },
+    //
+    IfYomy(val) {
+      //newqunto.Dayly
+      if (val) {
+        this.MonthiVal = false;
+        this.IFdefaultE = false;
+        this.newqunto.Monthly = null;
+        this.newqunto.DefaultId = null;
+      }
+    },
+    MonthiVal(val) {
+      //newqunto.Monthly
+      if (val) {
+        this.IfYomy = false;
+        this.IFdefaultE = false;
+        this.newqunto.Dayly = null;
+        this.newqunto.DefaultId = null;
+      }
+    },
+    IFdefaultE(val) {
+      //newqunto.DefaultId
+      if (val) {
+        this.IfYomy = false;
+        this.MonthiVal = false;
+        this.newqunto.Dayly = "";
+        this.newqunto.Monthly = "";
+      }
+    },
+    //
     "newqunto.Dayly"(val, Old) {
       console.log(Boolean(Old));
       if (Old) {
@@ -364,7 +522,6 @@ export default {
         this.DateZ = val;
       }
     },
-    // "newqunto.Monthly"(val) {},
     "shows.SHdivos"(val) {
       if (val) {
         this.$store.commit("Setmessage", true);
@@ -391,15 +548,10 @@ export default {
       }, 500);
     },
   },
-  computed: {
-    pleace() {
-      return `סנן לפי ${this.computedDat(this.selcto)}...`;
-    },
-    wachtStore() {
-      return this.$store.state.TogelAnimate;
-    },
-  },
   async mounted() {
+    const response = await this.$ax.get(URL + "GetOptionTypeQuesinnaire");
+    // console.log(response.data);
+    this.Optoz = response.data;
     let result = await this.$ax.get(URL);
     this.data = result.data;
     this.data2 = result.data;
@@ -476,14 +628,19 @@ export default {
     },
     Edit(row) {
       // this.idOfE = row.Id;
-      console.log(row);
+      // console.log(row);
       this.rowEdit = [row];
+      if (!row.QuestionnaireTypesId) this.newqunto.QuestionnaireTypesId = 1;
       let stat = row.StatusId;
       let M = row.Monthly;
+      let Os = row.Dayly;
+      let z = row.DefaultId;
       this.newqunto = row;
-      this.newqunto.Monthly = Boolean(M);
+      // this.newqunto.Monthly = Boolean(M);
       this.newqunto.StatusId = Boolean(stat);
-      this.newquen.Desc = row.Desc;
+      this.IfYomy = Boolean(Os);
+      this.MonthiVal = Boolean(M);
+      this.IFdefaultE = Boolean(z);
       this.newquen.Symbol = row.Symbol;
       this.newquen.StartQuestion = row.StartQuestion;
       this.newquen.StatusId = row.StatusId;
@@ -491,11 +648,13 @@ export default {
       this.shows.showeditQuen = true;
     },
     async EditQuen() {
-      // console.log(this.WachDate);
-      if (
-        (this.newqunto.Monthly && Boolean(this.newqunto.Dayly)) ||
-        !this.newqunto.Monthly
-      ) {
+      const Booleano =
+        (this.IfYomy && this.newqunto.Dayly) ||
+        (this.MonthiVal && this.newqunto.Monthly) ||
+        (this.IFdefaultE && this.newqunto.DefaultId) ||
+        this.newqunto.QuestionnaireTypesId !== 1;
+      //
+      if (Booleano) {
         let AddYom;
         if (this.WachDate) {
           AddYom = true;
@@ -504,11 +663,12 @@ export default {
         }
         this.newqunto.Dayly = this.DateZ;
         this.newqunto.AddYom = AddYom;
-        if (!this.newqunto.Monthly) {
-          this.newqunto.Dayly = null;
-        }
-        // console.log({ ...this.newqunto });
         this.loadingButton = true;
+        if (this.newqunto.QuestionnaireTypesId !== 1) {
+          this.newqunto.Dayly = null;
+          this.newqunto.Monthly = null;
+          this.newqunto.DefaultId = null;
+        }
         let { data } = await this.$ax.post(URL + "EditOfquen", this.newqunto);
         if (data) {
           this.$message.success("עודכן בהצלחה");
@@ -519,7 +679,20 @@ export default {
           this.loadingButton = false;
         }
       } else {
-        this.$message.error("כתוב תאריך");
+        if (this.IfYomy) {
+          this.$message.error("כתוב תאריך");
+        } else if (this.MonthiVal) {
+          this.$message.error("כתוב חודש");
+        } else if (this.IFdefaultE) {
+          this.$message.error("הוסף ערך");
+        } else if (
+          !this.IFdefaultE &&
+          !this.MonthiVal &&
+          !this.IfYomy &&
+          this.newqunto.QuestionnaireTypesId === 1
+        ) {
+          this.$message.error("בחר יומי או חודשי או דפולטיבי");
+        }
       }
     },
     DELETE(row) {
@@ -555,23 +728,39 @@ export default {
     },
     async Inserquen() {
       this.loadingButton = true;
-      // console.log(typeof +this.newquen.StatusId);
-      let { data } = await this.$ax.post(URL + "newequen", this.newquen);
-      this.loadingButton = false;
-      if (data) {
-        this.$message.success("נוסף בהצלחה");
-        this.shows.SHdivos = false;
-        this.shows.SHnewquestionnaire = false;
-        location.reload();
-        this.newquen.Desc = "";
-        this.newquen.Symbol = "";
-        this.newquen.StartQuestion = "";
-        this.newquen.StatusId = "";
+      // console.log({ ...this.newquen });
+      if (
+        true
+        // (this.ifYom && this.newquen.Date) ||
+        // (this.newquen.monthi && this.newquen.default && this.newquen.Desc)
+      ) {
+        let { data } = await this.$ax.post(URL + "newequen", this.newquen);
+        this.loadingButton = false;
+        if (data) {
+          this.$message.success("נוסף בהצלחה");
+          this.shows.SHdivos = false;
+          this.shows.SHnewquestionnaire = false;
+          location.reload();
+          this.newquen.Desc = "";
+          this.newquen.Symbol = "";
+          this.newquen.StartQuestion = "";
+          this.newquen.StatusId = "";
+        } else {
+          this.$message.error("משהו השתבש");
+          this.shows.SHdivos = false;
+          this.shows.SHnewquestionnaire = false;
+        }
       } else {
-        this.$message.error("משהו השתבש");
-
-        this.shows.SHdivos = false;
-        this.shows.SHnewquestionnaire = false;
+        if (this.ifYom) {
+          this.$message.error("מלא תאריך אחינו");
+        } else if (this.newquen.monthi) {
+          this.$message.error("מלא חודש");
+        } else if (!this.newquen.Desc) {
+          this.$message.error("מלא שם");
+        } else if (!this.ifYom && !this.newquen.monthi) {
+          this.$message.error("בחר תאריך יומי או חודשי");
+        }
+        this.loadingButton = false;
       }
     },
     isNumeric(str) {
@@ -584,7 +773,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .optionsONtheTable {
   background: linear-gradient(
     rgb(166, 209, 209),
@@ -599,21 +788,21 @@ export default {
   height: 3.9em;
   left: 117px;
   transition: all 0.3s;
-}
-.optionsONtheTableBig {
-  background: linear-gradient(
-    rgb(166, 209, 209),
-    rgb(174, 107, 107),
-    rgb(52, 55, 64)
-  );
-  display: flex;
-  flex-direction: row-reverse;
-  position: absolute;
-  width: 86%;
-  top: 40px;
-  height: 3.9em;
-  left: 117px;
-  transition: all 0.3s;
+  &Big {
+    background: linear-gradient(
+      rgb(166, 209, 209),
+      rgb(174, 107, 107),
+      rgb(52, 55, 64)
+    );
+    display: flex;
+    flex-direction: row-reverse;
+    position: absolute;
+    width: 86%;
+    top: 40px;
+    height: 3.9em;
+    left: 117px;
+    transition: all 0.3s;
+  }
 }
 .input {
   width: 400px;
@@ -622,31 +811,35 @@ export default {
   right: 250px;
   top: 8px;
   transition: all 0.3s;
-}
-.inputBig {
-  width: 650px;
-  z-index: 501;
-  position: relative;
-  right: 250px;
-  top: 8px;
-  transition: all 0.3s;
+  &Big {
+    width: 650px;
+    z-index: 501;
+    position: relative;
+    right: 250px;
+    top: 8px;
+    transition: all 0.3s;
+  }
 }
 .selectA {
   z-index: 501;
   position: relative;
   right: 300px;
   top: 8px;
-}
-.selectABig {
-  z-index: 501;
-  position: relative;
-  right: 340px;
-  top: 8px;
+  &Big {
+    z-index: 501;
+    position: relative;
+    right: 340px;
+    top: 8px;
+  }
 }
 .Newquen {
   position: absolute;
   top: 0;
   right: 0;
+  &:hover {
+    font-size: 23px;
+    color: black;
+  }
 }
 .table {
   width: 70%;
@@ -660,23 +853,19 @@ export default {
   overflow-y: auto;
   padding-bottom: 50px;
   transition: all 0.3s;
-}
-.tableBig {
-  width: 86%;
-  position: absolute;
-  top: 100px;
-  right: 0;
-  margin-right: 96.9px;
-  height: 700px;
-  z-index: 3;
-  border: 3px solid black;
-  overflow-y: auto;
-  padding-bottom: 50px;
-  transition: all 0.3s;
-}
-.Newquen:hover {
-  font-size: 23px;
-  color: black;
+  &Big {
+    width: 86%;
+    position: absolute;
+    top: 100px;
+    right: 0;
+    margin-right: 96.9px;
+    height: 700px;
+    z-index: 3;
+    border: 3px solid black;
+    overflow-y: auto;
+    padding-bottom: 50px;
+    transition: all 0.3s;
+  }
 }
 .queshens {
   background: white;
@@ -706,27 +895,27 @@ export default {
   border-radius: 10px;
   overflow-y: hidden;
   overflow-x: hidden;
-}
-.afterTable label {
-  float: right;
-  margin: 10px;
-}
-.afterTable .w3-input {
-  margin-bottom: 10px;
-  text-align: right;
-}
-.w3-input::placeholder {
-  text-align: right;
-  color: rgba(152, 132, 132, 0.771);
+  label {
+    float: right;
+    margin: 10px;
+  }
+  .w3-input {
+    margin-bottom: 10px;
+    text-align: right;
+    &::placeholder {
+      text-align: right;
+      color: rgba(152, 132, 132, 0.771);
+    }
+  }
 }
 .ButtonNext {
   float: right;
   margin: 5px;
   width: 150px;
   box-shadow: 0 0 7px 2px rgb(136, 123, 123);
-}
-.ButtonNext:hover {
-  box-shadow: 0 0 2px 0;
+  &:hover {
+    box-shadow: 0 0 2px 0;
+  }
 }
 .buttons {
   width: 100%;
@@ -754,120 +943,140 @@ export default {
   padding-bottom: 50px;
   left: 240px;
   border-radius: 20px;
-}
-.inEditQuen {
-  border: 3px solid black;
-  height: 400px;
-  width: 90%;
-  display: block;
-  /* margin: 30px; */
-  margin: 40px;
-  border-radius: 20px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-.inEditQuen .w3-input {
-  width: 220px;
-  background: none;
-  border-color: black;
-}
-.inEditQuen label:not(.labelBaya, .labelBayaB) {
-  position: relative;
-  left: 170px;
-}
-.labelBaya {
-  position: relative;
-  left: 90px;
-  margin-bottom: 8px;
-  /* border-bottom: 3px solid black; */
-}
-.inEditQuen .el-row {
-  position: relative;
-  left: 50px;
-  margin-bottom: 40px;
-}
-.labelBayaB {
-  position: relative;
-  left: 150px;
-}
-.inputTextarea {
-  position: relative;
-  top: 25px;
-  width: 280px;
-}
-.bottonsInD {
-  position: relative;
-  right: 20px;
+
+  .inEditQuen {
+    border: 3px solid black;
+    height: 400px;
+    width: 90%;
+    display: block;
+    /* margin: 30px; */
+    margin: 40px;
+    border-radius: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    .w3-input {
+      width: 220px;
+      background: none;
+      border-color: black;
+    }
+    label {
+      &:not(.labelBaya, .labelBayaB) {
+        position: relative;
+        left: 170px;
+      }
+    }
+    .el-row {
+      position: relative;
+      left: 50px;
+      margin-bottom: 40px;
+    }
+    .labelBaya {
+      position: relative;
+      left: 90px;
+      margin-bottom: 8px;
+    }
+    .labelBayaB {
+      position: relative;
+      left: 150px;
+    }
+    .inputTextarea {
+      position: relative;
+      top: 25px;
+      width: 280px;
+    }
+  }
+  .bottonsInD {
+    position: relative;
+    right: 20px;
+  }
 }
 .LoMatzanu {
   position: absolute;
   top: 30%;
   left: 30%;
 }
-.DateQuest {
-  margin: 13px;
-  position: relative;
-  right: 10px;
-  top: 30px;
+//
+.afterTable {
+  .rowA {
+    display: flex;
+    flex-direction: row-reverse;
+    margin: 15px;
+    .symbolQuest {
+      margin-right: 40px;
+    }
+    .defaultQuen {
+      width: 140px;
+      position: absolute;
+      top: 40px;
+      left: -680px;
+    }
+    .statusQues {
+      label {
+        position: absolute;
+      }
+      .stutus {
+        position: relative;
+        right: 45px;
+        top: 50px;
+      }
+    }
+  }
+  .rowB {
+    position: absolute;
+    display: flex;
+    flex-direction: row-reverse;
+    right: 0;
+    margin: 35px;
+    .MonthyQuen {
+      margin: 13px;
+      position: relative;
+      right: 380px;
+      top: 30px;
+      label {
+        position: absolute;
+        top: -40px;
+        right: -10px;
+      }
+    }
+    .DateQuest {
+      position: absolute;
+      top: 40px;
+      left: -440px;
+      label {
+        position: absolute;
+        top: -40px;
+        text-align: right;
+        right: 0;
+      }
+    }
+  }
+  .rowC {
+    position: absolute;
+    display: flex;
+    flex-direction: row-reverse;
+    right: -80px;
+    margin: 35px;
+    top: 150px;
+  }
+  .rowD {
+    position: absolute;
+    display: flex;
+    flex-direction: row-reverse;
+    right: 350px;
+    margin: 35px;
+    top: 310px;
+  }
 }
-.DateQuest label {
-  position: absolute;
-  top: -40px;
-  text-align: right;
-  right: 0;
-}
-.stutus {
-  position: relative;
-  right: 45px;
-  top: 50px;
-}
-.statusQues label {
-  position: absolute;
-}
-.rowA {
-  display: flex;
-  flex-direction: row-reverse;
-  margin: 15px;
-}
-.rowB {
-  position: absolute;
-  display: flex;
-  flex-direction: row-reverse;
-  right: 0;
-  margin: 45px;
-}
-.rowC {
-  position: absolute;
-  display: flex;
-  flex-direction: row-reverse;
-  right: -80px;
-  margin: 35px;
-  top: 200px;
-}
-.symbolQuest {
-  margin-right: 40px;
-}
-.defaultQuen {
-  width: 140px;
-  position: relative;
-  right: 390px;
-  top: 70px;
-}
-.MonthyQuen {
-  position: absolute;
-  top: 40px;
-  left: -180px;
-}
-.MonthyQuen label {
-  position: absolute;
-  top: -40px;
-  right: -10px;
-}
+
 .rowEA {
   display: flex;
   flex-direction: row-reverse;
   margin: 25px;
   position: relative;
+  .newSymbol {
+    margin-right: 60px;
+  }
 }
 .rowEB {
   display: flex;
@@ -884,8 +1093,13 @@ export default {
   right: 70px;
   top: 300px;
 }
-.newSymbol {
-  margin-right: 60px;
+.rowED {
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 25px;
+  position: absolute;
+  right: 450px;
+  top: 0px;
 }
 .newStat {
   margin-right: 140px;
@@ -905,31 +1119,103 @@ export default {
 .Date {
   position: relative;
   top: 20px;
-  left: 60px;
+  left: -10px;
+  /* left: 60px; */
 }
 .Date .el-input {
   position: relative;
-  left: 30px;
+  left: 20px;
 }
 .Date label {
   position: absolute !important;
   top: -40px;
   right: -60px !important;
 }
-.ifMonthi {
+.ifMonthio {
   position: relative;
-  right: 34px;
+  right: -36px;
   top: 30px;
   transition: all 0.3s;
+}
+.ifMonthio label {
+  position: absolute;
+  top: -40px;
+  left: 90px !important;
+}
+.Number {
+  position: relative;
+  right: 290px;
+  bottom: 90px;
+}
+.ifMonthi {
+  position: relative;
+  right: 313px;
+  top: -40px;
 }
 .ifMonthi label {
   position: absolute;
   top: -40px;
-  left: 100px !important;
+  left: 90px !important;
 }
-.Number {
+.ElSELECTZ {
+  position: absolute;
+  right: 50px;
+  width: 220px;
+}
+.MonthyQuen {
+  position: absolute;
+}
+.SwichIfMonthy {
   position: relative;
-  right: 350px;
+  right: 470px;
+  top: 100px;
+}
+.SwichIfMonthy label {
+  position: absolute;
+  top: -40px;
+  left: 0px !important;
+  width: 100%;
+}
+.ElSELECTZ1 {
+  position: absolute;
+  left: -280px;
+  bottom: -150px;
+}
+.Inptutozy {
+  width: 140px;
+}
+.swichIfMonchly {
+  position: relative;
+  right: 40px;
+  top: 20px;
+}
+.swichIfMonchly {
+  label {
+    position: absolute;
+    top: -40px;
+    left: -10px !important;
+    width: 110px;
+    display: inline-block;
+  }
+}
+.Default {
+  position: absolute;
+  left: -330px;
+}
+.DefaultId {
+  position: relative;
+  /* left: 400px; */
+}
+.SwitchDefaultId {
+  position: relative;
+  left: 100px;
+}
+.MaSHkaym {
+  z-index: 20;
+  position: absolute;
+  top: 240px !important;
+  left: 150px !important;
+  width: 200px;
 }
 </style>
 <style></style>

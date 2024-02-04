@@ -21,6 +21,9 @@
       "
     />
     <div>
+      <!-- <el-table :data="data">
+        <el-table-column label=""></el-table-column>
+      </el-table> -->
       <Tablos
         v-show="!showLoMatzanu"
         :dat="data"
@@ -29,14 +32,15 @@
           TableComponent: !watchtogelAnimate,
           TableComponentBigscreen: watchtogelAnimate,
         }"
-        v-if="ComplitedData"
         @NewComponnent="
           Component = $event.C;
           row = $event.params;
           showDivos = true;
         "
       />
+      <!-- v-if="ComplitedData" -->
     </div>
+
     <div class="divos" v-if="showDivos">
       <transition appear name="expand">
         <div
@@ -47,11 +51,6 @@
             AddFeacher: Component === 'AddFeacher',
           }"
         >
-          <!-- :class="{
-            AddNewAnswer: Component === 'AddAnswer',
-            EditOption: Component === 'EditOption',
-            warning: Component === 'warning',
-          }" -->
           <component
             :is="Component"
             :row="row"
@@ -89,6 +88,7 @@ export default {
     };
   },
   watch: {
+    ComplitedData(val) {},
     data(val) {
       //   console.log(val);
       let Table = this.$refs.Table;
@@ -105,6 +105,9 @@ export default {
     // console.log(data);
     this.data = data;
     this.ComplitedData = true;
+    let table = this.$refs.Table;
+    table.UpLoading(false);
+    table.data = data;
   },
   computed: {
     watchtogelAnimate() {
@@ -115,7 +118,7 @@ export default {
   methods: {
     loadingTABLO(val) {
       let Table = this.$refs.Table;
-      Table.loadingTABLEZ(val);
+      Table.UpLoading(val);
     },
   },
 };

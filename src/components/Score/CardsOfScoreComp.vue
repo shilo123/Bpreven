@@ -212,10 +212,8 @@ export default {
         this.Questos.unshift(el);
       });
       this.Questos.sort((a, b) => {
-        return a.sek - b.sek;
+        return a.Seq - b.Seq;
       });
-      // this.RevereseQu.reverse();
-
       this.compData();
 
       this.$ax.get(URL + "GetScore/" + this.activQushinnare).then((res) => {
@@ -267,7 +265,7 @@ export default {
         this.Questos.unshift(el);
       });
       this.Questos.sort((a, b) => {
-        return a.sek - b.sek;
+        return a.Seq - b.Seq;
       });
       this.Questos.forEach((element) => {
         this.RevereseQu.unshift(element);

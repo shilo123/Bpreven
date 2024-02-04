@@ -41,7 +41,7 @@ export default {
   data() {
     return {
       data: this.dat,
-      loadingTABLE: false,
+      loadingTABLE: true,
     };
   },
   computed: {
@@ -71,7 +71,7 @@ export default {
         });
       });
     },
-    loadingTABLEZ(val) {
+    UpLoading(val) {
       this.loadingTABLE = val;
     },
     UPmos(row) {

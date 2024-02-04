@@ -217,7 +217,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .loMatzanu {
   position: relative;
   top: 300px;
@@ -236,9 +236,12 @@ export default {
 }
 .Edito {
   width: 660px;
-  left: 300px;
-  height: 630px;
-  top: 30px;
+  //  height: 630px;
+  height: 480px;
+  left: 400px;
+  // left: 300px;
+  top: 80px;
+  // top: 30px;
 }
 .EditOption {
   height: 150px;

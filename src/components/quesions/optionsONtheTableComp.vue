@@ -126,6 +126,9 @@ export default {
   async mounted() {
     try {
       await this.$store.dispatch("fetchData");
+      await this.$nextTick();
+      this.sortInput();
+      this.sortRadio();
       this.Alldata.Allquestions = this.$store.state.AllData.Allquestions;
       this.Alldata.questionsOnly = this.$store.state.AllData.questionsOnly;
       this.Alldata.DataType = this.$store.state.AllData.DataType;
@@ -133,9 +136,6 @@ export default {
       //   console.log(this.$store.state.AllData);
       this.data = this.$store.state.data;
       this.data2 = this.$store.state.data;
-      await this.$nextTick();
-      this.sortInput();
-      this.sortRadio();
     } catch (error) {
       console.log(error);
     }

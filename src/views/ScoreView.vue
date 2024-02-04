@@ -10,6 +10,7 @@
             "
             :Params="Params[Params.length - 1]"
             :NameOfScore="NameOfScore"
+            :que="CompActivosQ()"
           />
         </div>
       </transition>
@@ -27,7 +28,19 @@
         shomesALL = true;
       "
     />
-    <div v-show="shomesALL">
+    <div class="TypeQusinnaire" v-show="activQushinnare">
+      סוג השאלון:
+      {{ typeQueshinarire ? typeQueshinarire.Name : "טוען" }}
+    </div>
+    <div v-if="typeQueshinarire.Id === 3">
+      <el-button type="success" class="ButtonSuccess" @click="HOsefInyanimOreh"
+        >הוסף עיניינים</el-button
+      >
+    </div>
+    <div v-if="typeQueshinarire.Id === 2" class="Harshama">
+      <Hashamos @AddScoreActionFORHarshama="AddScoreActionFORHarshama" />
+    </div>
+    <div v-if="shomesALL && typeQueshinarire.Id === 1">
       <h1
         class="LoMatzanu"
         v-show="
@@ -92,12 +105,14 @@ import { URL } from "@/URL/url";
 import InputAutoComplitade from "@/components/Score/Elenents/inputAutoComp.vue";
 import Cardos from "@/components/Score/CardsOfScoreComp.vue";
 import TablePopap from "@/components/Score/PopPap/TableInyonim.vue";
-import "../claly.css";
+import Hashamos from "@/components/Score/ComponnentHarshama.vue";
+// import "../claly.css";
 export default {
   components: {
     InputAutoComplitade,
     Cardos,
     TablePopap,
+    Hashamos,
   },
   name: "BprevenScoreView",
   data() {
@@ -115,6 +130,7 @@ export default {
       shomesALL: false,
       afterClear: false,
       reverse: false,
+      typeQueshinarire: "",
     };
   },
   computed: {
@@ -153,15 +169,11 @@ export default {
   },
 
   methods: {
-    Al() {
-      this.$alert("content", "title", {
-        confirmButtonText: "confirm",
-        callback: (action) => {},
-      });
-    },
     SgorSham() {
       let cardos = this.$refs.Cardos;
-      cardos.showPopAp = false;
+      if (cardos && cardos.showPopAp) {
+        cardos.showPopAp = false;
+      }
     },
     FuncafterClear() {
       this.FunctionActiveQushinnare(this.activQushinnare);
@@ -289,23 +301,49 @@ export default {
         this.shomes = false;
         this.shomesALL = true;
         let res = await this.$ax.get(URL + "GetOPtionForQuestion/" + val);
-        this.arrOptions = res.data;
-        if (!this.reverse) {
-          this.ObjDataQuestions[this.activQushinnare].reverse();
-          this.reverse = true;
+        // console.log(res.data);
+        this.arrOptions = res.data.arr;
+        this.typeQueshinarire = res.data.type;
+        if (res.data.type.Id === 1) {
+          if (!this.reverse) {
+            this.ObjDataQuestions[this.activQushinnare].reverse();
+            this.reverse = true;
+          }
+          const Params = {
+            Questions: this.ObjDataQuestions[this.activQushinnare],
+            Op: res.data.arr,
+          };
+          this.$store.commit("Score/UpData", Params);
+          this.shomes = true;
         }
-        const Params = {
-          Questions: this.ObjDataQuestions[this.activQushinnare],
-          Op: res.data,
-        };
-        this.$store.commit("Score/UpData", Params);
-        this.shomes = true;
-      } catch (error) {}
+      } catch (error) {
+        this.$message.error("משהו השתבשש");
+      }
     },
     ClearOption() {
       this.arrOptions = [];
       this.shomesALL = false;
       this.afterClear = true;
+    },
+    HOsefInyanimOreh() {
+      this.Params = [[]];
+      this.NameOfScore = this.typeQueshinarire.Name;
+      this.showDivos = true;
+    },
+    CompActivosQ() {
+      if (this.typeQueshinarire.Id === 3) {
+        return this.activQushinnare;
+      } else {
+        return null;
+      }
+    },
+    AddScoreActionFORHarshama(row) {
+      console.log({ ...row });
+      this.Params = [[row.Score]];
+      let nameS = `${row.StartYear} - ${row.EndYear} / ${row.NameGender}`;
+      this.NameOfScore = nameS;
+      this.showDivos = true;
+      // console.log({ nameS, params: this.Params });
     },
   },
 };
@@ -425,7 +463,7 @@ export default {
 }
 .LoMatzanu {
   position: absolute;
-  left: 22%;
+  left: 34%;
   top: 30%;
 }
 .Allel {
@@ -443,5 +481,29 @@ export default {
   left: 210px;
   top: 30px;
   border-radius: 20px;
+}
+.TypeQusinnaire {
+  font-size: 30px;
+  position: absolute;
+  top: 50px;
+  left: 110px;
+}
+.ButtonSuccess {
+  position: absolute;
+  left: 43%;
+  top: 200px;
+  width: 300px;
+  transition: all 0.3s;
+}
+.ButtonSuccess:hover {
+  font-size: 23px;
+  padding: 12px;
+}
+.Harshama {
+  position: absolute;
+  left: 28%;
+  top: 140px;
+  width: 920px;
+  transition: all 0.3s;
 }
 </style>

@@ -4,7 +4,7 @@
 
     <i class="el-icon-close" @click="$store.commit('SgorDivos', true)"></i>
 
-    <el-table :data="[rowEdit]" border>
+    <el-table :data="[rowEdit]" border v-if="false">
       <el-table-column
         align="center"
         label="NextQuestionId"
