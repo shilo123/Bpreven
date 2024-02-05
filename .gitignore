@@ -1,8 +1,8 @@
 .DS_Store
 node_modules
-/server
 /dist
 /FileTheFontAwemson
+server
 
 # local env files
 .env.local
