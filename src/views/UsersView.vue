@@ -135,7 +135,11 @@ export default {
   border-radius: 10px;
 }
 .Delete {
-  background: white;
+  background: rgb(197, 94, 94);
+  width: 300px;
+  height: 200px;
+  left: 35%;
+  top: 35%;
 }
 .AddStep {
   background: white;

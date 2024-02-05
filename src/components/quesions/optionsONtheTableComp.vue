@@ -40,10 +40,10 @@
         <select name="S" v-model="FilterChange">
           <option label="הכל" value="הכל" selected>הכל</option>
           <option
-            v-for="n in Alldata.NameQuen"
-            :key="n"
-            :value="n"
-            :label="n"
+            v-for="(n, i) in Alldata.NameQuen"
+            :key="i"
+            :value="n.Id"
+            :label="n.Desc"
           ></option>
         </select>
       </div>
@@ -106,7 +106,8 @@ export default {
     },
     FilterChange(val) {
       //   console.log(val);
-      this.$emit("Changosy", val);
+      let valDesc = this.Alldata.NameQuen.find((e) => e.Id === val);
+      this.$emit("Changosy", valDesc.Desc);
       if (val !== "הכל") {
         this.$ax.post(URL + "FIndQustinnare", { val }).then((res) => {
           // console.log(res.data);
@@ -134,8 +135,11 @@ export default {
       this.Alldata.DataType = this.$store.state.AllData.DataType;
       this.Alldata.NameQuen = this.$store.state.AllData.NameQuen;
       //   console.log(this.$store.state.AllData);
+      let { data } = await this.$ax.get(URL + "GetQustionsz");
+      this.Alldata.NameQuen = data;
       this.data = this.$store.state.data;
       this.data2 = this.$store.state.data;
+      console.log(this.Alldata);
     } catch (error) {
       console.log(error);
     }

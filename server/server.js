@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 const cors = require("cors");
 let mongo = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
@@ -17,19 +17,21 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 app.use("/Upload", express.static("Upload"));
 const URL = `http://localhost:${port}`;
-// console.log(URL);
+// console.log(port);
 const config = {
   // server: "MC58148\\SQLEXPRESS",
   // database: "Bpreven",
   // driver: "msnodesqlv8",
   // user: "sa",
   // password: "Shilo123!!",
+  //
   server: "185.68.120.69",
   database: "Bpreven",
   driver: "msnodesqlv8",
   user: "dgtracking_co_il_dgLaw",
   password: "dgtrackingJadekia556",
 };
+// console.log(config);
 function SQL(query) {
   return new Promise((resolve, reject) => {
     sql.connect(config, (err) => {
@@ -99,6 +101,7 @@ function random(min, max) {
 // const q = `SELECT * FROM ExercisesCategories
 // `;
 // SQLOS(q);
+//FILE
 app.post("/postFilee/:Idcategory", upload.single("file"), async (req, res) => {
   let Id = req.params.Idcategory;
   let File = req.file;
@@ -159,13 +162,19 @@ app.post(
     }
   }
 );
+//
+//Qustionnaire
 app.get("/", async (req, res) => {
-  const q = `SELECT *
-  FROM [Questionnaire]
-  `;
-  let result = await SQL(q);
-  // console.log(result);
-  res.json(result);
+  try {
+    const q = `SELECT *
+    FROM [Questionnaire]
+    `;
+    let result = await SQL(q);
+    // console.log(result);
+    res.json(result);
+  } catch (error) {
+    res.json(false);
+  }
 });
 app.get("/GetQueshianaire", async (req, res) => {
   try {
@@ -486,7 +495,8 @@ app.get("/GetQuestinsFromQueshennaire/:id", async (req, res) => {
 app.post("/Updata", async (req, res) => {
   let body = req.body;
   let UpdateOption = false;
-  // console.log(body);
+  console.log(body);
+  // console.log("beforQbeforQbeforQbeforQ", beforQ);
   for (const key in body) {
     if (typeof body[key] === "string") {
       body[key] = body[key].replace(/'/g, "''");
@@ -541,6 +551,12 @@ app.post("/Updata", async (req, res) => {
       updateQuery += `, DataTypesId = ${dataTypesId}`;
     }
     if (nextQuestionId !== null) {
+      console.log("nextQuestionId", nextQuestionId);
+      if (!isNumeric(nextQuestionId)) {
+        const querdinio = `SELECT Id FROM Questions WHERE [Desc] = '${nextQuestionId}'`;
+        let id = await SQL(querdinio);
+        nextQuestionId = id[0].Id;
+      }
       updateQuery += `, NextQuestionId = ${nextQuestionId}`;
       UpdateOption = true;
     } else {
@@ -548,7 +564,7 @@ app.post("/Updata", async (req, res) => {
     }
 
     updateQuery += ` WHERE Id = ${body.Id}`;
-
+    // console.log(updateQuery);
     await SQL(updateQuery);
     if (body.NextQuestionDesc !== "לפי האופציה") {
       if (UpdateOption) {
@@ -561,8 +577,44 @@ app.post("/Updata", async (req, res) => {
     }
     res.json(true);
   } catch (error) {
-    console.log(error);
-    res.json(false);
+    // console.log(error);
+    const {
+      Id,
+      Seq,
+      Desc,
+      StatusId,
+      IsEnd,
+      DescQuestionnaire,
+      DescDataType,
+      NextQuestionDesc,
+    } = body;
+    const qu = `SELECT Id FROM Questionnaire`;
+    let idq = await SQL(qu);
+    idq = idq[0].Id;
+    const que = `SELECT Id FROM DataTypes`;
+    let idD = await SQL(que);
+    idD = idD[0].Id;
+    const quer = `SELECT Id FROM Questions WHERE [Desc] = '${NextQuestionDesc}'`;
+    let idN = await SQL(quer);
+    idN = idN[0].Id;
+    const q = `SELECT * FROM Questions WHERE Id = ${Id}`;
+    let beforQ = await SQL(q);
+    beforQ = beforQ[0];
+    const S = StatusId ? 1 : 0;
+    let Booli =
+      beforQ.Id === Id &&
+      beforQ.QuestionnaireId === idq &&
+      beforQ.DataTypesId === idD &&
+      beforQ.Desc === Desc &&
+      beforQ.NextQuestionId === idN &&
+      beforQ.StatusId === S &&
+      beforQ.IsEnd === IsEnd;
+    if (Booli) {
+      res.json(true);
+      return;
+    } else {
+      res.json(false);
+    }
   }
 });
 app.post("/AddQuestin", async (req, res) => {
@@ -659,12 +711,21 @@ app.post("/FIndQustinnare", async (req, res) => {
     DataTypes.[Desc] AS DescDataType
     FROM Questions
     INNER JOIN Questionnaire ON Questionnaire.Id = Questions.QuestionnaireId
-    INNER JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId WHERE Questionnaire.[Desc] = '${req.body.val}'`;
+    INNER JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId WHERE Questionnaire.Id = '${req.body.val}'`;
     let data = await SQL(query);
     res.json(data);
   } catch (error) {
     console.log(error);
     res.json(false);
+  }
+});
+app.get("/GetQustionsz", async (req, res) => {
+  try {
+    const q = `SELECT Id,[Desc] FROM Questionnaire`;
+    let data = await SQL(q);
+    res.json(data);
+  } catch (error) {
+    res.json(null);
   }
 });
 app.post("/Serch", async (req, res) => {
@@ -1624,6 +1685,16 @@ app.put("/PutOfUserFlow", async (req, res) => {
     res.json(true);
   } catch (error) {
     console.log(error);
+    res.json(false);
+  }
+});
+app.delete("/DeleteProtokol/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const q = `DELETE UsersFlowSteps WHERE Id = ${id}`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
     res.json(false);
   }
 });

@@ -179,6 +179,7 @@ export default {
           this.showQuesheannaire = false;
         }
       });
+      // console.log("this.data", this.data);
       // console.log(this.QUestory);
     } catch (error) {
       this.$message.error("משהו השתבש");
