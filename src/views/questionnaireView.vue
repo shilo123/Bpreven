@@ -148,6 +148,18 @@
                   >
                   </el-input>
                 </div>
+                <div class="QuestorindEnd">
+                  <label>משפט סיום</label>
+                  <el-input
+                    key="input-2"
+                    type="textarea"
+                    dir="auto"
+                    :autosize="{ minRows: 2, maxRows: 34 }"
+                    v-model="newquen.EndQuestion"
+                    placeholder="משפט סיום"
+                  >
+                  </el-input>
+                </div>
                 <div class="MonthyQuen">
                   <label>שאלון יומי</label>
                   <el-switch
@@ -255,37 +267,6 @@
           </div>
           <div v-show="shows.SHdivos && shows.showeditQuen">
             <div class="inEditQuen w3-card-4">
-              <div
-                class="Date MaSHkaym"
-                v-show="IfYomy && newqunto.QuestionnaireTypesId === 1"
-              >
-                <label>תאריך יומי</label>
-                <el-date-picker
-                  v-model="newqunto.Dayly"
-                  placeholder="תאריך חדש"
-                ></el-date-picker>
-              </div>
-              <div
-                class="Number MaSHkaym"
-                v-show="MonthiVal && newqunto.QuestionnaireTypesId === 1"
-              >
-                <label>חודש</label>
-                <el-input
-                  placeholder="מספר"
-                  v-model="newqunto.Monthly"
-                ></el-input>
-              </div>
-              <div
-                class="DefaultId MaSHkaym"
-                v-show="IFdefaultE && newqunto.QuestionnaireTypesId === 1"
-              >
-                <label>דפולט</label>
-                <el-input
-                  placeholder="מספר"
-                  v-model="newqunto.DefaultId"
-                ></el-input>
-              </div>
-
               <div class="rowEA">
                 <div class="newName">
                   <label>שם חדש</label>
@@ -316,14 +297,25 @@
               </div>
               <div class="rowEB">
                 <div class="startQuesh">
-                  <label class="LabelAkshan">שאלה ראשונית חדשה</label>
+                  <label>שאלה ראשונית חדשה</label>
                   <el-input
                     placeholder="שאלה ראשונית חדשה"
                     type="textarea"
-                    :autosize="{ minRows: 4, maxRows: 4 }"
+                    :autosize="{ minRows: 2, maxRows: 4 }"
                     class="inputTextarea"
                     dir="auto"
                     v-model="newqunto.StartQuestion"
+                  />
+                </div>
+                <div class="startQueshEnd">
+                  <label>משפט סיום</label>
+                  <el-input
+                    placeholder="שאלה אחרונה חדשה"
+                    type="textarea"
+                    :autosize="{ minRows: 2, maxRows: 4 }"
+                    class="inputTextarea"
+                    dir="auto"
+                    v-model="newqunto.EndQuestion"
                   />
                 </div>
                 <div
@@ -336,6 +328,16 @@
                     active-text="כן"
                     inactive-text="לא"
                   ></el-switch>
+                </div>
+                <div
+                  class="Date"
+                  v-show="IfYomy && newqunto.QuestionnaireTypesId === 1"
+                >
+                  <label>תאריך יומי</label>
+                  <el-date-picker
+                    v-model="newqunto.Dayly"
+                    placeholder="תאריך חדש"
+                  ></el-date-picker>
                 </div>
               </div>
               <div class="rowEC">
@@ -365,6 +367,18 @@
                     inactive-text="לא"
                   ></el-switch>
                 </div>
+                <div
+                  class="Number"
+                  v-show="MonthiVal && newqunto.QuestionnaireTypesId === 1"
+                >
+                  <label>חודש</label>
+                  <el-input
+                    size="medium"
+                    placeholder="מספר"
+                    v-model="newqunto.Monthly"
+                  ></el-input>
+                </div>
+
                 <div class="rowED">
                   <el-switch
                     v-show="newqunto.QuestionnaireTypesId === 1"
@@ -373,6 +387,17 @@
                     active-text="כן"
                     inactive-text="לא"
                   ></el-switch>
+                </div>
+                <div
+                  class="DefaultId"
+                  v-show="IFdefaultE && newqunto.QuestionnaireTypesId === 1"
+                >
+                  <label>דפולט</label>
+                  <el-input
+                    size="medium"
+                    placeholder="מספר"
+                    v-model="newqunto.DefaultId"
+                  ></el-input>
                 </div>
               </div>
             </div>
@@ -628,7 +653,7 @@ export default {
     },
     Edit(row) {
       // this.idOfE = row.Id;
-      // console.log(row);
+      console.log(row);
       this.rowEdit = [row];
       if (!row.QuestionnaireTypesId) this.newqunto.QuestionnaireTypesId = 1;
       let stat = row.StatusId;
@@ -638,6 +663,7 @@ export default {
       this.newqunto = row;
       // this.newqunto.Monthly = Boolean(M);
       this.newqunto.StatusId = Boolean(stat);
+      // this.newqunto.EndQuestion = row.EndQuestion;
       this.IfYomy = Boolean(Os);
       this.MonthiVal = Boolean(M);
       this.IFdefaultE = Boolean(z);
@@ -845,8 +871,8 @@ export default {
   width: 70%;
   position: absolute;
   top: 100px;
-  right: 0;
-  margin-right: 340px;
+  left: 0;
+  margin-left: 116px;
   height: 700px;
   z-index: 3;
   border: 3px solid black;
@@ -1005,12 +1031,6 @@ export default {
     .symbolQuest {
       margin-right: 40px;
     }
-    .defaultQuen {
-      width: 140px;
-      position: absolute;
-      top: 40px;
-      left: -680px;
-    }
     .statusQues {
       label {
         position: absolute;
@@ -1031,7 +1051,8 @@ export default {
     .MonthyQuen {
       margin: 13px;
       position: relative;
-      right: 380px;
+      // right: 380px;
+      right: 54px;
       top: 30px;
       label {
         position: absolute;
@@ -1042,12 +1063,20 @@ export default {
     .DateQuest {
       position: absolute;
       top: 40px;
-      left: -440px;
+      left: -310px;
       label {
         position: absolute;
         top: -40px;
         text-align: right;
         right: 0;
+      }
+    }
+    .Questorind {
+      position: relative;
+      bottom: 50px;
+      &End {
+        position: absolute;
+        bottom: -50px;
       }
     }
   }
@@ -1058,6 +1087,17 @@ export default {
     right: -80px;
     margin: 35px;
     top: 150px;
+    .defaultQuen {
+      width: 140px;
+      position: absolute;
+      top: 40px;
+      left: -680px;
+    }
+    .ElSELECTZ1 {
+      position: absolute;
+      left: -280px;
+      bottom: -190px;
+    }
   }
   .rowD {
     position: absolute;
@@ -1077,6 +1117,18 @@ export default {
   .newSymbol {
     margin-right: 60px;
   }
+  .newStat {
+    // margin-right: 140px;
+    margin-right: 60px;
+    position: relative;
+    top: 25px;
+    label {
+      position: absolute;
+      top: -30px;
+      // left: 40px;
+      left: 110px !important;
+    }
+  }
 }
 .rowEB {
   display: flex;
@@ -1084,6 +1136,24 @@ export default {
   margin: 25px;
   position: absolute;
   right: 70px;
+  .startQuesh {
+    position: relative;
+    bottom: 30px;
+    label {
+      position: absolute;
+      top: -30px;
+      left: 68% !important;
+    }
+    &End {
+      position: absolute;
+      bottom: -60px;
+      label {
+        position: absolute;
+        top: -30px;
+        left: 79% !important;
+      }
+    }
+  }
 }
 .rowEC {
   display: flex;
@@ -1092,6 +1162,24 @@ export default {
   position: absolute;
   right: 70px;
   top: 300px;
+  .Number {
+    position: relative;
+    // right: 290px;
+    // bottom: 90px;
+    right: 330px;
+    bottom: 50px;
+    label {
+      font-size: 16px;
+      position: absolute !important;
+      right: -60px !important;
+      top: -24px !important;
+    }
+  }
+  .QTYpe {
+    position: relative;
+    top: 40px;
+    left: 30px;
+  }
 }
 .rowED {
   display: flex;
@@ -1101,15 +1189,10 @@ export default {
   right: 450px;
   top: 0px;
 }
-.newStat {
-  margin-right: 140px;
-  position: relative;
-  top: 25px;
-}
-.newStat label {
+.DefaultId {
   position: absolute;
-  top: -30px;
-  left: 40px;
+  left: -560px;
+  top: -10px;
 }
 .LabelAkshan {
   position: absolute;
@@ -1142,11 +1225,6 @@ export default {
   top: -40px;
   left: 90px !important;
 }
-.Number {
-  position: relative;
-  right: 290px;
-  bottom: 90px;
-}
 .ifMonthi {
   position: relative;
   right: 313px;
@@ -1176,11 +1254,6 @@ export default {
   left: 0px !important;
   width: 100%;
 }
-.ElSELECTZ1 {
-  position: absolute;
-  left: -280px;
-  bottom: -150px;
-}
 .Inptutozy {
   width: 140px;
 }
@@ -1198,24 +1271,13 @@ export default {
     display: inline-block;
   }
 }
-.Default {
-  position: absolute;
-  left: -330px;
-}
-.DefaultId {
-  position: relative;
-  /* left: 400px; */
-}
 .SwitchDefaultId {
   position: relative;
   left: 100px;
 }
-.MaSHkaym {
-  z-index: 20;
+.Default {
   position: absolute;
-  top: 240px !important;
-  left: 150px !important;
-  width: 200px;
+  left: -330px;
 }
 </style>
 <style></style>

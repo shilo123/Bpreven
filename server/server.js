@@ -98,7 +98,7 @@ function random(min, max) {
 
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-// const q = `SELECT * FROM ExercisesCategories
+// const q = `SELECT * FROM Questionnaire
 // `;
 // SQLOS(q);
 //FILE
@@ -285,16 +285,17 @@ app.post("/newequen", async (req, res) => {
     const defaultId = req.body.default;
     const monthi = req.body.monthi;
     const QuestionnaireTypesId = req.body.type;
+    const EndQustion = req.body.EndQuestion.replace(/'/g, "''");
     let q;
     if (Date) {
-      q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId,Dayly,Monthly,DefaultId,QuestionnaireTypesId)
-       VALUES ('${Desc}', '${Symbol}', '${StartQuestion}', '${StatusId}','${Date}',NULL,NULL,${QuestionnaireTypesId})`;
+      q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId,Dayly,Monthly,DefaultId,QuestionnaireTypesId,EndQuestion)
+       VALUES ('${Desc}', '${Symbol}', '${StartQuestion}', '${StatusId}','${Date}',NULL,NULL,${QuestionnaireTypesId},'${EndQustion}')`;
     } else if (defaultId) {
-      q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId,Dayly,Monthly,DefaultId,QuestionnaireTypesId)
-       VALUES ('${Desc}', '${Symbol}', '${StartQuestion}', '${StatusId}',NULL,NULL,${defaultId},${QuestionnaireTypesId})`;
+      q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId,Dayly,Monthly,DefaultId,QuestionnaireTypesId,EndQuestion)
+       VALUES ('${Desc}', '${Symbol}', '${StartQuestion}', '${StatusId}',NULL,NULL,${defaultId},${QuestionnaireTypesId},'${EndQustion}')`;
     } else if (monthi) {
-      q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId,Dayly,Monthly,DefaultId,QuestionnaireTypesId)
-       VALUES ('${Desc}', '${Symbol}', '${StartQuestion}', '${StatusId}',NULL,${monthi},NULL,${QuestionnaireTypesId})`;
+      q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId,Dayly,Monthly,DefaultId,QuestionnaireTypesId,EndQuestion)
+       VALUES ('${Desc}', '${Symbol}', '${StartQuestion}', '${StatusId}',NULL,${monthi},NULL,${QuestionnaireTypesId},'${EndQustion}')`;
     }
     await SQL(q);
     res.json(true);
@@ -358,6 +359,9 @@ app.post("/EditOfquen", async (req, res) => {
     const DefaultId = req.body.DefaultId;
     const QuestionnaireTypesId = req.body.QuestionnaireTypesId;
     const id = req.body.Id;
+    const EndQustion = req.body.EndQuestion
+      ? req.body.EndQuestion.replace(/'/g, "''")
+      : req.body.EndQuestion;
     // if (QuestionnaireTypesId === 3) {
     //   const query = `SELECT * FROM Score WHERE QuestionnaireId = ${id}`;
     //   let datush = await SQL(query);
@@ -372,6 +376,7 @@ app.post("/EditOfquen", async (req, res) => {
       q = `UPDATE Questionnaire
       SET 
          [Desc] = '${Desc}',
+          EndQuestion = '${EndQustion}',
           Symbol = '${Symbol}',
           StartQuestion = '${StartQuestion}',
           StatusId = ${StatusId},
@@ -385,6 +390,8 @@ app.post("/EditOfquen", async (req, res) => {
       q = `UPDATE Questionnaire
       SET 
          [Desc] = '${Desc}',
+         EndQuestion = '${EndQustion}',
+
           Symbol = '${Symbol}',
           StartQuestion = '${StartQuestion}',
           StatusId = ${StatusId},
@@ -398,6 +405,8 @@ app.post("/EditOfquen", async (req, res) => {
       q = `UPDATE Questionnaire
       SET 
          [Desc] = '${Desc}',
+         EndQuestion = '${EndQustion}',
+
           Symbol = '${Symbol}',
           StartQuestion = '${StartQuestion}',
           StatusId = ${StatusId},
@@ -411,6 +420,8 @@ app.post("/EditOfquen", async (req, res) => {
       q = `UPDATE Questionnaire
       SET 
          [Desc] = '${Desc}',
+         EndQuestion = '${EndQustion}',
+
           Symbol = '${Symbol}',
           StartQuestion = '${StartQuestion}',
           StatusId = ${StatusId},
