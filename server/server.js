@@ -17,6 +17,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 app.use("/Upload", express.static("Upload"));
 const URL = `http://localhost:${port}`;
+app.use(express.static(path.join(__dirname, "dist")));
+
 // console.log(port);
 const config = {
   // server: "MC58148\\SQLEXPRESS",
@@ -163,6 +165,9 @@ app.post(
   }
 );
 //
+app.get("/test", async (req, res) => {
+  console.log({ status: true });
+});
 //Qustionnaire
 app.get("/", async (req, res) => {
   try {
