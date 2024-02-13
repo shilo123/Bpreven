@@ -57,3 +57,10 @@ export function random(min, max) {
 
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+export function Booleano(val) {
+  return Boolean(val);
+}
+export function isNumeric(str) {
+  if (typeof str !== "string") return false;
+  return !isNaN(str) && !isNaN(parseFloat(str));
+}

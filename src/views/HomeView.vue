@@ -24,7 +24,9 @@ export default {
       console.log(this.$refs.elButton.$slots);
     },
   },
-
+  mounted() {
+    console.log({ ...this.$store.state.Questionaire });
+  },
   methods: {
     async Func() {
       try {

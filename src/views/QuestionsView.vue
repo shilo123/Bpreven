@@ -85,6 +85,7 @@
             :theOption="ParamsOfDelOP.theOption"
             :IdniFtah="IdniFtah"
             :Idq="ParamsOfSeq"
+            @UpdateData="UpdateData"
           ></component>
         </div>
       </transition>
@@ -201,8 +202,9 @@ export default {
     YeshLanu() {
       let Component = this.$refs.CompoTable;
       Component.data = this.$store.state.data;
-      Component.SortTable();
-      //   this.SortTable();
+      setTimeout(() => {
+        Component.SortTable();
+      }, 200); //   this.SortTable();
     },
     LoadingTable(val) {
       let Component = this.$refs.CompoTable;
@@ -214,6 +216,10 @@ export default {
       setTimeout(() => {
         Component.SortTable();
       }, 200);
+    },
+    async UpdateData() {
+      await this.$store.dispatch("fetchData");
+      this.YeshLanu();
     },
   },
 };

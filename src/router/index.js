@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import HomeView from "../views/HomeView.vue";
+// import queshtinnre from "@/views/questionnaireView.vue";
 import queshtinnre from "@/views/questionnaireView.vue";
 // import queshtins from "@/views/queshtinsView.vue";
 import queshtins from "@/views/QuestionsView.vue";

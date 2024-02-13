@@ -162,7 +162,8 @@ export default {
         if (data) {
           this.$store.commit("SgorDivos", true);
           this.$message.success("השאלה נוספה בהצלוחה");
-          window.location.reload();
+          // window.location.reload();
+          this.$emit("UpdateData");
         } else {
           this.$message.error("משהו השתבש");
         }

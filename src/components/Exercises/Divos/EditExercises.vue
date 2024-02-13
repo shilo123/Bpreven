@@ -102,6 +102,7 @@ export default {
     },
   },
   async mounted() {
+    console.log(this.NewData.link);
     let { data } = await this.$ax.get(URL + "GetCategiz");
     this.cateGory = data;
     // console.log(this.NewData);

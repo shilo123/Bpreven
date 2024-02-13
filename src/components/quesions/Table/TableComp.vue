@@ -40,7 +40,7 @@
       <el-table-column
         label="סדר"
         prop="Seq"
-        :width="wachtStore ? 150 : 80"
+        :width="wachtStore ? 150 : 60"
       ></el-table-column>
       <!-- v-if="wachtStore" -->
       <el-table-column label="אם אחרון">

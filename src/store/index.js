@@ -3,7 +3,7 @@ import Vuex from "vuex";
 import { URL } from "@/URL/url";
 import axios from "axios";
 import Score from "@/store/Score";
-
+import Questionaire from "./Qustionaire";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -68,5 +68,6 @@ export default new Vuex.Store({
   },
   modules: {
     Score,
+    Questionaire,
   },
 });

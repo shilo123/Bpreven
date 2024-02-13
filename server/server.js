@@ -16,22 +16,21 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 app.use("/Upload", express.static("Upload"));
-const URL = `http://localhost:${port}`;
-app.use(express.static(path.join(__dirname, "dist")));
+const URL = `https://bprevenserver.dgtracking.co.il`;
 
 // console.log(port);
 const config = {
-  // server: "MC58148\\SQLEXPRESS",
-  // database: "Bpreven",
-  // driver: "msnodesqlv8",
-  // user: "sa",
-  // password: "Shilo123!!",
-  //
-  server: "185.68.120.69",
+  server: "MC58148\\SQLEXPRESS",
   database: "Bpreven",
   driver: "msnodesqlv8",
-  user: "dgtracking_co_il_dgLaw",
-  password: "dgtrackingJadekia556",
+  user: "sa",
+  password: "Shilo123!!",
+  //
+  // server: "185.68.120.69",
+  // database: "Bpreven",
+  // driver: "msnodesqlv8",
+  // user: "dgtracking_co_il_dgLaw",
+  // password: "dgtrackingJadekia556",
 };
 // console.log(config);
 function SQL(query) {
@@ -165,9 +164,6 @@ app.post(
   }
 );
 //
-app.get("/test", async (req, res) => {
-  console.log({ status: true });
-});
 //Qustionnaire
 app.get("/", async (req, res) => {
   try {
@@ -282,15 +278,21 @@ app.get("/Getamudes", async (req, res) => {
 app.post("/newequen", async (req, res) => {
   console.log(req.body);
   try {
-    const Desc = req.body.Desc.replace(/'/g, "''");
-    const Symbol = req.body.Symbol.replace(/'/g, "''");
-    const StartQuestion = req.body.StartQuestion.replace(/'/g, "''");
+    const Desc = req.body.Desc ? req.body.Desc.replace(/'/g, "''") : "";
+    const Symbol = req.body.Symbol ? req.body.Symbol.replace(/'/g, "''") : "";
+    const StartQuestion = req.body.StartQuestion
+      ? req.body.StartQuestion.replace(/'/g, "''")
+      : " ";
     const StatusId = req.body.StatusId ? 1 : 0;
+    // console.log(StatusId);
     const Date = req.body.Date;
     const defaultId = req.body.default;
     const monthi = req.body.monthi;
     const QuestionnaireTypesId = req.body.type;
-    const EndQustion = req.body.EndQuestion.replace(/'/g, "''");
+    const EndQustion = req.body.EndQuestion
+      ? req.body.EndQuestion.replace(/'/g, "''")
+      : " ";
+
     let q;
     if (Date) {
       q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId,Dayly,Monthly,DefaultId,QuestionnaireTypesId,EndQuestion)
@@ -301,7 +303,11 @@ app.post("/newequen", async (req, res) => {
     } else if (monthi) {
       q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId,Dayly,Monthly,DefaultId,QuestionnaireTypesId,EndQuestion)
        VALUES ('${Desc}', '${Symbol}', '${StartQuestion}', '${StatusId}',NULL,${monthi},NULL,${QuestionnaireTypesId},'${EndQustion}')`;
+    } else if (!Date && !defaultId && !monthi) {
+      q = `INSERT INTO Questionnaire ([Desc], Symbol, StartQuestion, StatusId,Dayly,Monthly,DefaultId,QuestionnaireTypesId,EndQuestion)
+      VALUES ('${Desc}', '${Symbol}', '${StartQuestion}', '${StatusId}',NULL,NULL,NULL,${QuestionnaireTypesId},'${EndQustion}')`;
     }
+    //QuestionnaireTypesId !== 1 ||
     await SQL(q);
     res.json(true);
   } catch (error) {
@@ -312,6 +318,7 @@ app.post("/newequen", async (req, res) => {
 app.delete("/Delquen/:id", async (req, res) => {
   try {
     const id = req.params.id;
+    console.log(id);
     const q = `DELETE FROM Questionnaire WHERE Id = ${id}`;
     await SQL(q);
     const Query = `SELECT Id FROM Questions WHERE QuestionnaireId = ${id}`;
@@ -353,13 +360,13 @@ app.post("/EditOfquen", async (req, res) => {
         return null;
       }
     }
-    const Desc = req.body.Desc.replace(/'/g, "''");
-    const Symbol = req.body.Symbol.replace(/'/g, "''");
+    const Desc = req.body.Desc ? req.body.Desc.replace(/'/g, "''") : null;
+    const Symbol = req.body.Symbol ? req.body.Symbol.replace(/'/g, "''") : null;
     const StartQuestion = req.body.StartQuestion
       ? req.body.StartQuestion.replace(/'/g, "''")
       : req.body.StartQuestion;
     const StatusId = req.body.StatusId ? 1 : 0;
-    const Monthly = req.body.Monthly ? 1 : 0;
+    const Monthly = req.body.Monthly;
     const Dayly = await DalayRe();
     const DefaultId = req.body.DefaultId;
     const QuestionnaireTypesId = req.body.QuestionnaireTypesId;
@@ -367,6 +374,24 @@ app.post("/EditOfquen", async (req, res) => {
     const EndQustion = req.body.EndQuestion
       ? req.body.EndQuestion.replace(/'/g, "''")
       : req.body.EndQuestion;
+    // const StatusId = req.body.StatusId ? 1 : 0;
+    for (const key in req.body) {
+      if (!req.body[key] && key !== "Id") {
+        req.body[key] = "NULL";
+      }
+    }
+    // console.log({
+    //   Desc,
+    //   Symbol,
+    //   StartQuestion,
+    //   StatusId,
+    //   Monthly,
+    //   Dayly,
+    //   DefaultId,
+    //   QuestionnaireTypesId,
+    //   id,
+    //   EndQustion,
+    // });
     // if (QuestionnaireTypesId === 3) {
     //   const query = `SELECT * FROM Score WHERE QuestionnaireId = ${id}`;
     //   let datush = await SQL(query);
@@ -377,7 +402,7 @@ app.post("/EditOfquen", async (req, res) => {
     //   }
     // }
     let q;
-    if (Dayly) {
+    if (Dayly || Dayly === "NULL") {
       q = `UPDATE Questionnaire
       SET 
          [Desc] = '${Desc}',
@@ -391,7 +416,7 @@ app.post("/EditOfquen", async (req, res) => {
           Dayly = '${Dayly}'
           WHERE Id = ${id}
   `;
-    } else if (Monthly) {
+    } else if (Monthly || Monthly === "NULL") {
       q = `UPDATE Questionnaire
       SET 
          [Desc] = '${Desc}',
@@ -406,7 +431,7 @@ app.post("/EditOfquen", async (req, res) => {
           Dayly = NULL
           WHERE Id = ${id}
   `;
-    } else if (DefaultId) {
+    } else if (DefaultId || DefaultId === "NULL") {
       q = `UPDATE Questionnaire
       SET 
          [Desc] = '${Desc}',
@@ -1413,11 +1438,11 @@ app.get("/GetScoreAction/:arrIds/:Q", async (req, res) => {
   }
 });
 app.post("/GetDataForTableScoreAction", async (req, res) => {
-  if (!Array.isArray(req.body)) {
-    if (!Object.keys(req.body).length) {
-      req.body = [];
-    }
-  }
+  // if (!Array.isArray(req.body)) {
+  //   if (!Object.keys(req.body).length) {
+  //     req.body = [];
+  //   }
+  // }
   console.log("req.bodyreq.bodyreq.body", req.body);
   req.body.forEach((el) => {
     for (const key in el) {
