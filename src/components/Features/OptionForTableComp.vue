@@ -4,7 +4,12 @@
       ><i class="fa-regular fa-plus-large"></i> הוסף פיצ'ר</el-button
     >
     <div class="serch">
-      <el-input v-model="Serch" :placeholder="placeHolder" ref="inputSerch">
+      <el-input
+        v-model="Serch"
+        :placeholder="placeHolder"
+        ref="inputSerch"
+        dir="rtl"
+      >
         <i
           class="fa-solid fa-magnifying-glass fa-xl iconzo"
           slot="prefix"

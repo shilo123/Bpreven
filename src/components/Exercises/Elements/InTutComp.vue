@@ -20,6 +20,7 @@
         "
         @blur="showFocus = false"
         :class="{ FocusInp: showFocus, BlurInp: !showFocus }"
+        dir="rtl"
       />
       <div class="focus-lineL" v-if="showFocus" :style="{ background }"></div>
       <div class="focus-lineR" v-if="showFocus" :style="{ background }"></div>

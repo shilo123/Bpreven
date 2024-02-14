@@ -9,6 +9,7 @@
       @blur="blurInp"
       clearable
       @clear="$emit('clear')"
+      dir="rtl"
     ></el-input>
     <div class="ParentsItemsComplited" v-if="showAutoComplited">
       <div

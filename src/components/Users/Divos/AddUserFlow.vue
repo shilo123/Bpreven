@@ -6,6 +6,7 @@
       placeholder="חפש"
       v-show="!shows.showAdd && !shows.showUP"
       v-model="serch"
+      dir="rtl"
     />
     <el-button
       type="success"
@@ -21,12 +22,14 @@
         placeholder="כתוב שם"
         size="mini"
         class="InputAddName"
+        dir="rtl"
       ></el-input>
       <el-input
         class="InputSymbol"
         v-model="AddStmbol"
         placeholder="כתוב סימן"
         size="mini"
+        dir="rtl"
       ></el-input>
       <div class="buts">
         <el-button

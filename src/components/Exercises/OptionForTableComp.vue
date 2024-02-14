@@ -17,7 +17,7 @@
       <el-select v-model="filterOf" placeholder="" size="medium">
         <el-option v-for="(O, i) in OpFilter" :key="i" :value="O"></el-option>
       </el-select>
-      <input type="text" placeholder="חפש" v-model="serch" />
+      <input type="text" placeholder="חפש" v-model="serch" dir="rtl" />
     </div>
   </div>
 </template>

@@ -6,7 +6,6 @@
       <div class="rowA">
         <div class="quesinnaire">
           <label for="quesinnaire">שאלון</label>
-          <!-- <input type="text" name="quesinnaire" class="w3-input" /> -->
           <el-select v-model="NewStepUserFlow.Quesinnaire" placeholder="שאלון">
             <el-option
               v-for="(q, i) in objData.Questionnaire"

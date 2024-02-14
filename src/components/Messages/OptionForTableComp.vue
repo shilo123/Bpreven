@@ -4,7 +4,12 @@
       ><i class="fa-solid fa-message-plus"></i> הוסף הודעה</el-button
     >
     <div class="serch">
-      <el-input v-model="Serch" :placeholder="placeHolder" ref="inputSerch">
+      <el-input
+        v-model="Serch"
+        :placeholder="placeHolder"
+        ref="inputSerch"
+        dir="rtl"
+      >
         <i class="fa-solid fa-magnifying-glass fa-xl iconzo" slot="prefix"> </i>
       </el-input>
       <el-select placeholder="חפש לפי" v-model="filterOf">

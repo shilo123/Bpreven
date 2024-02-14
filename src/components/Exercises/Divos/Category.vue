@@ -6,10 +6,7 @@
       @mouseover="over = true"
       @mouseleave="over = false"
     ></i>
-    <el-button type="success" class="HosefCate" @click="newcategory"
-      >הוסף קטגוריה</el-button
-    >
-    <div class="container">
+    <!-- <div class="container">
       <div class="item" v-for="(n, i) in cateGory" :key="i">
         <span
           contenteditable="true"
@@ -36,7 +33,81 @@
           </el-popconfirm>
         </div>
       </div>
-    </div>
+    </div> -->
+    <el-card class="box-card">
+      <div slot="header" class="header">
+        <el-button
+          type="success"
+          class="HosefCate"
+          @click="
+            showNewCategory = true;
+            NewCategory = '';
+          "
+          size="mini"
+          >הוסף קטגוריה</el-button
+        >
+        <el-button
+          type="danger"
+          size="mini"
+          v-if="showNewCategory || showEditCategory"
+          @click="restShows"
+          >הסתר</el-button
+        >
+        <span>קטגוריות</span>
+      </div>
+      <el-input
+        v-model="NewCategory"
+        placeholder="קטגוריה חדשה"
+        size="medium"
+        v-if="showNewCategory || showEditCategory"
+        class="NewCateGory"
+        dir="rtl"
+      ></el-input>
+      <el-button
+        type="primary"
+        size="medium"
+        v-if="showNewCategory"
+        class="ButtonShmor"
+        @click="SaveCategory(NewCategory)"
+        >שמור</el-button
+      >
+      <el-button
+        type="primary"
+        size="medium"
+        v-if="showEditCategory"
+        class="ButtonShmor"
+        @click="EditCategory(NewCategory, IdEdit, indexEdit)"
+        >שמור</el-button
+      >
+      <div v-for="(n, i) in cateGory" :key="i" class="item">
+        {{ n.Name }}
+        <el-button
+          type="success"
+          size="mini"
+          class="Up"
+          @click="
+            IdEdit = n.Id;
+            showEditCategory = true;
+            NewCategory = n.Name;
+            indexEdit = i;
+          "
+          >עריכה</el-button
+        >
+
+        <el-popconfirm
+          confirm-button-text="כן"
+          cancel-button-text="לא, תודה"
+          icon="el-icon-info"
+          icon-color="red"
+          title="בטוח שאתה רוצה?"
+          @confirm="DeleteCategory(n.Id, i)"
+        >
+          <el-button type="danger" size="mini" class="Del" slot="reference"
+            >מחק</el-button
+          >
+        </el-popconfirm>
+      </div>
+    </el-card>
   </div>
 </template>
 
@@ -49,6 +120,11 @@ export default {
     return {
       cateGory: [],
       over: false,
+      showNewCategory: false,
+      showEditCategory: false,
+      NewCategory: "",
+      IdEdit: "",
+      indexEdit: "",
     };
   },
 
@@ -58,68 +134,93 @@ export default {
   },
 
   methods: {
-    newcategory() {
-      this.cateGory.unshift({ Name: "קטגוריה חדשה", ifNew: true });
-      setTimeout(() => {
-        if (this.$refs.Itemone) {
-          let itemone = this.$refs.Itemone;
-          itemone[0].focus();
-          // console.log();
-        } else {
-          this.$message.error("חלה שגיאונות קטנטונת");
-        }
-      }, 0);
+    restShows() {
+      this.showNewCategory = false;
+      this.showEditCategory = false;
     },
-    async SaveCategory(val, i) {
+    async SaveCategory(val) {
       if (!this.over) {
         let { data } = await this.$ax.post(URL + "AddCategory", { val });
         this.$Bool(data, "הקטגוריה נשמרה", "משהו השתבש", false);
-        this.cateGory[i].ifNew = false;
+        let res = await this.$ax.get(URL + "GetCategiz");
+        this.cateGory = res.data;
+        this.restShows();
       }
     },
-    async EditCategory(val, id) {
+    async EditCategory(val, id, i) {
       if (!this.over) {
         let { data } = await this.$ax.post(URL + "EditCategory", { val, id });
         this.$Bool(data, "הקטגוריה נשמרה", "משהו השתבש", false);
       }
+      this.cateGory[i].Name = val;
+      this.restShows();
     },
     async DeleteCategory(id, i) {
-      console.log(id);
+      // console.log(id);
       let { data } = await this.$ax.delete(URL + "DeeteCategory/" + id);
       this.$Bool(data, "הקטגוריה נמחקה", "משהו השתבש", false);
       if (data) {
         this.cateGory.splice(i, 1);
       }
+      this.restShows();
     },
   },
 };
 </script>
 
-<style scoped>
-.item {
-  background: rgb(101, 85, 85);
-  padding: 10px;
-  margin: 10px;
-  font-size: 20px;
+<style lang="scss" scoped>
+.box-card {
+  .ButtonShmor {
+    position: absolute;
+    left: 40px;
+  }
+  .NewCateGory {
+    width: 310px;
+    position: relative;
+    left: 100px;
+  }
+  .header {
+    span {
+      position: absolute;
+      right: 40px;
+      top: 10px;
+      font-size: 20px;
+    }
+    .HosefCate {
+      &:hover {
+        font-size: 24px;
+        left: 160px;
+      }
+    }
+  }
+  .item {
+    background: rgba(26, 5, 255, 0.301);
+    padding: 10px;
+    margin: 10px;
+    font-size: 20px;
+    text-align: right;
+    border: 3px solid rgba(0, 0, 0, 0.304);
+    border-radius: 5px;
+    .Del {
+      position: absolute;
+      left: 44px;
+    }
+    .Up {
+      position: absolute;
+      left: 104px;
+    }
+  }
 }
-.container {
-  text-align: right;
-}
-.buttons {
-  display: flex;
-  flex-direction: row;
-  position: relative;
-  left: 5px;
-}
-span {
-  padding: 10px;
-}
-.HosefCate {
-  position: relative;
-  left: 170px;
-}
-.HosefCate:hover {
-  font-size: 24px;
-  left: 160px;
-}
+// .container {
+//   text-align: right;
+// }
+// .buttons {
+//   display: flex;
+//   flex-direction: row;
+//   position: relative;
+//   left: 5px;
+// }
+// span {
+//   padding: 10px;
+// }
 </style>

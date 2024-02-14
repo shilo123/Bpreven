@@ -4,7 +4,7 @@
 
     <div>
       <el-input
-        dir="auto"
+        dir="rtl"
         placeholder="עדכן אופציה"
         v-model="ModelUpdateOption.Desc"
       ></el-input>

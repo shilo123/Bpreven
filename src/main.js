@@ -2,6 +2,8 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import ElementUI from "element-ui";
+import ExTableColumn from "ex-table-column";
+
 import axios from "axios";
 import store from "@/store/index";
 import Input from "@/components/Score/Elenents/InitialInput.vue";
@@ -29,6 +31,8 @@ for (const [key, value] of Object.entries(GlobalFunction)) {
   Vue.prototype["$" + key] = value;
 }
 Vue.component("InitialInput", Input);
+Vue.component(ExTableColumn.name, ExTableColumn);
+// console.log(Vue.config);
 Vue.use(ElementUI, { locale });
 // Vue.use(Quasar);
 Vue.prototype.$ax = axios;

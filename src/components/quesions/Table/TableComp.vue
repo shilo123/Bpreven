@@ -103,7 +103,8 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="שאלה" prop="Desc"></el-table-column>
+      <el-table-column label="שאלה" prop="Desc" autoFit></el-table-column>
+
       <el-table-column label="שאלון" prop="DescQuestionnaire"></el-table-column>
       <el-table-column type="expand" v-if="LoadingOptionss">
         <template slot-scope="props">
@@ -187,14 +188,14 @@
                             :key="i"
                             :value="q.Desc"
                             v-show="q.Seq > activQ.Seq"
-                            :style="
-                              bodek({
-                                q: q.Seq,
-                                activQ: activQ.Seq,
-                                BoolBool: q.Seq > activQ.Seq,
-                              })
-                            "
                           >
+                            <!-- :style="
+                              // bodek({
+                              //   q: q.Seq,
+                              //   activQ: activQ.Seq,
+                              //   BoolBool: q.Seq > activQ.Seq,
+                              // })
+                            " -->
                           </el-option>
                         </el-select>
                         <el-button
@@ -610,7 +611,6 @@ export default {
           //   console.log(tds);
           Array.from(tds).forEach((element, i) => {
             let elco;
-
             elco = element.children[8].children[0].children[0].children[0];
             elco.classList = "el-icon-arrow-left";
             Array.from(element.children).forEach((el) => {
@@ -953,3 +953,4 @@ export default {
   border-radius: 5px; /* עיגול פינות המגלגל */
 }
 </style>
+<style></style>

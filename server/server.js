@@ -227,22 +227,9 @@ app.get("/GetallQuestions", async (req, res) => {
       LEFT JOIN DataTypes ON DataTypes.Id = Questions.DataTypesId
        WHERE QuestionnaireId = ${el.Id} ORDER BY Questions.[Seq]`;
       let val = await SQL(QU);
-      // console.log(val);
       obj[propery] = val;
     });
-    // console.log(resultA);
     await Promise.all(Promises);
-    // console.log(obj);
-    //
-    //
-    // let arr = [];
-    // for (const key in obj) {
-    //   arr.push({ nameQuesinnare: key, qustions: obj[key] });
-    // }
-    // console.log(arr[0].qustions);
-
-    //
-    //
     res.json(obj);
   } catch (error) {
     console.log(error);
@@ -499,9 +486,9 @@ LEFT JOIN Questionnaire ON Questionnaire.Id = Q1.QuestionnaireId
 LEFT JOIN Questions AS Q2 ON Q1.NextQuestionId = Q2.Id
 LEFT JOIN DataTypes ON DataTypes.Id = Q1.DataTypesId ORDER BY Questionnaire.[Desc] Desc ,Q1.[Seq] ASC;
 `;
+
   // let result = [];
   let result = await SQL(q);
-  // console.log(result);
   res.json(result);
 });
 app.get("/GetData", async (req, res) => {

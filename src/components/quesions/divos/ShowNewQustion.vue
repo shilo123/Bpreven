@@ -5,7 +5,7 @@
       <div class="itemNewQA">
         <label>שם השאלה</label>
         <input
-          dir="auto"
+          dir="rtl"
           type="text"
           class="w3-input"
           placeholder="שם השאלה"

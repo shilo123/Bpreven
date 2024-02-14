@@ -4,7 +4,13 @@
     <div class="in">
       <div class="item" style="z-index: 10">
         <label for="">שם הפיצ'ר</label>
-        <input type="text" class="w3-input" placeholder="שם" v-model="Name" />
+        <input
+          type="text"
+          class="w3-input"
+          placeholder="שם"
+          v-model="Name"
+          dir="rtl"
+        />
       </div>
       <div class="item" style="z-index: 10">
         <label for="">שם הסימן</label>
@@ -22,6 +28,7 @@
           class="w3-input"
           placeholder="כתוב מספר"
           v-model="number"
+          dir="rtl"
         />
       </div>
     </div>

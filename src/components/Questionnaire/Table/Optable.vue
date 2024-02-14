@@ -16,7 +16,7 @@
         v-model="serch"
         :placeholder="pleace"
         :class="{ input: !wachtStore, inputBig: wachtStore }"
-        dir="auto"
+        dir="rtl"
         ref="inputSerch"
       >
         <i

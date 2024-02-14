@@ -44,6 +44,7 @@
             placeholder="תיאור התרגיל"
             v-model="NewE.descrip"
             class="item-rowB"
+            dir="rtl"
           >
           </el-input>
           <el-select

@@ -45,7 +45,7 @@
     <div class="inEdito w3-card-4">
       <div class="iteminEdit">
         <label>שם שאלה</label>
-        <input type="text" class="w3-input" v-model="rowEdit.Desc" dir="auto" />
+        <input type="text" class="w3-input" v-model="rowEdit.Desc" dir="rtl" />
       </div>
       <div class="allitemsSelect">
         <div class="iteminEditSelct">
@@ -210,11 +210,12 @@ export default {
   },
 
   mounted() {
-    this.Alldata.Allquestions = this.$store.state.AllData.Allquestions;
-    this.Alldata.questionsOnly = this.$store.state.AllData.questionsOnly;
-    this.Alldata.DataType = this.$store.state.AllData.DataType;
-    this.Alldata.NameQuen = this.$store.state.AllData.NameQuen;
-    // console.log(this.paramsEdit);
+    setTimeout(() => {
+      this.Alldata.Allquestions = this.$store.state.AllData.Allquestions;
+      this.Alldata.questionsOnly = this.$store.state.AllData.questionsOnly;
+      this.Alldata.DataType = this.$store.state.AllData.DataType;
+      this.Alldata.NameQuen = this.$store.state.AllData.NameQuen;
+    }, 100); // console.log(this.paramsEdit);
   },
 
   methods: {
@@ -252,12 +253,15 @@ export default {
       }
     },
     async EditQ() {
-      console.log(this.rowEdit);
+      // console.log(this.rowEdit);
       let { data } = await this.$ax.post(URL + "Updata", this.rowEdit);
-      console.log(data);
+      // console.log(data);
       if (data) {
         this.$message.success("עודכן בהצלחה");
         window.location.reload();
+        this.$store.commit("SgorDivos", true);
+        // await this.$store.dispatch("fetchData");
+        this.$emit("UpdateData");
       } else {
         this.$message.error("משהו השתבש אחינו");
         this.LoadingButton = false;

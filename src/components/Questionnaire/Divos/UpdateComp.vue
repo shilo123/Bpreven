@@ -9,7 +9,7 @@
             type="text"
             class="w3-input"
             v-model="newqunto.Desc"
-            dir="auto"
+            dir="rtl"
           />
         </div>
         <div class="newSymbol">
@@ -17,7 +17,7 @@
           <input
             type="text"
             class="w3-input"
-            dir="auto"
+            dir="rtl"
             v-model="newqunto.Symbol"
           />
         </div>
@@ -38,7 +38,7 @@
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 4 }"
             class="inputTextarea"
-            dir="auto"
+            dir="rtl"
             v-model="newqunto.StartQuestion"
           />
         </div>
@@ -49,7 +49,7 @@
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 4 }"
             class="inputTextarea"
-            dir="auto"
+            dir="rtl"
             v-model="newqunto.EndQuestion"
           />
         </div>
@@ -107,6 +107,7 @@
             size="medium"
             placeholder="מספר"
             v-model="newqunto.Monthly"
+            dir="rtl"
           ></el-input>
         </div>
 
@@ -130,6 +131,7 @@
             size="medium"
             placeholder="מספר"
             v-model="newqunto.DefaultId"
+            dir="rtl"
           ></el-input>
         </div>
       </div>

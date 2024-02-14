@@ -13,6 +13,7 @@
 
       <div class="ItemUp">
         <input
+          dir="rtl"
           type="text"
           class="w3-input"
           placeholder="הקלד שם חדש"
@@ -21,6 +22,7 @@
           @focus="showTextarea = true"
         />
         <el-input
+          dir="rtl"
           @blur="showTextarea = false"
           type="textarea"
           :autosize="{ minRows: 2, maxRows: 4 }"

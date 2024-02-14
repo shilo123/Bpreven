@@ -3,11 +3,11 @@
     <i class="el-icon-close" @click="$emit('Close')"></i>
     <div class="InputName">
       <label>שם הפיצ'ר</label>
-      <el-input v-model="Name" placeholder="שם הפיצ'ר"></el-input>
+      <el-input v-model="Name" placeholder="שם הפיצ'ר" dir="rtl"></el-input>
     </div>
     <div class="Symbol">
       <label>שם הסימן</label>
-      <el-input v-model="Symbol" placeholder="שם סימן"></el-input>
+      <el-input v-model="Symbol" placeholder="שם סימן" dir="rtl"></el-input>
     </div>
     <div class="number">
       <label>מספר</label>

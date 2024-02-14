@@ -4,7 +4,7 @@
 
     <input
       type="text"
-      dir="auto"
+      dir="rtl"
       class="w3-input"
       v-model="ModelInputDivAnswer"
     />

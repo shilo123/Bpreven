@@ -9,42 +9,48 @@
         row-key="Id"
         @row-dblclick="$emit('newComponent', { C: 'Edit', row: $event })"
       >
-        <el-table-column label="אפשרויות" align="center">
-          <template slot-scope="scope">
-            <el-button
-              type="danger"
-              size="mini"
-              @click="$emit('newComponent', { C: 'Delete', row: scope.row })"
-              >מחיקה</el-button
-            >
-            <el-button
-              type="success"
-              size="mini"
-              @click="$emit('newComponent', { C: 'Edit', row: scope.row })"
-              >עריכה</el-button
-            >
-          </template>
-        </el-table-column>
-        <el-table-column label="אם פעיל" align="center">
-          <template slot-scope="scope">
-            <div>{{ scope.row.StatusId === 1 ? "כן" : "לא" }}</div>
-          </template>
-        </el-table-column>
+        <!-- :header-row-style="{ textAlign: 'center' }" -->
         <el-table-column
-          label="שאלון"
-          prop="DescQuestion"
+          :label="`${data[0].UserDesc}/${data[0].SymbolUser}`"
           align="center"
-        ></el-table-column>
-        <el-table-column
-          label="סדר"
-          prop="Seq"
-          align="center"
-          width="100"
-        ></el-table-column>
-        <el-table-column label="סימן/סוג משתמש" align="center">
-          <template slot-scope="scope">
-            {{ `${scope.row.UserDesc}/${scope.row.SymbolUser}` }}
-          </template>
+        >
+          <el-table-column label="אפשרויות" align="center">
+            <template slot-scope="scope">
+              <el-button
+                type="danger"
+                size="mini"
+                @click="$emit('newComponent', { C: 'Delete', row: scope.row })"
+                >מחיקה</el-button
+              >
+              <el-button
+                type="success"
+                size="mini"
+                @click="$emit('newComponent', { C: 'Edit', row: scope.row })"
+                >עריכה</el-button
+              >
+            </template>
+          </el-table-column>
+          <el-table-column label="אם פעיל" align="center">
+            <template slot-scope="scope">
+              <div>{{ scope.row.StatusId === 1 ? "כן" : "לא" }}</div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="שאלון"
+            prop="DescQuestion"
+            align="center"
+          ></el-table-column>
+          <el-table-column
+            label="סדר"
+            prop="Seq"
+            align="center"
+            width="100"
+          ></el-table-column>
+          <!-- <el-table-column label="סימן/סוג משתמש" align="center">
+            <template slot-scope="scope">
+              {{ `${scope.row.UserDesc}/${scope.row.SymbolUser}` }}
+            </template>
+          </el-table-column> -->
         </el-table-column>
       </el-table>
     </ElTableDraggable>

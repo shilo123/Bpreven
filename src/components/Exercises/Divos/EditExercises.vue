@@ -3,8 +3,13 @@
     <i class="el-icon-close" @click="$emit('Close')"></i>
     <div class="in">
       <div class="rowA">
-        <input type="text" class="w3-input" v-model="NewData.Title" />
-        <input type="text" class="w3-input" v-model="NewData.Symbol" />
+        <input type="text" class="w3-input" v-model="NewData.Title" dir="rtl" />
+        <input
+          type="text"
+          class="w3-input"
+          v-model="NewData.Symbol"
+          dir="rtl"
+        />
         <el-switch
           v-model="NewData.stuts"
           active-text="פעיל"
@@ -18,6 +23,7 @@
           :autosize="{ minRows: 13, maxRows: 14 }"
           placeholder="תיאור"
           v-model="NewData.descrip"
+          dir="rtl"
         >
         </el-input>
         <el-select v-model="NewData.categityId" placeholder="קטגוריה">

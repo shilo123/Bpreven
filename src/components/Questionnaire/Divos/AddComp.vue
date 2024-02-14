@@ -10,7 +10,7 @@
             key="input-0"
             type="text"
             class="w3-input"
-            dir="auto"
+            dir="rtl"
             v-model="newquen.Desc"
             placeholder="שם שאלון"
           />
@@ -21,7 +21,7 @@
             key="input-1"
             type="text"
             class="w3-input"
-            dir="auto"
+            dir="rtl"
             v-model="newquen.Symbol"
             placeholder="שם סימן "
           />
@@ -42,7 +42,7 @@
           <el-input
             key="input-2"
             type="textarea"
-            dir="auto"
+            dir="rtl"
             :autosize="{ minRows: 2, maxRows: 34 }"
             v-model="newquen.StartQuestion"
             placeholder="שאלה ראשונית "
@@ -54,7 +54,7 @@
           <el-input
             key="input-2"
             type="textarea"
-            dir="auto"
+            dir="rtl"
             :autosize="{ minRows: 2, maxRows: 34 }"
             v-model="newquen.EndQuestion"
             placeholder="משפט סיום"
@@ -97,6 +97,7 @@
             type="number"
             class="w3-input"
             v-model="newquen.monthi"
+            dir="rtl"
           />
         </div>
         <el-select
@@ -130,6 +131,7 @@
             type="text"
             class="w3-input Inptutozy"
             v-model="newquen.default"
+            dir="rtl"
           />
         </div>
       </div>

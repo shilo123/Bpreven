@@ -117,7 +117,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .Tablos {
   width: 78%;
   position: absolute;
@@ -151,7 +151,8 @@ export default {
   left: 31%;
 }
 .AddMessage {
-  background: linear-gradient(to right, #55ddff, #544bff, #59fcd6);
+  // background: linear-gradient(to right, #55ddff, #544bff, #59fcd6);
+  background: rgba(175, 191, 255, 0.463);
   border-radius: 10px;
 }
 .LoMatzanu {
@@ -159,5 +160,8 @@ export default {
   left: 50%;
   top: 40%;
   font-size: 30px;
+}
+input::placeholder {
+  color: black;
 }
 </style>

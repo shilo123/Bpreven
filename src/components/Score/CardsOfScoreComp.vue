@@ -250,6 +250,9 @@ export default {
     wachtStore() {
       return this.$store.state.TogelAnimate;
     },
+    StartId() {
+      return this.Questos[0] ? this.Questos[0].Id : null;
+    },
   },
   mounted() {
     setTimeout(() => {
@@ -270,6 +273,7 @@ export default {
       this.Questos.forEach((element) => {
         this.RevereseQu.unshift(element);
       });
+      // console.log("🚀 ~ this.Questos.sort ~ this.Questos:", this.Questos);
 
       this.compData();
     }
@@ -317,7 +321,8 @@ export default {
     },
     compData() {
       // this.$ax.post(URL + "J", this.Questos);
-      // console.log(this.Questos);
+      console.log(this.Questos);
+      // console.log(this.Questos.map((e) => e.Seq));
       this.arrsTheOP = this.generateOptionsPaths(this.Questos);
       this.arrsTheOP.forEach((element, i) => {
         element.push(i);
@@ -425,12 +430,12 @@ export default {
       let allPaths = [];
 
       function buildPath(currentPath, currentQuestionId) {
+        // console.log(currentPath, currentQuestionId);
         let question = questions.find((q) => q.Id === currentQuestionId);
         if (!question) {
           allPaths.push(currentPath);
           return;
         }
-
         if (!question.op || question.op.length === 0) {
           allPaths.push([
             ...currentPath,
@@ -465,7 +470,7 @@ export default {
         });
       }
 
-      buildPath([], 1); // Start from the first question
+      buildPath([], this.StartId); // Start from the first question
       return allPaths;
     },
     arraysEqual(arr1, arr2) {

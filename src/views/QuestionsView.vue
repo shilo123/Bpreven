@@ -199,7 +199,7 @@ export default {
     paramsOfDeleteOp(id, theOption) {
       this.ParamsOfDelOP = { id, theOption };
     },
-    YeshLanu() {
+    async YeshLanu() {
       let Component = this.$refs.CompoTable;
       Component.data = this.$store.state.data;
       setTimeout(() => {
@@ -218,7 +218,7 @@ export default {
       }, 200);
     },
     async UpdateData() {
-      await this.$store.dispatch("fetchData");
+      await this.$store.dispatch("fetchData", true);
       this.YeshLanu();
     },
   },

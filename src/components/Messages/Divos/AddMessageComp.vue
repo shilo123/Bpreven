@@ -5,6 +5,7 @@
       <div class="InputName">
         <!-- <label>שם ההודעה</label> -->
         <input
+          dir="rtl"
           placeholder="שם ההודעה"
           class="w3-input"
           v-model="NewMes.DescMes"
@@ -15,6 +16,7 @@
           "
         />
         <el-input
+          dir="rtl"
           ref="textareaZ"
           @blur="showTextArea = false"
           v-show="showTextArea"
@@ -27,6 +29,7 @@
       </div>
       <div class="inputSymbol">
         <input
+          dir="rtl"
           placeholder="שם הסימן"
           class="w3-input"
           v-model="NewMes.SymbolMes"
@@ -114,8 +117,9 @@ label {
   width: 40%;
   /* float: right; */
   margin: 30px;
-  position: relative;
-  top: 100px;
+  position: absolute;
+  top: 0px;
+  right: 0;
 }
 .InputName .w3-input {
   background: rgba(126, 114, 114, 0.26);
@@ -127,8 +131,8 @@ label {
   width: 40%;
   float: left;
   margin: 30px;
-  position: relative;
-  bottom: 98px;
+  position: absolute;
+  top: 0;
 }
 .inputSymbol .w3-input {
   background: rgba(126, 114, 114, 0.26);
@@ -138,13 +142,13 @@ label {
 }
 .Swichoz {
   position: relative;
-  top: -10px;
+  top: 150px;
   width: 170px;
   height: 60px;
   padding: 10px;
   background: rgb(127, 116, 116);
   border-radius: 20px;
-  left: 60%;
+  left: 36%;
 }
 .Swichoz .el-switch {
   position: absolute;
@@ -164,5 +168,8 @@ label {
   bottom: 20px;
   right: 10px;
   margin: 10px;
+}
+input::placeholder {
+  color: rgba(0, 0, 0, 0.729);
 }
 </style>

@@ -15,7 +15,7 @@
       <el-input
         v-show="!showRadio"
         v-model="serch"
-        dir="auto"
+        dir="rtl"
         placeholder="חפש"
         :class="{ inputSerch: !wachtStore, inputSerchBig: wachtStore }"
         ref="inputSerch"
@@ -139,7 +139,7 @@ export default {
       this.Alldata.NameQuen = data;
       this.data = this.$store.state.data;
       this.data2 = this.$store.state.data;
-      console.log(this.Alldata);
+      console.log(data);
     } catch (error) {
       console.log(error);
     }
