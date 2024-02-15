@@ -35,19 +35,22 @@
           ></el-option>
         </el-select>
       </div>
-      <div :class="{ File: true, fileUp: afterUp }">
+      <div :class="{ File: true, fileUp: afterUp }" v-if="iFUrl">
         <video
           autoplay
           :src="NewData.link"
           width="380"
           height="220"
           controls
-          v-if="showVideo"
+          v-if="showVideo && (type === 'video' || type === 'audio')"
         ></video>
+        <img
+          :src="NewData.link"
+          v-if="showVideo && type === 'image'"
+          width="380"
+          height="220"
+        />
         <el-upload :action="URLaction" :on-success="successFile">
-          <!-- <div slot="tip" class="el-upload__tip">
-            בהעלאת הקובץ הקובץ המקורי ימחק
-          </div> -->
           <el-button type="primary" class="BofUp"
             >העלה קובץ אחר במקום הקיים</el-button
           >
@@ -55,6 +58,14 @@
         <el-button type="danger" class="BofUpa" @click="DeleteFile"
           >מחק את הקובץ</el-button
         >
+      </div>
+      <div v-else class="FileElse">
+        <el-upload :action="URLaction" :on-success="successFile">
+          <el-button type="primary" class="BofUp">
+            <i class="fa-solid fa-upload"></i> אין לך כאן קבצים זה הזמן
+            להעלות</el-button
+          >
+        </el-upload>
       </div>
     </div>
     <div class="butons">
@@ -95,6 +106,8 @@ export default {
       cateGory: [],
       showVideo: true,
       afterUp: false,
+      type: "",
+      iFUrl: true,
     };
   },
   computed: {
@@ -108,16 +121,34 @@ export default {
     },
   },
   async mounted() {
-    console.log(this.NewData.link);
+    //image,video,audio
+    // this.CheckURL(this.NewData.link);
+    let typos = this.NewData.link.split(".")[1];
+    await this.IfURL(this.NewData.link);
+    if (typos === "png") {
+      this.type = "image";
+    } else if (typos === "mp3") {
+      this.type = "video";
+    } else if (typos === "mp4") {
+      this.type = "audio";
+    }
     let { data } = await this.$ax.get(URL + "GetCategiz");
     this.cateGory = data;
     // console.log(this.NewData);
   },
 
   methods: {
-    successFile(res) {
-      this.NewData.link = res;
-      console.log(res);
+    //image,video,audio
+    async IfURL(URLO) {
+      this.iFUrl = await this.CheckURL(URLO);
+    },
+    async successFile(res) {
+      // console.log(res);
+      this.NewData.link = res.response;
+      // // console.log(res);
+      await this.IfURL(res.response);
+
+      this.type = res.Type;
       this.showVideo = false;
       setTimeout(() => {
         this.showVideo = true;
@@ -142,6 +173,17 @@ export default {
         setTimeout(() => {
           this.showVideo = true;
         }, 200);
+      }
+      this.iFUrl = !data;
+    },
+    async CheckURL(url) {
+      try {
+        await this.$ax.get(url);
+        // console.log(res.response.status);
+        return true;
+      } catch (error) {
+        return false;
+        // console.log(error.response.status);
       }
     },
   },
@@ -232,5 +274,15 @@ video {
   position: absolute;
   right: 40px;
   bottom: 20px;
+}
+.FileElse {
+  position: absolute;
+  bottom: -80px;
+  margin: 20px;
+  padding: 20px;
+  width: 250px;
+  /* width: 250px; */
+  height: 300px;
+  left: 470px;
 }
 </style>

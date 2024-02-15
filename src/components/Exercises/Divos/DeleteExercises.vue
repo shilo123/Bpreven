@@ -65,6 +65,6 @@ export default {
 .boutons {
   position: relative;
   left: 250px;
-  top: 64px;
+  top: 34px;
 }
 </style>

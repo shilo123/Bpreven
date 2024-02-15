@@ -2,7 +2,7 @@
   <div class="all">
     <h1>היי</h1>
     <div class="content">שלום שלום שלום</div>
-    <!-- <el-button type="primary" @click="Func">server</el-button> -->
+    <el-button type="primary" @click="Func">Click</el-button>
   </div>
 </template>
 <script>
@@ -25,17 +25,12 @@ export default {
     },
   },
   mounted() {
-    console.log({ ...this.$store.state.Questionaire });
+    // console.log({ ...this.$store.state.Questionaire });
   },
   methods: {
     async Func() {
-      try {
-        let url = "../../server/server.js";
-        await this.$ax.get(url + "/" + "test");
-        this.$message.success("יש לנו");
-      } catch (error) {
-        this.$message.error("אין לנו");
-      }
+      let str = "Hellow".split(" ")[1];
+      console.log(str);
     },
   },
 };

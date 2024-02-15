@@ -17,20 +17,21 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 app.use("/Upload", express.static("Upload"));
 const URL = `https://bprevenserver.dgtracking.co.il`;
+// const URL = `http://localhost:3001`;
 
 // console.log(port);
 const config = {
-  server: "MC58148\\SQLEXPRESS",
-  database: "Bpreven",
-  driver: "msnodesqlv8",
-  user: "sa",
-  password: "Shilo123!!",
-  //
-  // server: "185.68.120.69",
+  // server: "MC58148\\SQLEXPRESS",
   // database: "Bpreven",
   // driver: "msnodesqlv8",
-  // user: "dgtracking_co_il_dgLaw",
-  // password: "dgtrackingJadekia556",
+  // user: "sa",
+  // password: "Shilo123!!",
+  //
+  server: "185.68.120.69",
+  database: "Bpreven",
+  driver: "msnodesqlv8",
+  user: "dgtracking_co_il_dgLaw",
+  password: "dgtrackingJadekia556",
 };
 // console.log(config);
 function SQL(query) {
@@ -106,17 +107,33 @@ function random(min, max) {
 app.post("/postFilee/:Idcategory", upload.single("file"), async (req, res) => {
   let Id = req.params.Idcategory;
   let File = req.file;
+  let Type;
+  console.log(File.mimetype);
   const pathFloader = path.join(__dirname, "Upload", Id);
   if (!fs.existsSync(pathFloader)) {
     fs.mkdirSync(pathFloader, { recursive: true });
   }
 
   let nameFile = File.originalname;
-  if (File.originalname.split(" ")[0]) {
-    nameFile =
-      File.originalname.split(" ")[0] +
-      JSON.stringify(random(0, 1000)) +
-      ".mp4";
+  if (nameFile.split(".")[1]) {
+    nameFile = nameFile.split(".")[0];
+  }
+  if (nameFile.split(" ")[1]) {
+    nameFile = nameFile.split(" ")[0];
+  }
+  Type = "image";
+  if (File.mimetype.startsWith("image/")) {
+    nameFile += JSON.stringify(random(0, 1000)) + ".png";
+  } else if (File.mimetype.startsWith("video/")) {
+    Type = "video";
+
+    nameFile += JSON.stringify(random(0, 1000)) + ".mp4";
+  } else if (File.mimetype.startsWith("audio/")) {
+    Type = "audio";
+
+    nameFile += JSON.stringify(random(0, 1000)) + ".mp3";
+  } else {
+    console.log("קובץ מוזר");
   }
   const filePath = path.join(pathFloader, nameFile);
   // debugger;
@@ -125,7 +142,7 @@ app.post("/postFilee/:Idcategory", upload.single("file"), async (req, res) => {
       console.error(err);
       return res.status(500).send("Error saving the file.");
     }
-    res.send(`${URL}/Upload/${Id}/${nameFile}`);
+    res.json({ response: `${URL}/Upload/${Id}/${nameFile}`, Type });
   });
 });
 app.post(
@@ -135,16 +152,30 @@ app.post(
     try {
       const nameFilea = req.params.name;
       const Id = req.params.idCategory;
+      let Type = "";
       deleteFileInFolder(Id, nameFilea);
-      let nameFile = "";
-      if (req.file.originalname.split(" ")[0]) {
-        nameFile =
-          req.file.originalname.split(" ")[0] +
-          JSON.stringify(random(0, 1000)) +
-          ".mp4";
-      } else {
-        nameFile = req.file.originalname;
+      let file = req.file;
+      // console.log(file);
+      let nameFile = req.file.originalname;
+      if (nameFile.split(".")[1]) {
+        nameFile = nameFile.split(".")[0];
       }
+      if (nameFile.split(" ")[1]) {
+        nameFile = nameFile.split(" ")[0];
+      }
+      if (file.mimetype.startsWith("image/")) {
+        Type = "image";
+        nameFile += JSON.stringify(random(0, 1000)) + ".png";
+      } else if (file.mimetype.startsWith("video/")) {
+        Type = "video";
+        nameFile += JSON.stringify(random(0, 1000)) + ".mp4";
+      } else if (file.mimetype.startsWith("audio/")) {
+        Type = "audio";
+        nameFile += JSON.stringify(random(0, 1000)) + ".mp3";
+      } else {
+        console.log("קובץ");
+      }
+
       const pathFloader = path.join(__dirname, "Upload", Id);
       if (!fs.existsSync(pathFloader)) {
         fs.mkdirSync(pathFloader, { recursive: true });
@@ -155,7 +186,7 @@ app.post(
           console.error(err);
           return res.status(500).send("Error saving the file.");
         }
-        res.send(`${URL}/Upload/${Id}/${nameFile}`);
+        res.json({ response: `${URL}/Upload/${Id}/${nameFile}`, Type });
       });
     } catch (error) {
       console.log("errFile", error);
@@ -523,7 +554,7 @@ app.get("/GetQuestinsFromQueshennaire/:id", async (req, res) => {
 app.post("/Updata", async (req, res) => {
   let body = req.body;
   let UpdateOption = false;
-  console.log(body);
+  // console.log(body);
   // console.log("beforQbeforQbeforQbeforQ", beforQ);
   for (const key in body) {
     if (typeof body[key] === "string") {
@@ -1344,6 +1375,7 @@ app.delete("/deleFile/:name/:f", async (req, res) => {
   // console.log("sdfsdfs");
   try {
     // console.log(req.params.name);
+    // console.log(req.params.f);
     if (req.params.name !== "none") {
       deleteFileInFolder(req.params.f, req.params.name);
     }

@@ -81,12 +81,23 @@
           autoplay
           v-show="afterUp"
           class="video"
-          v-if="afterUp"
+          v-if="afterUp && type === 'video'"
           width="540"
           height="210"
           controls
           :src="NewE.link"
         ></video>
+        <img
+          :src="NewE.link"
+          v-if="afterUp && type === 'image'"
+          width="540"
+          height="210"
+          class="video"
+        />
+        <audio controls v-if="afterUp && type === 'audio'" class="audio">
+          <source type="audio/mpeg" :src="NewE.link" />
+          דפדפן שלך לא תומך באלמנט אודיו.
+        </audio>
       </div>
     </div>
     <div class="botons">
@@ -128,6 +139,7 @@ export default {
         link: "",
       },
       AlowUp: false,
+      type: "",
     };
   },
   computed: {
@@ -138,6 +150,11 @@ export default {
       return this.NewE.link
         ? this.NewE.link.split("/")[this.NewE.link.split("/").length - 1]
         : "none";
+    },
+  },
+  watch: {
+    type(val) {
+      console.log(val);
     },
   },
   async mounted() {
@@ -153,7 +170,8 @@ export default {
       }, 0);
     },
     GetFile(res) {
-      this.NewE.link = res;
+      this.NewE.link = res.response;
+      this.type = res.Type;
       this.afterUp = true;
     },
     async AddEx(newE) {
@@ -308,5 +326,10 @@ export default {
 .da:hover {
   box-shadow: 0 0 4px 0;
   font-size: 22px;
+}
+.audio {
+  position: absolute;
+  left: 40px;
+  bottom: 50px;
 }
 </style>
