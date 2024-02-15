@@ -5,6 +5,7 @@
       :class="{ table: !wachtStore, bigTable: wachtStore }"
       height="100%"
       ref="Table"
+      row-key="Id"
       border
       v-if="RafreshTable"
       v-loading="loadingTABLE || !showTable"
@@ -355,6 +356,8 @@ export default {
       this.Alldata.DataType = this.$store.state.AllData.DataType;
       this.Alldata.NameQuen = this.$store.state.AllData.NameQuen;
       this.data = this.$store.state.data;
+      // console.log(this.data);
+
       this.loadingTABLE = false;
       await this.$nextTick();
       this.SortTable();
@@ -626,6 +629,17 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    RafreshColumnOfOption(id) {
+      setTimeout(() => {
+        this.RafreseTable();
+        console.log(id);
+        let row = this.data.find((e) => e.Id === id);
+        console.log(row);
+        setTimeout(() => {
+          this.$refs.Table.toggleRowExpansion(row);
+        }, 100);
+      }, 0);
     },
     computedOfisEnd(val) {
       if (val) {

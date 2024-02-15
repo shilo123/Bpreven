@@ -40,6 +40,7 @@
             :data="data"
             :row="row"
             @Close="showDivos = false"
+            @Updata="Updata"
           ></component>
         </div>
       </transition>
@@ -109,6 +110,12 @@ export default {
       let table = this.$refs.Table;
       table.data = this.data;
       // console.log(this.data);
+    },
+    async Updata() {
+      let table = this.$refs.Table;
+      let { data } = await this.$ax.get(URL + "GetUsers/" + this.id);
+      table.data = data;
+      this.showDivos = false;
     },
   },
 };

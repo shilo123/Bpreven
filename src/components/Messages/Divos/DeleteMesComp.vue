@@ -33,7 +33,15 @@ export default {
       LoadingButton: false,
     };
   },
-
+  watch: {
+    LoadingButton(val) {
+      if (val) {
+        let buttons = document.querySelector(".buttons");
+        buttons.style.position = "relative";
+        buttons.style.top = "100px";
+      }
+    },
+  },
   mounted() {},
 
   methods: {

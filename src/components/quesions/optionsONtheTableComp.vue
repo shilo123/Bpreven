@@ -106,6 +106,7 @@ export default {
     },
     FilterChange(val) {
       //   console.log(val);
+
       if (val !== "הכל") {
         let valDesc = this.Alldata.NameQuen.find((e) => e.Id === val);
         console.log(valDesc);

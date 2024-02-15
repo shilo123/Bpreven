@@ -9,6 +9,7 @@
       @click="Delete(id)"
       :loading="LoadingButton"
       :class="{ LoadingButton: LoadingButton }"
+      ref="But"
       >מחק</el-button
     >
     <el-button
@@ -35,13 +36,20 @@ export default {
   },
 
   mounted() {},
-
+  watch: {
+    LoadingButton(val) {
+      if (val) {
+        this.$refs.But.$el.style.position = "absolute";
+      }
+    },
+  },
   methods: {
     async Delete(id) {
       this.LoadingButton = true;
       let { data } = await this.$ax.delete(URL + "DeleteProtokol/" + id);
       this.LoadingButton = false;
-      this.$Bool(data, "נמחק בהצלחה", "משהו השתבשש", true);
+      this.$Bool(data, "נמחק בהצלחה", "משהו השתבשש", false);
+      this.$emit("Updata");
     },
   },
 };

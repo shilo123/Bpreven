@@ -87,6 +87,7 @@
             :IdniFtah="IdniFtah"
             :Idq="ParamsOfSeq"
             @UpdateData="UpdateData"
+            @RafreshTable="RafreshTable"
           ></component>
         </div>
       </transition>
@@ -229,6 +230,10 @@ export default {
       setTimeout(() => {
         Component.SortTable();
       }, 100);
+    },
+    RafreshTable(id) {
+      let Component = this.$refs.CompoTable;
+      Component.RafreshColumnOfOption(id);
     },
   },
 };

@@ -11,14 +11,12 @@
     <el-button
       type="success"
       class="ButAdANs"
-      @click="
-        ADDnewtAnswer(IdniFtah, ModelInputDivAnswer);
-        $store.commit('SgorDivos', true);
-      "
+      @click="ADDnewtAnswer(IdniFtah, ModelInputDivAnswer)"
       :loading="LoadingButton"
       ref="butnoc"
       >הוסף אופציה</el-button
     >
+    <!-- // $store.commit('SgorDivos', true); -->
   </div>
 </template>
 <script>
@@ -27,6 +25,7 @@ export default {
   props: ["IdniFtah"],
   data() {
     return {
+      LoadingButton: false,
       ModelInputDivAnswer: "",
       data: [],
       AllData: {},
@@ -42,6 +41,15 @@ export default {
     wachtData(val) {
       this.data = val;
     },
+    LoadingButton(val) {
+      try {
+        let bu = this.$refs.butnoc.$el;
+        if (val) {
+          bu.style.position = "absulote";
+          bu.style.top = "60%";
+        }
+      } catch (error) {}
+    },
   },
   mounted() {
     this.theOption = this.$store.state.theOption;
@@ -51,15 +59,17 @@ export default {
 
   methods: {
     async ADDnewtAnswer(id, text) {
-      console.log(id);
+      // console.log(id);
       this.LoadingButton = true;
       if (text) {
         try {
           let { data } = await this.$ax.post(URL + "AddAnswer", { text, id });
           if (data) {
-            this.theOption.push({ Desc: text });
-            this.$store.commit("UptheOption", this.theOption);
+            // this.theOption.push({ Desc: text });
+            // this.$store.commit("UptheOption", this.theOption);
+            await this.$store.dispatch("UpdateOption", id);
             this.$store.commit("SgorDivos", true);
+            this.$emit("RafreshTable", id);
             this.$message.success("התשובה נוספה");
           } else {
             this.$message.error("משהו השתבש");

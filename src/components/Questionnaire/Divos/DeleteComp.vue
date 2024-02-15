@@ -35,7 +35,14 @@ export default {
   },
 
   mounted() {},
-
+  watch: {
+    loadingButton(val) {
+      if (val) {
+        let but = this.$refs.butnonn.$el;
+        but.style.position = "absolute";
+      }
+    },
+  },
   methods: {
     async deletequen(id) {
       // console.log(id);

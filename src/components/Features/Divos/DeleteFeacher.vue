@@ -9,6 +9,7 @@
         class="dangero"
         @click="Delete(row.Id)"
         :loading="LoadingButton"
+        ref="BU"
         >מחק</el-button
       >
       <el-button
@@ -33,13 +34,22 @@ export default {
       LoadingButton: false,
     };
   },
-
+  watch: {
+    LoadingButton(val) {
+      if (val) {
+        let but = this.$refs.BU.$el;
+        but.style.position = "absolute";
+      }
+    },
+  },
   mounted() {},
 
   methods: {
     async Delete(id) {
+      this.LoadingButton = true;
       let { data } = await this.$ax.delete(URL + "DeleteFeacher/" + id);
       this.$Bool(data, "הוסר בהצלחה", "משהו השתבש", false);
+      this.LoadingButton = false;
       this.$emit("Updata");
     },
   },

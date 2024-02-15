@@ -9,14 +9,16 @@
       @row-dblclick="Edit"
     >
       <!-- v-loading="!Booleano(dataos ? dataos.length : 0)" -->
-      <el-table-column label="אפשרויות">
+      <el-table-column label="אפשרויות" width="185">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="Edit(scope.row)"
-            ><i class="el-icon-edit"></i> עריכה</el-button
-          >
-          <el-button type="danger" size="mini" @click="DELETE(scope.row)"
-            ><i class="el-icon-delete"></i> מחיקה</el-button
-          >
+          <div class="Buttons">
+            <el-button type="primary" size="mini" @click="Edit(scope.row)"
+              ><i class="el-icon-edit"></i> עריכה</el-button
+            >
+            <el-button type="danger" size="mini" @click="DELETE(scope.row)"
+              ><i class="el-icon-delete"></i> מחיקה</el-button
+            >
+          </div>
         </template>
       </el-table-column>
       <el-table-column label="סטטוס" prop="StatusId">
@@ -162,5 +164,9 @@ export default {
     padding-bottom: 50px;
     transition: all 0.3s;
   }
+}
+.Buttons {
+  display: flex;
+  flex-direction: row;
 }
 </style>

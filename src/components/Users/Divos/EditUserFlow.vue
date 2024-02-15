@@ -83,7 +83,8 @@ export default {
         ...NewData,
       });
       this.loadingButton = false;
-      this.$Bool(data, "עודכן בהצלחה", "משהו השתבש", true);
+      this.$Bool(data, "עודכן בהצלחה", "משהו השתבש", false);
+      this.$emit("Updata");
     },
     IfCurronetQushinaire(id) {
       const CuronetQ = this.row.QushinnareId;

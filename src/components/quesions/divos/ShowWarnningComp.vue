@@ -6,6 +6,7 @@
     <el-button
       type="danger"
       size="small"
+      ref="Bu"
       class="dangero"
       @click="deletequen(idOfDel)"
       :loading="LoadingButton"
@@ -55,6 +56,13 @@ export default {
     wachtData(val) {
       this.data = val;
     },
+    LoadingButton(val) {
+      try {
+        this.$refs.Bu.$el.style.position = "absolute";
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 
   methods: {
@@ -62,13 +70,17 @@ export default {
       // console.log(id);
       this.LoadingButton = true;
       let { data } = await this.$ax.delete(URL + "DeleteQustions/" + id);
-      this.LoadingButton = false;
-      if (data) {
-        this.$message.success("השאלה נמחקה בהצלחה");
-        window.location.reload();
-      } else {
-        this.$message.error("משהו השתבש");
-      }
+      setTimeout(() => {
+        this.LoadingButton = false;
+        if (data) {
+          this.$message.success("השאלה נמחקה בהצלחה");
+          this.$emit("UpdateData");
+          this.$store.commit("SgorDivos", true);
+          // window.location.reload();
+        } else {
+          this.$message.error("משהו השתבש");
+        }
+      }, 5000);
     },
   },
 };

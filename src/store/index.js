@@ -66,6 +66,10 @@ export default new Vuex.Store({
         // Handle error appropriately
       }
     },
+    async UpdateOption({ commit }, id) {
+      let { data } = await axios.get(URL + "GetOption/" + id);
+      commit("UptheOption", data);
+    },
   },
   modules: {
     Score,

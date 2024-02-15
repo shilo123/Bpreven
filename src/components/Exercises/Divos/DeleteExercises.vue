@@ -34,7 +34,7 @@ export default {
 
   methods: {
     async DeleteExar(id) {
-      console.log(id);
+      // console.log(id);
       let nameFile = "";
       if (this.params.Link) {
         nameFile =
@@ -43,7 +43,7 @@ export default {
         nameFile = "none";
       }
       const URI = `${URL}delEx/${id}/${nameFile}/${this.params.ExercisesCategoriesId}`;
-      console.log(URI);
+      // console.log(URI);
       let { data } = await this.$ax.delete(URI);
       this.$Bool(data, "נמחק בהצלחה", "משהו השתבש", false);
       this.$emit("Updata");
