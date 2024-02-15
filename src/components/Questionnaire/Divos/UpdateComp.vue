@@ -441,17 +441,17 @@ export default {
       }
     }
   }
-  .rowEC {
-  }
+  // .rowEC {
+  // }
 
-  .rowED {
-    // display: flex;
-    // flex-direction: row-reverse;
-    // margin: 25px;
-    // position: absolute;
-    // right: 450px;
-    // top: 0px;
-  }
+  // .rowED {
+  //   // display: flex;
+  //   // flex-direction: row-reverse;
+  //   // margin: 25px;
+  //   // position: absolute;
+  //   // right: 450px;
+  //   // top: 0px;
+  // }
 }
 .ifMonthi {
   position: relative;
