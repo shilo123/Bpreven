@@ -258,7 +258,7 @@ export default {
       // console.log(data);
       if (data) {
         this.$message.success("עודכן בהצלחה");
-        window.location.reload();
+        // window.location.reload();
         this.$store.commit("SgorDivos", true);
         // await this.$store.dispatch("fetchData");
         this.$emit("UpdateData");

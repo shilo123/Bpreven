@@ -128,7 +128,8 @@ export default {
       this.LoadingButton = true;
       let { data } = await this.$ax.post(URL + "UpdateEx", New);
       this.LoadingButton = false;
-      this.$Bool(data, "התרגיל עודכן בהצלחה!", "משהו השתבש", true);
+      this.$Bool(data, "התרגיל עודכן בהצלחה!", "משהו השתבש", false);
+      this.$emit("Updata");
     },
     async DeleteFile() {
       const URI =

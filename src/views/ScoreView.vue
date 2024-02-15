@@ -28,7 +28,7 @@
         shomesALL = true;
       "
     />
-    <div class="TypeQusinnaire" v-show="activQushinnare">
+    <div class="TypeQusinnaire" v-show="activQushinnare && wachtStore">
       סוג השאלון:
       {{ typeQueshinarire ? typeQueshinarire.Name : "טוען" }}
     </div>
@@ -49,11 +49,11 @@
             : !null && activQushinnare !== ''
         "
       >
-        "לא נמצע ערך זהה ל "{{ activQushinnare }}
+        "לא נמצאו שאלות ל "{{ activQushinnare }}
       </h1>
       <div v-if="shomes" ref="TheAlElements" class="Allel">
         <!-- style="position: Sticky; top: -130px; z-index: 3" -->
-        <el-row>
+        <el-row dir="rtl">
           <el-col
             :span="0.5"
             v-for="(q, i) in ObjDataQuestions[activQushinnare]"

@@ -39,7 +39,8 @@ export default {
   methods: {
     async Delete(id) {
       let { data } = await this.$ax.delete(URL + "DeleteFeacher/" + id);
-      this.$Bool(data, "הוסר בהצלחה", "משהו השתבש", true);
+      this.$Bool(data, "הוסר בהצלחה", "משהו השתבש", false);
+      this.$emit("Updata");
     },
   },
 };

@@ -46,7 +46,8 @@ export default {
     async AddFeacher(newF) {
       console.log(newF);
       let { data } = await this.$ax.post(URL + "Addfeacher", newF);
-      this.$Bool(data, "נוסף בהצלחה", "משהו השתבש", true);
+      this.$Bool(data, "נוסף בהצלחה", "משהו השתבש", false);
+      this.$emit("Updata");
     },
   },
 };

@@ -158,7 +158,8 @@ export default {
     },
     async AddEx(newE) {
       let { data } = await this.$ax.post(URL + "AddNewExires", newE);
-      this.$Bool(data, "התרגיל נוסף בהצלחה", "משהו השתבש", true);
+      this.$Bool(data, "התרגיל נוסף בהצלחה", "משהו השתבש", false);
+      this.$emit("Updata");
     },
     async DeleteFile(floader, name) {
       if (floader && name) {

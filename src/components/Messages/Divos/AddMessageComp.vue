@@ -79,7 +79,9 @@ export default {
   methods: {
     async AddMessage(newMes) {
       let { data } = await this.$ax.post(URL + "AddMes", newMes);
-      this.$Bool(data, "נוסף בהצלחה", "משהו השתבש", true);
+      this.$Bool(data, "נוסף בהצלחה", "משהו השתבש", false);
+      this.$emit("Updata");
+      // this.$store.commit("SgorDivos", true);
     },
     FocusTexArea() {
       if (this.$refs.textareaZ && this.$refs.textareaZ.$el) {

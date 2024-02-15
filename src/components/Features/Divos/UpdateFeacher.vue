@@ -68,7 +68,8 @@ export default {
     async UpFeacher(row, id) {
       //   console.log(row, id);
       let { data } = await this.$ax.post(URL + "UpFeacher", { row, id });
-      this.$Bool(data, "עודכן בהצלחה", "משהו השתבש", true);
+      this.$Bool(data, "עודכן בהצלחה", "משהו השתבש", false);
+      this.$emit("Updata");
     },
   },
 };

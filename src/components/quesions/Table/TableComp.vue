@@ -6,12 +6,12 @@
       height="100%"
       ref="Table"
       border
-      v-loading="loadingTABLE"
       v-if="RafreshTable"
+      v-loading="loadingTABLE || !showTable"
       @expand-change="GetOptions"
       @row-dblclick="Edit"
-      v-show="showTable"
     >
+      <!-- v-show="showTable" -->
       <el-table-column label="אופציות" ref="Clumn" width="180">
         <template slot-scope="scope">
           <div class="buttons">
@@ -317,15 +317,16 @@ export default {
     WachLoadingTable() {
       return this.$store.state.LoadingTable;
     },
+    datos() {
+      return this.$store.state.data;
+    },
   },
   watch: {
+    datos(val) {
+      this.Ifloading(val);
+    },
     theOption(val) {
       this.$store.commit("UptheOption", val);
-    },
-    LoadingButton(val) {
-      // if (val && this.$refs.butnoc) {
-      //   this.$refs.butnoc.$el.style.position = "absolute";
-      // }
     },
     loadingTABLE(val) {
       if (!val && this.$store.state.theOption.length === 0) {
@@ -347,6 +348,7 @@ export default {
   async mounted() {
     try {
       this.loadingTABLE = true;
+      this.Ifloading(this.$store.state.data);
       await this.$store.dispatch("fetchData");
       this.Alldata.Allquestions = this.$store.state.AllData.Allquestions;
       this.Alldata.questionsOnly = this.$store.state.AllData.questionsOnly;
@@ -363,9 +365,12 @@ export default {
   },
 
   methods: {
-    bodek(val) {
-      // console.log("val", val);
-      // return "c";
+    Ifloading(val) {
+      if (val.length) {
+        this.loadingTABLE = false;
+      } else {
+        this.loadingTABLE = true;
+      }
     },
     async GetOptions(row, expanded) {
       await this.$nextTick();
@@ -692,6 +697,10 @@ export default {
         }
         // console.log(data);
       }
+    },
+    UpData(val) {
+      this.data = val;
+      console.log("sd");
     },
   },
 };

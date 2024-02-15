@@ -36,7 +36,7 @@
           <el-input
             placeholder="שאלה ראשונית חדשה"
             type="textarea"
-            :autosize="{ minRows: 2, maxRows: 4 }"
+            :autosize="{ minRows: 2, maxRows: 2 }"
             class="inputTextarea"
             dir="rtl"
             v-model="newqunto.StartQuestion"
@@ -47,7 +47,7 @@
           <el-input
             placeholder="שאלה אחרונה חדשה"
             type="textarea"
-            :autosize="{ minRows: 2, maxRows: 4 }"
+            :autosize="{ minRows: 2, maxRows: 2 }"
             class="inputTextarea"
             dir="rtl"
             v-model="newqunto.EndQuestion"

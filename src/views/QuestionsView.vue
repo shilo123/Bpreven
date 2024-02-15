@@ -42,6 +42,7 @@
         shows.showDivos = true;
         Component = $event;
       "
+      @UpdateData="UpdateDataAll"
     />
     <Table
       ref="CompoTable"
@@ -220,6 +221,14 @@ export default {
     async UpdateData() {
       await this.$store.dispatch("fetchData", true);
       this.YeshLanu();
+    },
+    async UpdateDataAll() {
+      await this.$store.dispatch("fetchData");
+      let Component = this.$refs.CompoTable;
+      Component.UpData(this.$store.state.data);
+      setTimeout(() => {
+        Component.SortTable();
+      }, 100);
     },
   },
 };

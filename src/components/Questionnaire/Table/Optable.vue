@@ -156,7 +156,8 @@ export default {
     width: 650px;
     z-index: 501;
     position: relative;
-    right: 250px;
+    // right: 250px;
+    right: 20%;
     top: 8px;
     transition: all 0.3s;
   }
@@ -169,7 +170,8 @@ export default {
   &Big {
     z-index: 501;
     position: relative;
-    right: 340px;
+    // right: 340px;
+    right: 25%;
     top: 8px;
   }
 }
@@ -210,7 +212,8 @@ export default {
     width: 86%;
     top: 40px;
     height: 3.9em;
-    left: 117px;
+    // left: 117px;
+    left: 7.7%;
     transition: all 0.3s;
   }
 }

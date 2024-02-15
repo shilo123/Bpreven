@@ -73,6 +73,9 @@ export default {
     LoadingTABLEZZ(val) {
       //   alert();
       this.loadingTABLE = val;
+      setTimeout(() => {
+        this.SortTable();
+      }, 200);
     },
   },
 };

@@ -125,10 +125,6 @@ export default {
     },
     $route(to, from) {
       let path = to.path;
-      setTimeout(() => {
-        let Inputs = document.querySelectorAll("input");
-        console.log(Inputs);
-      }, 1000);
 
       if (path === "/") {
         document.body.style.background = "";
@@ -158,6 +154,7 @@ export default {
     },
   },
   async mounted() {
+    document.title = "Bpreven";
     if (this.$route.path === "/") {
       document.body.style.background = "";
     }

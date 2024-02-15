@@ -50,7 +50,7 @@ export default new Vuex.Store({
   actions: {
     async fetchData({ commit }, bool) {
       try {
-        console.log("bool", bool);
+        // console.log("bool", bool);
         let { data } = await axios.get(URL + "GetQuestions");
         let res = await axios.get(URL + "GetData");
         let allquestions = await axios.get(URL + "GetallQuestions");

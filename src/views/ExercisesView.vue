@@ -24,13 +24,13 @@
           TableComponent: !watchtogelAnimate,
           TableComponentBig: watchtogelAnimate,
         }"
-        v-if="ComplitedData"
         @newComponent="
           Component = $event.C;
           params = $event.params;
           showDivos = true;
         "
       />
+      <!-- v-if="ComplitedData" -->
     </div>
     <div class="divos" v-if="showDivos">
       <transition appear name="expand">
@@ -47,6 +47,7 @@
             :is="Component"
             :params="params"
             @Close="showDivos = false"
+            @Updata="Updata"
           ></component>
         </div>
       </transition>
@@ -96,9 +97,17 @@ export default {
     },
   },
   async mounted() {
+    this.LoadingTable(true);
+    await this.$nextTick();
     let { data } = await this.$ax.get(URL + "GetExercises");
     this.data = data;
-    this.ComplitedData = true;
+    // this.ComplitedData = true;
+    // console.log(table);
+    let table = this.$refs.Table;
+    if (table) {
+      table.data = data;
+    }
+    this.LoadingTable(false);
   },
 
   methods: {
@@ -107,6 +116,15 @@ export default {
       if (table) {
         table.LoadingTable(val);
       }
+    },
+    async Updata() {
+      this.showDivos = false;
+      let table = this.$refs.Table;
+      let { data } = await this.$ax.get(URL + "GetExercises");
+      table.data = data;
+      setTimeout(() => {
+        table.SortTable();
+      }, 100);
     },
   },
 };

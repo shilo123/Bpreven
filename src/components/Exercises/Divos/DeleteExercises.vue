@@ -45,7 +45,8 @@ export default {
       const URI = `${URL}delEx/${id}/${nameFile}/${this.params.ExercisesCategoriesId}`;
       console.log(URI);
       let { data } = await this.$ax.delete(URI);
-      this.$Bool(data, "נמחק בהצלחה", "משהו השתבש", true);
+      this.$Bool(data, "נמחק בהצלחה", "משהו השתבש", false);
+      this.$emit("Updata");
     },
   },
 };

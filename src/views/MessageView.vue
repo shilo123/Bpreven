@@ -24,9 +24,9 @@
           Component = $event.Comp;
           params = $event.params;
         "
-        v-if="Loadingoz"
         v-show="!LoMaTznu"
       />
+      <!-- v-if="Loadingoz" -->
     </div>
     <div class="divos" v-if="showDivos">
       <transition appear name="expand">
@@ -43,7 +43,7 @@
             EditOption: Component === 'EditOption',
             warning: Component === 'warning',
           }" -->
-          <component :is="Component" :row="params"></component>
+          <component :is="Component" :row="params" @Updata="Updata"></component>
         </div>
       </transition>
     </div>
@@ -103,16 +103,37 @@ export default {
     },
   },
   async mounted() {
+    this.LoadingTable(true);
     await this.$nextTick();
+    // setTimeout(async () => {
     let { data } = await this.$ax(URL + "GetMessages");
     this.data = data;
+    this.DataTableUp(data);
     this.Loadingoz = true;
+    this.LoadingTable(false);
+    // }, 2000);
   },
 
   methods: {
     LoadingTable(val) {
       let table = this.$refs.ComponnentsTable;
       table.LoadingTABLEZZ(val);
+    },
+    DataTableUp(NewData) {
+      if (!NewData) {
+        NewData = [];
+      }
+      let table = this.$refs.ComponnentsTable;
+      table.data = NewData;
+    },
+    async Updata() {
+      this.showDivos = false;
+      let { data } = await this.$ax(URL + "GetMessages");
+      let table = this.$refs.ComponnentsTable;
+      table.data = data;
+      setTimeout(() => {
+        table.SortTable();
+      }, 100);
     },
   },
 };
@@ -160,8 +181,5 @@ export default {
   left: 50%;
   top: 40%;
   font-size: 30px;
-}
-input::placeholder {
-  color: black;
 }
 </style>

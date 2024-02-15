@@ -125,11 +125,18 @@
     >
       <i class="el-icon-more Icnoc"></i>
     </div>
-    <div class="LoNimtzeou" v-show="ShowLomatz || arrsTheOP.length">
+    <div
+      class="LoNimtzeou"
+      v-show="ShowLomatz || (arrsTheOP.length === 0 && false)"
+    >
       <div class="title">לא מצאנו אחי</div>
       <br />
-      <div class="Haze">
-        <div v-for="(A, i) in ArrLoMatzanu" :key="i" class="Haze-item">
+      <div class="Haze" dir="rtl">
+        <div
+          v-for="(A, i) in ArrLoMatzanu.slice().reverse()"
+          :key="i"
+          class="Haze-item"
+        >
           <i
             v-show="i !== 0"
             class="fa-solid fa-arrow-right fa-rotate-180 fa-xl"

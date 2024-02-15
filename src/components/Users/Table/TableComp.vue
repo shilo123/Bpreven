@@ -7,10 +7,11 @@
         class="table"
         border
         row-key="Id"
+        v-loading="!titaen"
         @row-dblclick="$emit('newComponent', { C: 'Edit', row: $event })"
       >
-        <!-- :header-row-style="{ textAlign: 'center' }" -->
         <el-table-column
+          v-if="titaen"
           :label="`${data[0].UserDesc}/${data[0].SymbolUser}`"
           align="center"
         >
@@ -46,11 +47,6 @@
             align="center"
             width="100"
           ></el-table-column>
-          <!-- <el-table-column label="סימן/סוג משתמש" align="center">
-            <template slot-scope="scope">
-              {{ `${scope.row.UserDesc}/${scope.row.SymbolUser}` }}
-            </template>
-          </el-table-column> -->
         </el-table-column>
       </el-table>
     </ElTableDraggable>
@@ -67,10 +63,15 @@ export default {
   data() {
     return {
       data: this.dat ? this.dat : [],
+      titaen: false,
     };
   },
   watch: {},
-  async mounted() {},
+  async mounted() {
+    setTimeout(() => {
+      this.titaen = true;
+    }, 200);
+  },
 
   methods: {
     async Move(e) {

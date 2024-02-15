@@ -55,6 +55,7 @@
             :is="Component"
             :row="row"
             @Close="showDivos = false"
+            @Updata="Updata"
           ></component>
         </div>
       </transition>
@@ -102,7 +103,6 @@ export default {
   },
   async mounted() {
     let { data } = await this.$ax(URL + "GetFeatures");
-    // console.log(data);
     this.data = data;
     this.ComplitedData = true;
     let table = this.$refs.Table;
@@ -119,6 +119,15 @@ export default {
     loadingTABLO(val) {
       let Table = this.$refs.Table;
       Table.UpLoading(val);
+    },
+    async Updata() {
+      this.showDivos = false;
+      let Table = this.$refs.Table;
+      let { data } = await this.$ax(URL + "GetFeatures");
+      Table.data = data;
+      setTimeout(() => {
+        Table.SortTable();
+      }, 100);
     },
   },
 };

@@ -43,7 +43,8 @@ export default {
       this.LoadingButton = false;
       if (data) {
         this.$message.success("נמחק בהצלחה");
-        window.location.reload();
+        // window.location.reload();
+        this.$emit("Updata");
       } else {
         this.$message.error("משהו השתבש");
       }

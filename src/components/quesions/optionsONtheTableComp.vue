@@ -106,9 +106,10 @@ export default {
     },
     FilterChange(val) {
       //   console.log(val);
-      let valDesc = this.Alldata.NameQuen.find((e) => e.Id === val);
-      this.$emit("Changosy", valDesc.Desc);
       if (val !== "הכל") {
+        let valDesc = this.Alldata.NameQuen.find((e) => e.Id === val);
+        console.log(valDesc);
+        this.$emit("Changosy", valDesc.Desc);
         this.$ax.post(URL + "FIndQustinnare", { val }).then((res) => {
           // console.log(res.data);
           //   this.data = res.data;
@@ -119,8 +120,9 @@ export default {
           }
         });
       } else {
-        this.data = this.data2;
-        window.location.reload();
+        this.data = this.$store.state.data;
+        this.$emit("UpdateData");
+        // window.location.reload();
       }
     },
   },

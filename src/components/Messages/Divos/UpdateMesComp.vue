@@ -2,7 +2,7 @@
   <div>
     <i class="el-icon-close" @click="$store.commit('SgorDivos', true)"></i>
     <div class="inUp">
-      <div class="ItemUp">
+      <div class="ItemUpSymbol">
         <input
           type="text"
           class="w3-input"
@@ -11,7 +11,7 @@
         />
       </div>
 
-      <div class="ItemUp">
+      <div class="ItemUpName">
         <input
           dir="rtl"
           type="text"
@@ -84,7 +84,8 @@ export default {
         let { data } = await this.$ax.post(URL + "UpdateMessage", row);
         if (data) {
           this.$message.success("עודכן בהצלחה");
-          window.location.reload();
+          // window.location.reload();
+          this.$emit("Updata");
         } else {
           this.$message.success("משהו השתבש");
         }
@@ -108,17 +109,23 @@ export default {
   border-radius: 20px;
   box-shadow: 0 0 7px 3px rgb(183, 154, 154);
 }
-.ItemUp {
-  display: flex;
-  flex-direction: column;
+.ItemUpSymbol {
+  position: absolute;
   /* float: right; */
   width: 40%;
   margin: 30px;
 }
+.ItemUpName {
+  position: absolute;
+  /* float: right; */
+  right: 0;
+  width: 40%;
+  margin: 30px;
+}
 .swichtoz {
-  position: relative;
-  left: 390px;
-  top: -60px;
+  position: absolute;
+  left: 40%;
+  top: 63%;
 }
 .Buttons {
   position: absolute;
