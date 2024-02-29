@@ -54,7 +54,7 @@
 </template>
 <script>
 import { URL } from "@/URL/url";
-import OptionTable from "@/components/Messages/OptionForTableComp.vue";
+import OptionTable from "@/components/Messages/Table/OptionForTableComp.vue";
 import Table from "@/components/Messages/Table/TableComp.vue";
 import DeleteMes from "@/components/Messages/Divos/DeleteMesComp.vue";
 import UpdateMes from "@/components/Messages/Divos/UpdateMesComp.vue";
@@ -173,7 +173,7 @@ export default {
 }
 .AddMessage {
   // background: linear-gradient(to right, #55ddff, #544bff, #59fcd6);
-  background: rgba(175, 191, 255, 0.463);
+  background: #afbfff76;
   border-radius: 10px;
 }
 .LoMatzanu {

@@ -91,27 +91,18 @@ export default {
 
   methods: {
     Edit(row) {
-      // this.idOfE = row.Id;
+      console.log(row);
       if (!row.QuestionnaireTypesId) row.QuestionnaireTypesId = 1;
       let stat = row.StatusId;
       row.StatusId = Boolean(stat);
-      //   let M = row.Monthly;
-      //   let Os = row.Dayly;
-      //   let z = row.DefaultId;
-      //   const IfYomy = Boolean(Os);
-      //   const MonthiVal = Boolean(M);
-      //   const IFdefaultE = Boolean(z);
-      //   console.log(row, { Otehr: { IfYomy, MonthiVal, IFdefaultE } });
       this.paramsFromEdit = {
         paramsModel: row,
-        // OtheVars: { IfYomy, MonthiVal, IFdefaultE },
       };
-      this.component = "Up";
       this.$emit("newComponnent", { C: "Up", params: this.paramsFromEdit });
     },
     DELETE(row) {
       console.log(row);
-      this.$emit("newComponnent", { C: "Del", params: row.Id });
+      this.$emit("newComponnent", { C: "Del", params: row });
     },
     Booleano(val) {
       return Boolean(val);
@@ -168,5 +159,8 @@ export default {
 .Buttons {
   display: flex;
   flex-direction: row;
+  .el-button {
+    margin: 2px;
+  }
 }
 </style>

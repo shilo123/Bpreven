@@ -7,24 +7,29 @@
       v-loading="loadingTABLE"
       @row-dblclick="UPmos"
     >
-      <el-table-column label="אפשרויות">
+      <el-table-column label="אפשרויות" width="240">
         <template slot-scope="scope">
-          <el-button
-            type="primary"
-            size="mini"
-            @click="
-              $emit('NewComponnent', { C: 'UpdateFeacher', params: scope.row })
-            "
-            ><i class="fa-solid fa-pen-to-square"></i> עריכה</el-button
-          >
-          <el-button
-            type="danger"
-            size="mini"
-            @click="
-              $emit('NewComponnent', { C: 'DeleteFeach', params: scope.row })
-            "
-            ><i class="fa-solid fa-trash-xmark"></i> מחיקה</el-button
-          >
+          <div class="buttons">
+            <el-button
+              type="primary"
+              size="mini"
+              @click="
+                $emit('NewComponnent', {
+                  C: 'UpdateFeacher',
+                  params: scope.row,
+                })
+              "
+              ><i class="fa-solid fa-pen-to-square"></i> עריכה</el-button
+            >
+            <el-button
+              type="danger"
+              size="mini"
+              @click="
+                $emit('NewComponnent', { C: 'DeleteFeach', params: scope.row })
+              "
+              ><i class="fa-solid fa-trash-xmark"></i> מחיקה</el-button
+            >
+          </div>
         </template>
       </el-table-column>
       <el-table-column label="סימן" prop="Symbol"></el-table-column>
@@ -81,8 +86,15 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .el-table {
   height: 700px;
+}
+.buttons {
+  display: flex;
+  margin-right: 18px;
+  .el-button {
+    margin: 3px;
+  }
 }
 </style>

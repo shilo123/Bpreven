@@ -66,6 +66,7 @@
           v-show="IfYomy && newqunto.QuestionnaireTypesId === 1"
         >
           <label>תאריך יומי</label>
+          <!-- dir="rtl" -->
           <el-date-picker
             v-if="RafreshOtam"
             v-model="newqunto.Dayly"
@@ -113,7 +114,7 @@
 
         <div class="rowED">
           <div class="SwitchDefaultId" v-if="RafreshOtam">
-            <label>דפולט</label>
+            <label v-show="newqunto.QuestionnaireTypesId === 1">דפולט</label>
             <el-switch
               v-show="newqunto.QuestionnaireTypesId === 1"
               v-model="IFdefaultE"
@@ -215,6 +216,8 @@ export default {
         this.IFdefaultE = false;
         this.newqunto.Monthly = null;
         this.newqunto.DefaultId = null;
+      } else {
+        this.newqunto.Dayly = null;
       }
     },
     MonthiVal(val) {
@@ -224,6 +227,8 @@ export default {
         this.IFdefaultE = false;
         this.newqunto.Dayly = null;
         this.newqunto.DefaultId = null;
+      } else {
+        this.newqunto.Monthly = null;
       }
     },
     IFdefaultE(val) {
@@ -233,6 +238,8 @@ export default {
         this.MonthiVal = false;
         this.newqunto.Dayly = null;
         this.newqunto.Monthly = null;
+      } else {
+        this.newqunto.DefaultId = null;
       }
     },
     "newqunto.Dayly"(val, Old) {
@@ -267,7 +274,7 @@ export default {
             this.newqunto.Dayly = this.newqunto.Dayly.toISOString();
           }
         }
-        console.log(this.newqunto.Dayly);
+        // console.log(this.newqunto.Dayly);
         this.newqunto.AddYom = AddYom;
         this.loadingButton = true;
         if (this.newqunto.QuestionnaireTypesId !== 1) {

@@ -34,38 +34,44 @@
             :label="s.Name"
           ></el-option>
         </el-select>
-      </div>
-      <div :class="{ File: true, fileUp: afterUp }" v-if="iFUrl">
-        <video
-          autoplay
-          :src="NewData.link"
-          width="380"
-          height="220"
-          controls
-          v-if="showVideo && (type === 'video' || type === 'audio')"
-        ></video>
-        <img
-          :src="NewData.link"
-          v-if="showVideo && type === 'image'"
-          width="380"
-          height="220"
-        />
-        <el-upload :action="URLaction" :on-success="successFile">
-          <el-button type="primary" class="BofUp"
-            >העלה קובץ אחר במקום הקיים</el-button
-          >
-        </el-upload>
-        <el-button type="danger" class="BofUpa" @click="DeleteFile"
-          >מחק את הקובץ</el-button
-        >
-      </div>
-      <div v-else class="FileElse">
-        <el-upload :action="URLaction" :on-success="successFile">
-          <el-button type="primary" class="BofUp">
-            <i class="fa-solid fa-upload"></i> אין לך כאן קבצים זה הזמן
-            להעלות</el-button
-          >
-        </el-upload>
+        <div>
+          <!-- v-if="afterUp" -->
+          <div :class="{ File: true, fileUp: afterUp }" v-if="iFUrl">
+            <video
+              autoplay
+              :src="NewData.link"
+              width="380"
+              height="220"
+              controls
+              v-if="(showVideo && type === 'video') || type === 'audio'"
+              @error="iFUrl = false"
+            ></video>
+            <img
+              :src="NewData.link"
+              v-if="showVideo && type === 'image'"
+              alt="יש כאן בעיה"
+              width="380"
+              height="220"
+              @error="iFUrl = false"
+            />
+            <el-upload :action="URLaction" :on-success="successFile">
+              <el-button type="primary" class="BofUp"
+                >העלה קובץ אחר במקום הקיים</el-button
+              >
+            </el-upload>
+            <el-button type="danger" class="BofUpa" @click="DeleteFile"
+              >מחק את הקובץ</el-button
+            >
+          </div>
+          <div v-else-if="!iFUrl" class="FileElse">
+            <el-upload :action="URLaction" :on-success="successFile">
+              <el-button type="primary" class="BofUp">
+                <i class="fa-solid fa-upload"></i> אין לך כאן קבצים זה הזמן
+                להעלות</el-button
+              >
+            </el-upload>
+          </div>
+        </div>
       </div>
     </div>
     <div class="butons">
@@ -122,25 +128,46 @@ export default {
   },
   async mounted() {
     //image,video,audio
+    // await this.IfURL(this.NewData.link);
     // this.CheckURL(this.NewData.link);
-    let typos = this.NewData.link.split(".")[1];
+    console.log("this.NewData.link", this.NewData.link);
+    // console.log(
+    //   " await this.IfURL(this.NewData.link):",
+    //   await this.CheckURL(this.NewData.link)
+    // );
+    let beforTypos =
+      this.NewData.link.split("/")[this.NewData.link.split("/").length - 1];
+    let typos = beforTypos.split(".")[beforTypos.split(".").length - 1];
+    // console.log(beforTypos);
     await this.IfURL(this.NewData.link);
     if (typos === "png") {
       this.type = "image";
-    } else if (typos === "mp3") {
-      this.type = "video";
     } else if (typos === "mp4") {
+      this.type = "video";
+    } else if (typos === "mp3") {
       this.type = "audio";
+    } else {
+      // this.NewData.link.split("/");
+      console.log("אחי אין סוג");
+      this.iFUrl = false;
+      // console.log(typos);
     }
+    console.log(this.type);
     let { data } = await this.$ax.get(URL + "GetCategiz");
     this.cateGory = data;
+    await this.IfURL(this.NewData.link);
     // console.log(this.NewData);
   },
 
   methods: {
     //image,video,audio
     async IfURL(URLO) {
+      // console.log(URLO);
       this.iFUrl = await this.CheckURL(URLO);
+      this.showVideo = false;
+      setTimeout(() => {
+        this.showVideo = true;
+      }, 500);
     },
     async successFile(res) {
       // console.log(res);
@@ -152,7 +179,7 @@ export default {
       this.showVideo = false;
       setTimeout(() => {
         this.showVideo = true;
-      }, 200);
+      }, 500);
       this.afterUp = true;
     },
     async UpdateExares(New) {
@@ -176,15 +203,21 @@ export default {
       }
       this.iFUrl = !data;
     },
+    /**, {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+          },
+        } */
     async CheckURL(url) {
-      try {
-        await this.$ax.get(url);
-        // console.log(res.response.status);
-        return true;
-      } catch (error) {
-        return false;
-        // console.log(error.response.status);
-      }
+      // try {
+      //   const response = await this.$ax.head(url);
+      //   console.log(response);
+      //   return response.status === 200; // מחזיר true אם הקובץ קיים, false אחרת
+      // } catch (error) {
+      //   console.log("Error:", error);
+      //   return false;
+      // }
+      return true;
     },
   },
 };

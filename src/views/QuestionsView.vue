@@ -56,6 +56,7 @@
       @ParamsEditOption="ParamsEditO = $event"
       @paramsOfDeleteOp="paramsOfDeleteOp"
       @IdniFtah="IdniFtah = $event"
+      @UpdateData="UpdateData"
     />
     <h1 class="loMatzanu" v-show="data.length === 0">
       {{
@@ -96,7 +97,7 @@
 </template>
 <script>
 import { URL } from "@/URL/url";
-import OpTable from "@/components/quesions/optionsONtheTableComp.vue";
+import OpTable from "@/components/quesions/Table/optionsONtheTableComp.vue";
 import Table from "@/components/quesions/Table/TableComp.vue";
 // import Table from "@/components/quesions/Table/TableCopy.vue";
 // import draggable from "vuedraggable";

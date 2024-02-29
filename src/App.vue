@@ -334,4 +334,8 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+.cell {
+  word-break: normal !important;
+  direction: rtl;
+}
 </style>

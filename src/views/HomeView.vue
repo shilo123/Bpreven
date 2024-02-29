@@ -2,7 +2,7 @@
   <div class="all">
     <h1>היי</h1>
     <div class="content">שלום שלום שלום</div>
-    <el-button type="primary" @click="Func">Click</el-button>
+    <!-- <el-button type="primary" @click="Func">Click</el-button> -->
   </div>
 </template>
 <script>
@@ -29,8 +29,25 @@ export default {
   },
   methods: {
     async Func() {
-      let str = "Hellow".split(" ")[1];
-      console.log(str);
+      let x = "sd";
+      setTimeout(() => {
+        console.log(2);
+      }, 2);
+      setTimeout(() => {
+        console.log(1);
+      }, 1);
+      setTimeout(() => {
+        console.log(x);
+      }, 0);
+      setTimeout(() => {
+        console.log(x);
+      }, 0);
+      setTimeout(() => {
+        console.log(x);
+      }, 0);
+      setTimeout(() => {
+        console.log(x);
+      }, 0);
     },
   },
 };

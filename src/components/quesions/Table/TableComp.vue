@@ -132,7 +132,8 @@
                 <el-option
                   v-for="(q, i) in Alldata.questionsOnly"
                   :key="i"
-                  :value="q.Desc"
+                  :label="q.Desc"
+                  :value="q.Id"
                   v-show="q.Seq > activQ.Seq"
                 ></el-option>
               </el-select>
@@ -158,7 +159,12 @@
                     :class="{ bigScreenOPtion: wachtStore }"
                     :id="O.Id"
                   >
-                    <span>{{ O.Desc }}</span>
+                    <span
+                      @mouseover="overSpan = true"
+                      @mouseleave="overSpan = false"
+                      ref="StamSpan"
+                      >{{ O.Desc }}</span
+                    >
                     <div class="ParentsAdcen">
                       <el-button
                         class="buttonUP"
@@ -187,16 +193,10 @@
                           <el-option
                             v-for="(q, i) in Alldata.questionsOnly"
                             :key="i"
-                            :value="q.Desc"
+                            :value="q.Id"
+                            :label="q.Desc"
                             v-show="q.Seq > activQ.Seq"
                           >
-                            <!-- :style="
-                              // bodek({
-                              //   q: q.Seq,
-                              //   activQ: activQ.Seq,
-                              //   BoolBool: q.Seq > activQ.Seq,
-                              // })
-                            " -->
                           </el-option>
                         </el-select>
                         <el-button
@@ -281,12 +281,12 @@ export default {
   components: { draggable },
   data() {
     return {
-      StutSelectAll: false,
       data: [],
       loadingTABLE: false,
       LoadingButton: false,
       LoadingOptionss: true,
       RafreshTable: true,
+      overSpan: false,
       showHosef: {},
       OptheOption: {},
       ModelQestions: {},
@@ -321,6 +321,10 @@ export default {
     datos() {
       return this.$store.state.data;
     },
+    DescDefaultSelect() {
+      return this.$store.state.data.find((e) => e.Id === this.DefoltSelsct)
+        .Desc;
+    },
   },
   watch: {
     datos(val) {
@@ -344,6 +348,16 @@ export default {
     },
     DefoltSelsct(val) {
       this.AllnextQuestion = val;
+    },
+    overSpan(val) {
+      // let el = this.$refs.StamSpan;
+      // [...el].forEach((e) => {
+      //   if (val) {
+      //     e.style.position = "relative";
+      //   } else {
+      //     e.style.position = "absolute";
+      //   }
+      // });
     },
   },
   async mounted() {
@@ -376,18 +390,24 @@ export default {
       }
     },
     async GetOptions(row, expanded) {
+      this.ModelQestions = [];
       await this.$nextTick();
       this.activQ = row;
       // console.log(row);
       if (row.DescDataType === "OptionId") {
         this.IdniFtah = row.Id;
         this.$emit("IdniFtah", row.Id);
+        // console.log(expanded);
         if (expanded.length === 0) {
           this.theOption = [];
           this.ModelInputDivAnswer = "";
           this.SortTable();
           this.RafreseTable();
-          this.IdShinuy[`Item-${row.Id}`] = this.DefoltSelsct;
+          this.IdShinuy[`Item-${row.Id}`] = this.DescDefaultSelect;
+          setTimeout(() => {
+            this.$emit("UpdateData");
+            // console.log("UP");
+          }, 2000);
         } else if (expanded.length !== 0) {
           this.loadingTABLE = true;
           this.LoadingOptionss = false;
@@ -400,7 +420,7 @@ export default {
             this.OptheOption[`showButton-${element.Id}`] = false;
             this.OptheOption[`loading-${element.Id}`] = false;
             if (element.Nextques) {
-              this.ModelQestions[`op-${element.Id}`] = element.Nextques;
+              this.ModelQestions[`op-${element.Id}`] = element.NextQuestionId;
             } else {
               this.ModelQestions[`op-${element.Id}`] = "ללא שאלה הבאה";
             }
@@ -419,19 +439,36 @@ export default {
           }, 300);
         }
       }
-      let values = Object.values(this.ModelQestions);
-      const boolian = values.every((val) => val === values[0]);
-      if (boolian) {
-        this.DefoltSelsct = values[0];
-        this.AllnextQuestion = values[0];
+      if (expanded.length !== 0) {
+        let values = Object.values(this.ModelQestions);
+        // console.log(values);
+        const boolian = values.every((val) => val === values[0]);
+        if (boolian) {
+          // console.log("values[0]", values[0]);
+          this.DefoltSelsct = values[0];
+          this.AllnextQuestion = values[0];
+        } else {
+          this.DefoltSelsct = "לפי האופציה";
+        }
       }
-
-      // console.log(data);
+      const interval = setInterval(() => {
+        if (this.$refs.StamSpan) {
+          // console.log(this.$refs.StamSpan);
+          // this.$refs.StamSpan.forEach((el) => {
+          //   el.addEventListener("mousemove", (e) => {
+          //     el.style.position = "relative";
+          //     console.log(el);
+          //   });
+          // });
+          clearInterval(interval);
+        }
+      }, 500);
     },
     Delete(row) {
       // console.log(row);
       this.$emit("IdOfDelq", row.Id);
       this.$emit("newComponent", "warning");
+      this.$store.commit("CommitRow", row);
     },
     Edit(row) {
       // console.log(row);
@@ -456,6 +493,7 @@ export default {
     DeleteAnswerTHEshows(id) {
       // console.log(id);
       //   this.$message.success("ds");
+
       this.$emit("paramsOfDeleteOp", id, this.theOption);
       this.$emit("newComponent", "DeleteAnswer");
     },
@@ -469,8 +507,10 @@ export default {
       //UpdateOption
     },
     async AddNewQuestion(idOfOption, nextQusions, IdQuestion, bool) {
+      // console.log({ idOfOption, nextQusions, IdQuestion });
       this.beforModelQestions = this.ModelQestions;
       let values = Object.values(this.ModelQestions);
+      // console.log(values);
       const boolian = values.every((val) => val === values[0]);
       if (boolian) {
         this.DefoltSelsct = values[0];
@@ -488,7 +528,6 @@ export default {
         id: IdQuestion,
       });
       const params = { idOfOption, nextQusions, IdQuestion };
-      // console.log(params);
       this.LoadingButton = true;
 
       let { data } = await this.$ax.post(URL + "addNewQustionsId", params);
@@ -497,13 +536,14 @@ export default {
         if (!bool) {
           this.$message.success("השאלה הבאה עודכנה");
         }
-        this.StutSelectAll = true;
       } else {
-        this.StutSelectAll = false;
         this.$message.error("משהו השתבש אחי");
       }
       this.OptheOption[`showButton-${idOfOption}`] = false;
       this.AllnextQuestion = this.DefoltSelsct;
+      setTimeout(() => {
+        this.$emit("UpdateData");
+      }, 400);
     },
     changeEventOptions(val, id) {
       this.OptheOption[`showButton-${id}`] = true;
@@ -534,9 +574,8 @@ export default {
       }
     },
     SelectFromAll(val, id, row) {
-      this.beforModelQestions = this.ModelQestions;
-      if (val !== "לפי אופציה") {
-      }
+      let ifFeatch = false;
+      // this.beforModelQestions = this.ModelQestions;
       if (val !== "שאלה אחרונה" && val !== "לפי אופציה") {
         for (const key in this.ModelQestions) {
           if (val !== "לפי האופציה") {
@@ -562,28 +601,40 @@ export default {
       }
 
       const IdofQuestions = id;
+      let valTheOp;
       for (const key in this.ModelQestions) {
-        let idofOpt = key.split("-")[1];
-        let valTheOp = this.ModelQestions[key];
-        let counter = 0;
-        setTimeout(() => {
-          counter++;
-          this.AddNewQuestion(idofOpt, valTheOp, IdofQuestions, true);
-          setTimeout(() => {
-            if (this.StutSelectAll) {
-              this.$message.success("השאלות הבאות עודכנו בהצלחה");
-            } else {
-              this.$message.success("משהו השתבש אחינו");
-            }
-          }, 100);
-        }, 500);
+        valTheOp = this.ModelQestions[key];
+        ifFeatch = true;
+      }
+      if (ifFeatch) {
+        this.AddNewQuestionALL(valTheOp, IdofQuestions);
       }
       this.LoadingOptionss = false;
       setTimeout(() => {
         this.LoadingOptionss = true;
+        setTimeout(() => {
+          this.$emit("UpdateData");
+        }, 400);
       }, 100);
     },
+    async AddNewQuestionALL(nextQusions, IdQuestion) {
+      // console.log({ nextQusions, IdQuestion });
+      const params = { nextQusions, IdQuestion };
+      // // console.log(params);
+      let { data } = await this.$ax.post(
+        URL + "addNewQustionsIdSAndOption",
+        params
+      );
+      if (data) {
+        this.$message.success("השאלות הבאות עודכנו");
+      } else {
+        this.$message.error("משהו השתבש אחי");
+      }
+      // this.OptheOption[`showButton-${idOfOption}`] = false;
+      // this.AllnextQuestion = this.DefoltSelsct;
+    },
     TextOfNewqusetions(row) {
+      // console.log(row);
       if (this.IdShinuy[`Item-${row.Id}`] && row.DescDataType === "OptionId") {
         if (this.IdShinuy[`Item-${row.Id}`] !== "ללא שאלה הבאה") {
           return this.IdShinuy[`Item-${row.Id}`];
@@ -609,22 +660,37 @@ export default {
     SortTable() {
       try {
         let table = this.$refs.Table.$el;
-        if (table.children[1].children[0].children[1].children[0].children) {
-          let TableHeader =
-            table.children[1].children[0].children[1].children[0].children;
-          Array.from(TableHeader).forEach((element) => {
-            element.style.textAlign = "center";
-          });
-          let tds = table.children[2].children[0].children[1].children;
-          //   console.log(tds);
-          Array.from(tds).forEach((element, i) => {
-            let elco;
-            elco = element.children[8].children[0].children[0].children[0];
-            elco.classList = "el-icon-arrow-left";
-            Array.from(element.children).forEach((el) => {
-              el.style.textAlign = "right";
+        if (
+          table &&
+          table.children[1] &&
+          table.children[1].children[0] &&
+          table.children[1].children[0].children[1] &&
+          table.children[1].children[0].children[1].children[0] &&
+          table.children[1].children[0].children[1].children[0].children
+        ) {
+          if (
+            table.children[1] &&
+            table.children[1].children[0] &&
+            table.children[1].children[0].children[1] &&
+            table.children[1].children[0].children[1].children[0]
+          ) {
+            let TableHeader =
+              table.children[1].children[0].children[1].children[0].children;
+            Array.from(TableHeader).forEach((element) => {
+              element.style.textAlign = "center";
             });
-          });
+            let tds = table.children[2].children[0].children[1].children;
+            //   console.log(tds);
+            Array.from(tds).forEach((element, i) => {
+              let elco;
+              elco = element.children[8].children[0].children[0].children[0];
+              elco.classList = "el-icon-arrow-left";
+              Array.from(element.children).forEach((el) => {
+                el.style.textAlign = "right";
+                el.dir = "rtl";
+              });
+            });
+          }
         }
       } catch (error) {
         console.log(error);
@@ -714,12 +780,12 @@ export default {
     },
     UpData(val) {
       this.data = val;
-      console.log("sd");
+      // console.log("sd");
     },
   },
 };
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .table {
   width: 78%;
   position: absolute;
@@ -736,6 +802,10 @@ export default {
 }
 .buttons {
   display: flex;
+  gap: 5px;
+  // .el-button {
+  //   margin: 3px;
+  // }
 }
 .parentsheaderOFAnswers {
   background: linear-gradient(
@@ -781,44 +851,51 @@ export default {
 .button-and-li {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-.button-and-li .el-button {
   position: relative;
-  /* left: 360px; */
-  left: 313px;
-  margin-bottom: 20px;
-}
-.button-and-li .el-button--primary.buttonUP {
-  background: rgba(4, 82, 252, 0.822);
-}
-.button-and-li .el-button--primary:hover {
-  background: rgba(4, 83, 252, 0.434);
-}
-.button-and-li .el-button--danger {
-  background: rgba(252, 4, 4, 0.822);
-}
-.button-and-li .el-button--danger:hover {
-  background: rgba(252, 4, 4, 0.327);
-}
-.button-and-li span {
-  flex-grow: 1;
-  background: rgb(206, 69, 0);
-  flex-basis: 190px; /* רוחב התחלתי */
-  max-width: 190px; /* מקסימום רוחב */
-  margin-bottom: 20px;
-  height: auto;
-  color: white;
-  position: relative;
-  right: 450px;
-  overflow-y: auto;
-  padding: 10px;
-  border-radius: 20px;
-  transition: all 0.3s;
-}
-.button-and-li span:hover {
-  background: rgba(206, 69, 0, 0.821);
-  cursor: grab;
+  margin-bottom: 10px;
+  .el-button--primary.buttonUP {
+    background: rgba(4, 82, 252, 0.822);
+    position: absolute;
+    right: 30%;
+    top: 0;
+    &:hover {
+      background: rgba(4, 83, 252, 0.434);
+    }
+  }
+  .el-button--danger {
+    background: rgba(252, 4, 4, 0.822);
+    position: absolute;
+    top: 0;
+    left: 30%;
+    &:hover {
+      background: rgba(252, 4, 4, 0.327);
+    }
+  }
+  span {
+    background: rgb(206, 69, 0);
+    flex-basis: 190px;
+    // max-width: 190px;
+    width: 200px;
+
+    margin-bottom: 20px;
+    height: auto;
+    color: white;
+    position: relative;
+    top: 0;
+    right: 41%;
+    overflow-y: auto;
+    padding: 10px;
+    border-radius: 20px;
+    transition: all 0.3s;
+    &:hover {
+      background: rgba(206, 69, 0, 0.821);
+      cursor: grab;
+    }
+  }
+  .indeSel {
+    position: absolute;
+    top: 0;
+  }
 }
 .bigScreenOPtion {
   display: flex;

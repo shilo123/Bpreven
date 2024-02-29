@@ -2,20 +2,32 @@
   <div class="DeleteAnswer">
     <i class="el-icon-close" @click="$store.commit('SgorDivos', true)"></i>
 
-    <div class="text">הפריט ימחק לעולם ולא יחזור גם אם תרצה מאוד</div>
-    <div class="butonascy">
+    <div v-if="!ifScore">
+      <div class="text">הפריט ימחק לעולם ולא יחזור גם אם תרצה מאוד</div>
+      <div class="butonascy">
+        <el-button
+          type="danger"
+          size="mini"
+          @click="$store.commit('SgorDivos', true)"
+          >סגור</el-button
+        >
+        <el-button
+          type="success"
+          size="mini"
+          @click="DelOfAnswer(idOfDelAnswer)"
+          :loading="LoadingButton"
+          >מחק</el-button
+        >
+      </div>
+    </div>
+    <div v-else>
+      <p class="text">האופציה לא ניתנת למחיקה משום שהאופציה תחת ציון</p>
       <el-button
+        class="Button_Else"
         type="danger"
         size="mini"
         @click="$store.commit('SgorDivos', true)"
         >סגור</el-button
-      >
-      <el-button
-        type="success"
-        size="mini"
-        @click="DelOfAnswer(idOfDelAnswer)"
-        :loading="LoadingButton"
-        >מחק</el-button
       >
     </div>
   </div>
@@ -32,6 +44,7 @@ export default {
       theOption: [],
       AllData: [],
       data: [],
+      row: {},
     };
   },
   computed: {
@@ -40,6 +53,9 @@ export default {
     // theOption: [],
     wachtData() {
       return this.$store.state.data;
+    },
+    ifScore() {
+      return this.row.IfScore;
     },
   },
   watch: {
@@ -52,6 +68,10 @@ export default {
     this.theOption = this.$store.state.theOption;
     this.AllData = this.$store.state.AllData;
     this.data = this.$store.state.data;
+    // console.log(this.theOption);
+    this.row = this.theOption.find((e) => {
+      return e.Id === this.idOfDelAnswer;
+    });
   },
 
   methods: {
@@ -90,7 +110,8 @@ export default {
 .DeleteAnswer .text {
   position: relative;
   top: 50px;
-  left: 10px;
+  left: -10px;
+  text-align: right;
 }
 .butonascy {
   position: absolute;
@@ -105,5 +126,10 @@ export default {
 .butonascy .el-button--success {
   position: absolute;
   right: 50px;
+}
+.Button_Else {
+  position: absolute;
+  left: 40%;
+  bottom: 20px;
 }
 </style>

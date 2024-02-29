@@ -8,20 +8,24 @@
       height="600px"
       @row-dblclick="UPE"
     >
-      <el-table-column label="אפשרויות">
+      <el-table-column label="אפשרויות" width="160">
         <template slot-scope="scope">
-          <el-button
-            type="primary"
-            size="mini"
-            @click="$emit('newComponent', { C: 'EditEx', params: scope.row })"
-            >עריכה</el-button
-          >
-          <el-button
-            type="danger"
-            size="mini"
-            @click="$emit('newComponent', { C: 'DeleteEx', params: scope.row })"
-            >מחיקה</el-button
-          >
+          <div class="Buttons">
+            <el-button
+              type="primary"
+              size="mini"
+              @click="$emit('newComponent', { C: 'EditEx', params: scope.row })"
+              >עריכה</el-button
+            >
+            <el-button
+              type="danger"
+              size="mini"
+              @click="
+                $emit('newComponent', { C: 'DeleteEx', params: scope.row })
+              "
+              >מחיקה</el-button
+            >
+          </div>
         </template>
       </el-table-column>
 
@@ -95,4 +99,12 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.Buttons {
+  display: flex;
+  // margin-right: 18px;
+  .el-button {
+    margin: 3px;
+  }
+}
+</style>

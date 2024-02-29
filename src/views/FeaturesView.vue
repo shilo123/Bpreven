@@ -70,7 +70,7 @@
 <script>
 import { URL } from "@/URL/url";
 import Tablos from "@/components/Features/Table/TableComp.vue";
-import OpTable from "@/components/Features/OptionForTableComp.vue";
+import OpTable from "@/components/Features/Table/OptionForTableComp.vue";
 import AddFeacher from "@/components/Features/Divos/AddFeacher.vue";
 import UpdateFeacher from "@/components/Features/Divos/UpdateFeacher.vue";
 import DeleteFeach from "@/components/Features/Divos/DeleteFeacher.vue";

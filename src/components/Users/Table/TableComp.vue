@@ -15,20 +15,24 @@
           :label="`${data[0].UserDesc}/${data[0].SymbolUser}`"
           align="center"
         >
-          <el-table-column label="אפשרויות" align="center">
+          <el-table-column label="אפשרויות" align="center" width="190">
             <template slot-scope="scope">
-              <el-button
-                type="danger"
-                size="mini"
-                @click="$emit('newComponent', { C: 'Delete', row: scope.row })"
-                >מחיקה</el-button
-              >
-              <el-button
-                type="success"
-                size="mini"
-                @click="$emit('newComponent', { C: 'Edit', row: scope.row })"
-                >עריכה</el-button
-              >
+              <div class="boutons">
+                <el-button
+                  type="danger"
+                  size="mini"
+                  @click="
+                    $emit('newComponent', { C: 'Delete', row: scope.row })
+                  "
+                  >מחיקה</el-button
+                >
+                <el-button
+                  type="success"
+                  size="mini"
+                  @click="$emit('newComponent', { C: 'Edit', row: scope.row })"
+                  >עריכה</el-button
+                >
+              </div>
             </template>
           </el-table-column>
           <el-table-column label="אם פעיל" align="center">
@@ -101,12 +105,19 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .table {
   width: 78%;
   position: absolute;
   top: 100px;
   margin-left: 80px;
   transition: all 0.3s;
+}
+.boutons {
+  display: flex;
+  margin-right: 12px;
+  .el-button {
+    margin: 3px;
+  }
 }
 </style>

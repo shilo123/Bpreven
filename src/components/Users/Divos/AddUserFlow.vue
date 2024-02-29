@@ -86,9 +86,9 @@
             title="בטוח שברצונך למחוק?"
             @confirm="Delete(scope.row.Id)"
           >
-            <el-button type="danger" size="mini" slot="reference"
+            <!-- <el-button type="danger" size="mini" slot="reference"
               >מחיקה</el-button
-            >
+            > -->
           </el-popconfirm>
         </template>
       </el-table-column>

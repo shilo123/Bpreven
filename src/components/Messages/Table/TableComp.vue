@@ -7,17 +7,22 @@
       @row-dblclick="ShowupdateMes"
       border
     >
-      <el-table-column label="אפשרויות">
+      <el-table-column label="אפשרויות" width="250">
         <template slot-scope="scope">
-          <el-button
-            type="primary"
-            @click="ShowupdateMes(scope.row)"
-            size="mini"
-            ><i class="fa-solid fa-message-pen"></i> עריכה</el-button
-          >
-          <el-button type="danger" size="mini" @click="ShowDeleteMes(scope.row)"
-            ><i class="fa-solid fa-message-xmark"></i> מחיקה</el-button
-          >
+          <div class="Buttons">
+            <el-button
+              type="primary"
+              @click="ShowupdateMes(scope.row)"
+              size="mini"
+              ><i class="fa-solid fa-message-pen"></i> עריכה</el-button
+            >
+            <el-button
+              type="danger"
+              size="mini"
+              @click="ShowDeleteMes(scope.row)"
+              ><i class="fa-solid fa-message-xmark"></i> מחיקה</el-button
+            >
+          </div>
         </template>
       </el-table-column>
       <el-table-column label="סטטוס">
@@ -80,8 +85,15 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .el-table {
   height: 700px;
+}
+.Buttons {
+  display: flex;
+  margin-right: 18px;
+  .el-button {
+    margin: 3px;
+  }
 }
 </style>

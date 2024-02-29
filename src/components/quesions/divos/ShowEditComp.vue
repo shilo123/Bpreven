@@ -210,6 +210,7 @@ export default {
   },
 
   mounted() {
+    // console.log(this.rowEdit);
     setTimeout(() => {
       this.Alldata.Allquestions = this.$store.state.AllData.Allquestions;
       this.Alldata.questionsOnly = this.$store.state.AllData.questionsOnly;

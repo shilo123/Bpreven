@@ -60,7 +60,7 @@
 <script>
 import { URL } from "@/URL/url";
 import Tablos from "@/components/Exercises/Table/TableComp.vue";
-import OpTable from "@/components/Exercises/OptionForTableComp.vue";
+import OpTable from "@/components/Exercises/Table/OptionForTableComp.vue";
 import AddEx from "@/components/Exercises/Divos/AddExercises.vue";
 import EditEx from "@/components/Exercises/Divos/EditExercises.vue";
 import DeleteEx from "@/components/Exercises/Divos/DeleteExercises.vue";

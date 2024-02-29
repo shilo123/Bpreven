@@ -1,24 +1,48 @@
 <template>
   <div class="w3-panel w3-pale-red w3-leftbar w3-border-red warning">
     <i class="el-icon-close" @click="$store.commit('SgorDivos', true)"></i>
-
-    אם תמחק את השאלון הוא ימחק לצמיתות
-    <el-button
-      type="danger"
-      size="small"
-      ref="Bu"
-      class="dangero"
-      @click="deletequen(idOfDel)"
-      :loading="LoadingButton"
-      >מחק</el-button
-    >
-    <el-button
-      type="primary"
-      size="small"
-      class="primaryo"
-      @click="$store.commit('SgorDivos', true)"
-      >סגור</el-button
-    >
+    <div v-if="!ifOp">
+      אם תמחק את השאלה היא תימחק לצמיתות
+      <el-button
+        type="danger"
+        size="small"
+        ref="Bu"
+        class="dangero"
+        @click="deletequen(idOfDel)"
+        :loading="LoadingButton"
+        >מחק</el-button
+      >
+      <el-button
+        type="primary"
+        size="small"
+        class="primaryo"
+        @click="$store.commit('SgorDivos', true)"
+        >סגור</el-button
+      >
+    </div>
+    <div v-else>
+      <p class="TextOfV-Else">
+        השאלה הזו היא חלק מציון
+        <br />
+        <i class="fa-solid fa-circle-exclamation"></i>
+      </p>
+      <!-- <el-button
+        type="danger"
+        size="small"
+        ref="Bu"
+        class="dangero"
+        @click="deletequen(idOfDel)"
+        :loading="LoadingButton"
+        >מחק</el-button
+      > -->
+      <el-button
+        type="primary"
+        size="small"
+        class="primaryo"
+        @click="$store.commit('SgorDivos', true)"
+        >סגור</el-button
+      >
+    </div>
   </div>
 </template>
 <script>
@@ -33,15 +57,16 @@ export default {
     };
   },
 
-  mounted() {},
+  mounted() {
+    // console.log("this.$store.state.rowDelete", this.$store.state.rowDelete);
+  },
   computed: {
-    // data: [],
-    // AllData: {},
-    // theOption: [],
+    ifOp() {
+      return this.$store.state.rowDelete.IfOp;
+    },
     wachtData() {
       return this.$store.state.data;
     },
-
     data() {
       return this.$store.state.data;
     },
@@ -86,11 +111,24 @@ export default {
 };
 </script>
 <style scoped>
+.el-icon-close {
+  position: absolute;
+  top: 27px;
+}
 .warning {
   width: 300px;
   height: 210px;
   padding: 70px;
   text-align: center;
   left: 530px;
+}
+.TextOfV-Else {
+  position: relative;
+  bottom: 40px;
+  right: 60px;
+  background: white;
+  padding: 10px;
+  border-radius: 5px;
+  width: 170%;
 }
 </style>

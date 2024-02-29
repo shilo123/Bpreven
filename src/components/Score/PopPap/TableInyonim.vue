@@ -187,22 +187,26 @@ export default {
       let { data } = await this.$ax.get(
         URL + "GetScoreAction/" + arrIdso + "/" + this.que
       );
-      this.data = data;
-      let res = await this.$ax.post(URL + "GetDataForTableScoreAction", data);
-      this.ObjAlldata = res.data;
-      console.log({ ...this.ObjAlldata });
-      await this.$nextTick();
-      this.SortTable();
-      //   console.log(this.ObjAlldata);
-      if (this.ObjAlldata[this.AddTo][0]) {
-        this.Selected = this.ObjAlldata[this.AddTo][0].Id;
+      if (Boolean(data)) {
+        this.data = data;
+        let res = await this.$ax.post(URL + "GetDataForTableScoreAction", data);
+        this.ObjAlldata = res.data;
+        console.log({ ...this.ObjAlldata });
+        await this.$nextTick();
+        this.SortTable();
+        //   console.log(this.ObjAlldata);
+        if (this.ObjAlldata[this.AddTo][0]) {
+          this.Selected = this.ObjAlldata[this.AddTo][0].Id;
+        } else {
+          this.Selected = "";
+        }
+        if (Boolean(this.ObjAlldata[this.AddTo].length)) {
+          this.DisabledButton = false;
+        } else {
+          this.DisabledButton = true;
+        }
       } else {
-        this.Selected = "";
-      }
-      if (Boolean(this.ObjAlldata[this.AddTo].length)) {
-        this.DisabledButton = false;
-      } else {
-        this.DisabledButton = true;
+        this.$message.error("משהו השתבש");
       }
     } catch (error) {
       console.log(error);
@@ -304,7 +308,7 @@ export default {
       }, 1000);
     },
     async DeleteActionScore(Colomn, row, property) {
-      let findo = this.data.find((e) => e[property] === row[property]);
+      // let findo = this.data.find((e) => e[property] === row[property]);
 
       const Desco = row[property];
       const arrIdso = this.arrIds.join(",");

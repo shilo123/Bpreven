@@ -16,6 +16,7 @@ export default new Vuex.Store({
     data2: [],
     AllData: {},
     theOption: [],
+    rowDelete: {},
   },
   mutations: {
     Setmessage(state, mes) {
@@ -44,6 +45,9 @@ export default new Vuex.Store({
       state.data = payload.data;
       state.data2 = payload.data;
       state.AllData = payload.allData;
+    },
+    CommitRow(state, val) {
+      state.rowDelete = val;
     },
   },
   getters: {},
