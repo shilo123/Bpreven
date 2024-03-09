@@ -53,15 +53,16 @@
       </h1>
       <div v-if="shomes" ref="TheAlElements" class="Allel">
         <!-- style="position: Sticky; top: -130px; z-index: 3" -->
-        <el-row dir="rtl">
+        <el-row dir="rtl" :gutter="20">
           <el-col
-            :span="0.5"
+            :span="span"
             v-for="(q, i) in ObjDataQuestions[activQushinnare]"
             :key="i"
             class="content"
             ref="contentCOL"
-            v-show="q.DescDateTypes === 'OptionId'"
+            :style="{ width }"
           >
+            <!-- v-show="q.DescDateTypes === 'OptionId'" -->
             <div class="HeaderQuestions" ref="HeaderQuestions">
               {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
             </div>
@@ -71,11 +72,15 @@
                 :key="i"
                 class="Item-content"
                 ref="ItemContent"
-                :style="{ width }"
               >
-                <span>
-                  {{ s.Desc }}
-                </span>
+                <!-- :style="
+                  ComputedStyle(
+                    width,
+                    ObjDataQuestions[activQushinnare].length === 1
+                  )
+                " -->
+                <!-- :style="{ width }" -->
+                <span> {{ s.Desc }} </span>
               </div>
             </div>
           </el-col>
@@ -98,6 +103,76 @@
         @newParams="NameOfScore = $event"
       />
     </div>
+    <div v-else-if="shomesALL && typeQueshinarire.Id === 4">
+      <h1
+        class="LoMatzanu"
+        v-show="
+          activQushinnare
+            ? !ObjDataQuestions[activQushinnare].length > 0
+            : !null && activQushinnare !== ''
+        "
+      >
+        "לא נמצאו שאלות ל "{{ activQushinnare }}
+      </h1>
+      <div v-if="shomes" ref="TheAlElements" class="Allel">
+        <!-- style="position: Sticky; top: -130px; z-index: 3" -->
+        <el-row dir="rtl" :gutter="20">
+          <el-col
+            :span="0.5"
+            v-for="(q, i) in ObjDataQuestions[activQushinnare]"
+            :key="i"
+            class="content"
+            ref="contentCOL"
+            :style="{ width }"
+          >
+            <!-- // v-show="q.DescDateTypes === 'OptionId'" -->
+            <div class="HeaderQuestions" ref="HeaderQuestions">
+              {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
+            </div>
+            <div ref="ItemsNoheader">
+              <div
+                v-for="(s, i) in ComputedOptions({ arrOptions, Desco: q.Desc })"
+                :key="i"
+                class="Item-content"
+                ref="ItemContent"
+              >
+                <!-- :style="
+                  ComputedStyle(
+                    width,
+                    ObjDataQuestions[activQushinnare].length === 1
+                  )
+                " -->
+                <!-- :style="{ width }" -->
+                <span> {{ s.Desc }} </span>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+      <Cardos
+        ref="Cardos"
+        :activQushinnare="activQushinnare"
+        :width="width"
+        v-show="
+          activQushinnare
+            ? ObjDataQuestions[activQushinnare].length > 0
+            : null && activQushinnare !== ''
+        "
+        v-if="IfComponents && activQushinnare"
+        @showPopUp="
+          showDivos = true;
+          Params = $event;
+        "
+        @newParams="NameOfScore = $event"
+        @ShowPopapMetaplim="PopapMetaplim"
+      />
+    </div>
+    <PopapMetape
+      v-if="ShowPopapMetaplim"
+      :activQushinnare="activQushinnare"
+      :arrIDS="arrIDSTerapist"
+      @Sgor="ShowPopapMetaplim = false"
+    />
   </div>
 </template>
 <script>
@@ -106,6 +181,7 @@ import InputAutoComplitade from "@/components/Score/Elenents/inputAutoComp.vue";
 import Cardos from "@/components/Score/CardsOfScoreComp.vue";
 import TablePopap from "@/components/Score/PopPap/TableInyonim.vue";
 import Hashamos from "@/components/Score/ComponnentHarshama.vue";
+import PopapMetape from "@/components/Score/PopPap/PopPapMetapel.vue";
 // import "../claly.css";
 export default {
   components: {
@@ -113,29 +189,36 @@ export default {
     Cardos,
     TablePopap,
     Hashamos,
+    PopapMetape,
   },
   name: "BprevenScoreView",
   data() {
     return {
-      NameOfScore: "",
-      Params: {},
       showDivos: false,
-      ObjDataQuestions: [],
-      arrOptions: [],
-      activQushinnare: "",
       shomes: false,
-      Screen: window.innerWidth - 240,
-      width: "",
       IfComponents: false,
       shomesALL: false,
       afterClear: false,
       reverse: false,
+      ShowPopapMetaplim: false,
+      NameOfScore: "",
+      activQushinnare: "",
+      width: "",
       typeQueshinarire: "",
+      Params: {},
+      ObjDataQuestions: [],
+      arrOptions: [],
+      arrIDSTerapist: "",
+      Screen: window.innerWidth - 240,
+      span: 0,
     };
   },
   computed: {
     wachtStore() {
       return this.$store.state.TogelAnimate;
+    },
+    returnLength() {
+      return this.ObjDataQuestions[this.activQushinnare].length;
     },
   },
   watch: {
@@ -158,6 +241,13 @@ export default {
         this.ClearOption();
       }
       this.sortTabs();
+    },
+    typeQueshinarire: {
+      handler(val) {
+        // console.log(val);
+        // this.$store.state.Score
+        this.$store.commit("Score/ActivType", val);
+      },
     },
   },
   async mounted() {
@@ -194,88 +284,111 @@ export default {
     },
     async sortTabs() {
       await this.$nextTick();
-      setTimeout(async () => {
-        let widtho;
-        let col;
+      // setTimeout(async () => {
+      let widtho;
+      let LengthItems;
+      const Intervalos = setInterval(() => {
         if (this.$refs.contentCOL) {
-          let ItemsOnly = this.$refs.ItemsNoheader;
-          col = this.$refs.contentCOL;
-          widtho = this.Screen / col.length - 65 + "px";
-          this.width = widtho;
-          // console.log(col.length);
-          let elAll = this.$refs.TheAlElements;
-          this.$store.commit("Score/UpItems", elAll);
-          col.forEach((e, i) => {
-            e = e.$el;
-            // console.log(e);
-            if (col.length === 2) {
-              widtho = this.Screen / col.length - 75 + "px";
-            } else if (col.length === 1) {
-              widtho = this.Screen / col.length - 175 + "px";
-            } else if (col.length > 7) {
-              widtho = this.Screen / col.length - 15 + "px";
-              if (i === col.length - 1) {
-                this.ItemosSorted(ItemsOnly);
-              }
-            }
-            e.style.width = widtho;
-            e.style.marginRight = "30px";
-          });
-          let item = this.$refs.ItemContent;
-          if (!item) {
-            await this.delay(500);
-          }
-          if (item) {
-            item.forEach((elo) => {
-              elo.style.position = "relative";
-              elo.style.left = "50%";
-              elo.style.transform = "translateX(-50%)";
-            });
-          }
-        }
-        this.IfComponents = true;
-      }, 200);
-    },
-    async ItemosSorted(elements) {
-      elements.forEach((el) => {
-        // console.log(el);
-        Array.from(el.children).forEach((e) => {
-          // console.log(e);
-          e.style.width = "120px";
-        });
-      });
-      let Headers = this.$refs.HeaderQuestions;
-      // console.log(Headers);
-      Headers.forEach((element) => {
-        // console.log(element);
-        element.style.fontSize = "10px";
-        element.style.width = "130px";
-      });
-      let all = this.$refs.contentCOL;
+          // setTimeout(async () => {
+          // await this.$nextTick();
 
-      all.forEach((element) => {
-        // console.log("Yesh");
-        // console.log("element.$el", element.$el);
-        let W =
-          +element.$el.style.width.split("px")[0] +
-          +element.$el.style.marginRight.split("px")[0];
-        W = W + "px";
-        this.width = W;
-        element.$el.style.position = "relative";
-        element.$el.style.left = "40px";
-        // element.$el.style.width = "0px";
-        let ELOS = Array.from(element.$el.children[1].children);
-        setTimeout(() => {
-          ELOS.forEach((e) => {
-            // console.log("e", e);
-            e.style.position = "relative";
-            e.style.left = "60px";
-            e.style.marginRight = "30px";
-            // console.log(e.style.left);
-          });
-        }, 300);
-      });
+          LengthItems = this.returnLength;
+
+          widtho = this.Screen / LengthItems + "px";
+
+          this.span = LengthItems / 24;
+          this.width = widtho;
+          this.$store.commit("Score/Upwidth", widtho);
+          this.IfComponents = true;
+          // }, 200);
+          clearInterval(Intervalos);
+        }
+      }, 100);
+      // console.log(col.length);
+      //     let elAll = this.$refs.TheAlElements;
+      //     this.$store.commit("Score/UpItems", elAll);
+      //     col.forEach((e, i) => {
+      //       e = e.$el;
+      //       // console.log(e);
+      //       if (col.length === 2) {
+      //         widtho = this.Screen / col.length - 75 + "px";
+      //       } else if (col.length === 1) {
+      //         widtho = this.Screen / col.length - 175 + "px";
+      //       } else if (col.length > 7) {
+      //         widtho = this.Screen / col.length - 15 + "px";
+      //         if (i === col.length - 1) {
+      //           this.ItemosSorted(ItemsOnly);
+      //         }
+      //       }
+      //       e.style.width = widtho;
+      //       e.style.marginRight = "30px";
+      //     });
+      //     let item = this.$refs.ItemContent;
+      //     if (!item) {
+      //       await this.delay(500);
+      //     }
+      //     if (item) {
+      //       // console.log("item.length", col.length);
+      //       item.forEach((elo) => {
+      //         elo.style.position = "relative";
+      //         if (col.length !== 1) {
+      //           elo.style.left = "50%";
+      //         } else {
+      //           elo.style.left = "34%";
+      //           setTimeout(() => {
+      //             elo.style.width = "80%";
+      //           }, 100);
+      //         }
+      //         elo.style.transform = "translateX(-50%)";
+      //       });
+      //     }
+      //   }
+      //   this.IfComponents = true;
+      //  400);
+      // },
     },
+    //
+    // async ItemosSorted(elements) {
+    //   elements.forEach((el) => {
+    //     // console.log(el);
+    //     Array.from(el.children).forEach((e) => {
+    //       // console.log(e);
+    //       e.style.width = "120px";
+    //     });
+    //   });
+    //   let Headers = this.$refs.HeaderQuestions;
+    //   // console.log(Headers);
+    //   Headers.forEach((element) => {
+    //     // console.log(element);
+    //     element.style.fontSize = "10px";
+    //     element.style.width = "130px";
+    //   });
+    //   let all = this.$refs.contentCOL;
+
+    //   all.forEach((element) => {
+    //     // console.log("Yesh");
+    //     // console.log("element.$el", element.$el);
+    //     let W =
+    //       +element.$el.style.width.split("px")[0] +
+    //       +element.$el.style.marginRight.split("px")[0];
+    //     W = W + "px";
+    //     this.width = W;
+    //     element.$el.style.position = "relative";
+    //     element.$el.style.left = "40px";
+    //     // element.$el.style.width = "0px";
+    //     let ELOS = Array.from(element.$el.children[1].children);
+    //     setTimeout(() => {
+    //       ELOS.forEach((e) => {
+    //         // console.log("e", e);
+    //         e.style.position = "relative";
+    //         e.style.left = "60px";
+    //         e.style.marginRight = "30px";
+    //         // console.log(e.style.left);
+    //       });
+    //     }, 300);
+    //   });
+    // },
+    //
     ComputedOptions(val) {
       // console.log(val);
       let result = val.arrOptions.find((e) => {
@@ -304,7 +417,7 @@ export default {
         // console.log(res.data);
         this.arrOptions = res.data.arr;
         this.typeQueshinarire = res.data.type;
-        if (res.data.type.Id === 1) {
+        if (res.data.type.Id === 1 || res.data.type.Id === 4) {
           if (!this.reverse) {
             this.ObjDataQuestions[this.activQushinnare].reverse();
             this.reverse = true;
@@ -345,10 +458,24 @@ export default {
       this.showDivos = true;
       // console.log({ nameS, params: this.Params });
     },
+    ComputedStyle(width, mIfOne) {
+      let objStyle = { width };
+      if (mIfOne) {
+        objStyle.left = "54%";
+      }
+
+      return objStyle;
+    },
+    //
+    PopapMetaplim(val) {
+      // console.log("val in score", val);
+      this.arrIDSTerapist = val[val.length - 1].join(",");
+      this.ShowPopapMetaplim = true;
+    },
   },
 };
 </script>
-<style scoped>
+<style lang="scss" scoped>
 /* .D {
   background: #000;
   height: 30px;
@@ -361,6 +488,10 @@ export default {
   background: rgb(255, 255, 255);
   color: crimson;
   padding: 6px;
+  max-height: 100px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: 10px;
 }
 .HeaderQuestions span {
   font-size: 12px;
@@ -380,12 +511,13 @@ export default {
 .Item-content {
   background: rgb(159, 195, 101);
   padding: 5px;
-  width: 160px;
+  //  width: 160px;
+  width: 100%;
   margin-top: 30px;
   border-radius: 10px;
   font-size: 14px;
   position: relative;
-  left: 30px;
+  left: 0px;
   transition: all 0.4s;
 }
 .Item-content:not(:last-child)::after {
@@ -475,10 +607,12 @@ export default {
 }
 .indivos {
   background: rgba(255, 255, 255, 0.792);
-  /* height: 760px; */
-  height: 630px;
-  width: 1140px;
-  left: 210px;
+  // height: 630px;
+  height: 90%;
+  // width: 1140px;
+  width: 80%;
+  // left: 210px;
+  left: 10%;
   top: 30px;
   border-radius: 20px;
 }
@@ -505,5 +639,21 @@ export default {
   top: 140px;
   width: 920px;
   transition: all 0.3s;
+}
+::-webkit-scrollbar {
+  width: 5px;
+  height: 10px;
+}
+
+/* עיצוב המגלגל (החלק שנע) */
+::-webkit-scrollbar-thumb {
+  background: #efff6180; /* צבע המגלגל */
+  border-radius: 5px; /* עיגול פינות המגלגל */
+  position: relative;
+  top: 40px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #575757b3; /* צבע המגלגל */
+  border-radius: 5px; /* עיגול פינות המגלגל */
 }
 </style>

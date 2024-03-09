@@ -40,14 +40,15 @@
             v-for="(Op, index) in A"
             :key="index"
           >
-            <!-- {{ ObjFromIds(Op, i) }} -->
+            <!-- // {{ ObjFromIds(Op, i) }} -->
             <!-- // Op.DescQustions -->
             <div v-if="index !== A.length - 1 && index !== A.length - 2">
-              <!-- v-show="index !== A.length - 3" -->
+              <!-- // v-show="index !== A.length - 3" -->
+              <!-- {{ $ConSol(Op.question) }} -->
               <el-tooltip
                 class="item"
                 effect="dark"
-                :content="Op.DescQustions"
+                :content="Op.question.Desc"
                 placement="top-end"
               >
                 <div class="Boxo" :style="{ width, marginLeft }">
@@ -60,52 +61,62 @@
               ></i>
             </div>
           </div>
-          <div class="inptut">
-            <InitialInput
-              @value="ModelInputL[`Model-${A[A.length - 2]}`] = $event"
-              :val="ModelInputL[`Model-${A[A.length - 2]}`]"
-              background="blue"
-              placeHolder="כתוב ציון"
-              class="inponenets"
-            />
-            <el-button
-              type="primary"
-              size="mini"
-              class="inponenets-button"
-              :loading="LoadingButton"
-              @click="
-                SaveScore(
-                  A[A.length - 1],
-                  ModelInputL[`Model-${A[A.length - 2]}`],
-                  `${A[A.length - 1]}`
-                )
-              "
-              >שמור</el-button
-            >
-            <el-popconfirm
-              confirm-button-text="כן"
-              cancel-button-text="לא, תודה"
-              icon="el-icon-info"
-              icon-color="red"
-              title="?בטוח שאתה רוצה למחוק"
-              @confirm="
-                DeleteScore(
-                  A[A.length - 1],
-                  ModelInputL[`Model-${A[A.length - 2]}`],
-                  `${A[A.length - 2]}`
-                )
-              "
-            >
+          <div class="ifTypeNormal" v-if="TypeQuestionnaireId === 1">
+            <div class="inptut">
+              <InitialInput
+                @value="ModelInputL[`Model-${A[A.length - 2]}`] = $event"
+                :val="ModelInputL[`Model-${A[A.length - 2]}`]"
+                background="blue"
+                placeHolder="כתוב ציון"
+                class="inponenets"
+              />
               <el-button
-                v-show="ModelInputL[`Model-${A[A.length - 2]}`]"
-                slot="reference"
-                type="danger"
+                type="primary"
                 size="mini"
-                class="inponenets-buttonDanger"
+                class="inponenets-button"
                 :loading="LoadingButton"
-                >מחק ציון</el-button
+                @click="
+                  SaveScore(
+                    A[A.length - 1],
+                    ModelInputL[`Model-${A[A.length - 2]}`],
+                    `${A[A.length - 1]}`
+                  )
+                "
+                >שמור</el-button
               >
-            </el-popconfirm>
+              <el-popconfirm
+                confirm-button-text="כן"
+                cancel-button-text="לא, תודה"
+                icon="el-icon-info"
+                icon-color="red"
+                title="?בטוח שאתה רוצה למחוק"
+                @confirm="
+                  DeleteScore(
+                    A[A.length - 1],
+                    ModelInputL[`Model-${A[A.length - 2]}`],
+                    `${A[A.length - 2]}`
+                  )
+                "
+              >
+                <el-button
+                  v-show="ModelInputL[`Model-${A[A.length - 2]}`]"
+                  slot="reference"
+                  type="danger"
+                  size="mini"
+                  class="inponenets-buttonDanger"
+                  :loading="LoadingButton"
+                  >מחק ציון</el-button
+                >
+              </el-popconfirm>
+            </div>
+          </div>
+          <div class="else" v-else>
+            <el-button
+              type="success"
+              size="medium"
+              @click="$emit('ShowPopapMetaplim', A)"
+              >בחר</el-button
+            >
           </div>
         </div>
         <el-button
@@ -114,6 +125,7 @@
           type="success"
           size="mini"
           class="ButtonInyonim"
+          v-if="TypeQuestionnaireId === 1"
           >הוסף עינייונים</el-button
         >
       </div>
@@ -129,7 +141,7 @@
       class="LoNimtzeou"
       v-show="ShowLomatz || (arrsTheOP.length === 0 && false)"
     >
-      <div class="title">לא מצאנו אחי</div>
+      <div class="title">לא מצאנו</div>
       <br />
       <div class="Haze" dir="rtl">
         <div
@@ -154,7 +166,7 @@
 import { URL } from "@/URL/url";
 import miniSelect from "@/components/Score/Elenents/MiniSelect.vue";
 export default {
-  props: ["activQushinnare"],
+  props: ["activQushinnare", "typeQueshinarire"],
   name: "BprevenCardsOfScoreComp",
   components: { miniSelect },
   data() {
@@ -188,23 +200,16 @@ export default {
       this.$emit("newParams", newParams);
     },
     ValRadio(val) {
-      // if (!this.filter) {
-      //   this.arrsTheOP = this.arrsTheOPG;
-      // }
-      // this.filter = false;
       this.EventChange(val);
-
-      if (val === "הכל") {
-      }
     },
-    Elall(val) {
+    GetWidth(val) {
       if (val) {
-        this.width = val.children[0].children[0].style.width;
-        // console.log(this.width);
-        this.marginLeft = val.children[0].children[0].style.marginRight;
+        this.width = val;
+        this.marginLeft = "27px";
+        // // console.log(this.width);
       }
     },
-    dataQ(valu) {
+    dataQ() {
       this.ResetSelects();
       this.arrsTheOP = [];
       this.Questos = [];
@@ -248,8 +253,8 @@ export default {
     MaxQuestions() {
       return this.$findLargestArray(this.generateOptionsPaths(this.Questos));
     },
-    Elall() {
-      return this.$store.state.Score.items;
+    GetWidth() {
+      return this.$store.state.Score.width;
     },
     dataQ() {
       return this.$store.state.Score.data;
@@ -260,13 +265,12 @@ export default {
     StartId() {
       return this.Questos[0] ? this.Questos[0].Id : null;
     },
+    TypeQuestionnaireId() {
+      return this.$store.state.Score.ActivType.Id;
+    },
   },
   mounted() {
-    setTimeout(() => {
-      // console.log(this.ModelInputL);
-    }, 200000);
     let val = this.$store.state.Score.data;
-    // console.log("val", val);
     if (val.Questions) {
       val.Questions.forEach((el) => {
         let Options = val.Op.find((eo) => eo[el.Desc]);
@@ -280,22 +284,17 @@ export default {
       this.Questos.forEach((element) => {
         this.RevereseQu.unshift(element);
       });
-      // console.log("🚀 ~ this.Questos.sort ~ this.Questos:", this.Questos);
 
       this.compData();
     }
-    if (
-      this.Elall &&
-      this.Elall.children[0] &&
-      this.Elall.children[0].children[0]
-    ) {
-      this.width = this.Elall.children[0].children[0].style.width;
-      this.marginLeft = this.Elall.children[0].children[0].style.marginRight;
+    if (this.GetWidth) {
+      this.width = this.GetWidth;
+      this.marginLeft = "27px";
     }
-    // this.BuildIndexes();
 
     this.$ax.get(URL + "GetScore/" + this.activQushinnare).then((res) => {
       // let arr = [];
+      // console.log(res);
       res.data.forEach((el) => {
         if (!Array.isArray(el.QuestionsAnswersIds)) {
           el.QuestionsAnswersIds = el.QuestionsAnswersIds.split(",");
@@ -328,7 +327,7 @@ export default {
     },
     compData() {
       // this.$ax.post(URL + "J", this.Questos);
-      console.log(this.Questos);
+      // console.log(this.Questos);
       // console.log(this.Questos.map((e) => e.Seq));
       this.arrsTheOP = this.generateOptionsPaths(this.Questos);
       this.arrsTheOP.forEach((element, i) => {
@@ -444,18 +443,12 @@ export default {
           return;
         }
         if (!question.op || question.op.length === 0) {
-          allPaths.push([
-            ...currentPath,
-            { Desc: null, DescQustions: question.Desc },
-          ]);
+          allPaths.push([...currentPath, { Desc: null, question: question }]);
           return;
         }
 
         question.op.forEach((option) => {
-          let newPath = [
-            ...currentPath,
-            { ...option, DescQustions: question.Desc },
-          ];
+          let newPath = [...currentPath, { ...option, question: question }];
           let nextQuestionIndex = questions.findIndex(
             (q) => q.Id === option.NextQuestionId
           );
@@ -466,7 +459,7 @@ export default {
             i < nextQuestionIndex;
             i++
           ) {
-            newPath.push({ Desc: null, DescQustions: questions[i].Desc });
+            newPath.push({ Desc: null, question: questions[i] });
           }
 
           if (option.NextQuestionId === null) {
@@ -594,7 +587,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .parentsSelects {
   display: flex;
   flex-direction: row-reverse;
@@ -834,5 +827,15 @@ export default {
   left: 0;
   top: 0;
 }
+.else {
+  .el-button {
+    position: relative;
+    right: 80px;
+    bottom: 14px;
+  }
+}
+// .ifTypeNormal {
+//   display: contents;
+// }
 </style>
 <style></style>

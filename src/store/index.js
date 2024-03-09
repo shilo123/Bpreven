@@ -4,6 +4,7 @@ import { URL } from "@/URL/url";
 import axios from "axios";
 import Score from "@/store/Score";
 import Questionaire from "./Qustionaire";
+import TAndO from "./Table&Opt";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -17,6 +18,7 @@ export default new Vuex.Store({
     AllData: {},
     theOption: [],
     rowDelete: {},
+    idShowButton: "",
   },
   mutations: {
     Setmessage(state, mes) {
@@ -49,6 +51,10 @@ export default new Vuex.Store({
     CommitRow(state, val) {
       state.rowDelete = val;
     },
+    //
+    SaveShowButton(state, id) {
+      state.idShowButton = id;
+    },
   },
   getters: {},
   actions: {
@@ -78,5 +84,6 @@ export default new Vuex.Store({
   modules: {
     Score,
     Questionaire,
+    TAndO,
   },
 });

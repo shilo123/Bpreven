@@ -121,13 +121,13 @@ export default {
   background: white;
   height: 600px;
   width: 990px;
-  left: 200px;
-  top: 60px;
+  // left: 200px;
+  left: 21%;
+  top: 130px;
   padding: 40px;
   border: 13px solid rgb(55, 55, 216);
   border-radius: 20px;
   overflow-y: hidden;
-  /* padding-bottom: 40px; */
 }
 .warning {
   /* background: rgb(255, 255, 255); */
@@ -135,23 +135,66 @@ export default {
   height: 210px;
   padding: 70px;
   text-align: center;
-  left: 530px;
+  // left: 530px;
+  left: 36%;
   /* border-radius: 20px; */
 }
 .EditQuen {
   width: 1020px;
   background: rgba(255, 255, 255, 0.547);
   height: 550px;
-  top: 30px;
+  top: 100px;
   border: 10px solid rgba(206, 215, 164, 0.586);
   padding-bottom: 50px;
-  left: 240px;
+  // left: 240px;
+  left: 18%;
   border-radius: 20px;
 }
 .LoMatzanu {
   position: absolute;
   top: 30%;
   left: 30%;
+}
+@media screen and (max-width: 1300px) {
+  .queshens {
+    background: white;
+    // height: 600px;
+    height: 560px;
+    width: 990px;
+    left: 6%;
+    top: 15px;
+    padding: 40px;
+    border: 13px solid rgb(55, 55, 216);
+    border-radius: 20px;
+    overflow-y: auto;
+  }
+  .warning {
+    /* background: rgb(255, 255, 255); */
+    width: 300px;
+    height: 210px;
+    padding: 70px;
+    text-align: center;
+    // left: 530px;
+    left: 36%;
+    /* border-radius: 20px; */
+  }
+  .EditQuen {
+    width: 1020px;
+    background: rgba(255, 255, 255, 0.547);
+    height: 520px;
+    top: 20px;
+    border: 10px solid rgba(206, 215, 164, 0.586);
+    padding-bottom: 50px;
+    // left: 240px;
+    left: 5%;
+    border-radius: 20px;
+    overflow-y: auto;
+  }
+  .LoMatzanu {
+    position: absolute;
+    top: 30%;
+    left: 30%;
+  }
 }
 </style>
 <style></style>

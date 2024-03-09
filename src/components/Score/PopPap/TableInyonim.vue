@@ -42,7 +42,7 @@
       border
       ref="Table"
       class="Tabloz"
-      height="510"
+      height="550"
       empty-text="אין נתונים זה הזמן למלאות"
     >
       <el-table-column :label="NameOfScore" align="center">
@@ -178,11 +178,11 @@ export default {
       } else {
         arrIdso = null;
       }
-      console.log({
-        Params: arrIdso,
-        NameOfScore: this.NameOfScore,
-        q: this.que,
-      });
+      // console.log({
+      //   Params: arrIdso,
+      //   NameOfScore: this.NameOfScore,
+      //   q: this.que,
+      // });
 
       let { data } = await this.$ax.get(
         URL + "GetScoreAction/" + arrIdso + "/" + this.que
@@ -191,7 +191,7 @@ export default {
         this.data = data;
         let res = await this.$ax.post(URL + "GetDataForTableScoreAction", data);
         this.ObjAlldata = res.data;
-        console.log({ ...this.ObjAlldata });
+        // console.log({ ...this.ObjAlldata });
         await this.$nextTick();
         this.SortTable();
         //   console.log(this.ObjAlldata);
@@ -337,12 +337,13 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .Tabloz {
   width: 80%;
   position: relative;
   margin: 20px;
-  left: 90px;
+  /* left: 90px; */
+  left: 10%;
   top: 20px;
 }
 body {
@@ -351,7 +352,8 @@ body {
 .opTable {
   width: 80%;
   position: relative;
-  left: 110px;
+  /* left: 110px; */
+  left: 12%;
   top: 20px;
   background: rgba(255, 58, 58, 0.744);
   padding: 15px;
@@ -362,11 +364,13 @@ body {
 }
 .Elselected {
   position: relative;
-  right: 100px;
+  // right: 100px;
+  right: 10%;
 }
 .ButtonHosef {
   position: relative;
-  right: 200px;
+  // right: 200px;
+  right: 20%;
 }
 .ButtonPuper {
   margin: 5px;

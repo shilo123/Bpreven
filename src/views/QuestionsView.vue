@@ -98,11 +98,10 @@
 <script>
 import { URL } from "@/URL/url";
 import OpTable from "@/components/quesions/Table/optionsONtheTableComp.vue";
+// import Table from "@/components/quesions/Table/TableComp.vue";
 import Table from "@/components/quesions/Table/TableComp.vue";
-// import Table from "@/components/quesions/Table/TableCopy.vue";
-// import draggable from "vuedraggable";
-import AddAnswer from "@/components/quesions/divos/ShowAddAnswerComp.vue";
-import DeleteAnswer from "@/components/quesions/divos/ShowDeleteAnswerComp.vue";
+import AddAnswer from "@/components/quesions/divos/ShowAddOpComp.vue";
+import DeleteAnswer from "@/components/quesions/divos/ShowDeleteOpComp.vue";
 import Edit from "@/components/quesions/divos/ShowEditComp.vue";
 import EditOption from "@/components/quesions/divos/ShowEditOptionComp.vue";
 import NewQustion from "@/components/quesions/divos/ShowNewQustion.vue";
@@ -112,7 +111,7 @@ export default {
   components: {
     Table,
     OpTable,
-    /*draggable,*/
+    /*,*/
     AddAnswer,
     DeleteAnswer,
     Edit,
@@ -249,6 +248,8 @@ export default {
 .AddNewAnswer {
   height: 300px;
   width: 400px;
+  left: 60%;
+  // right: -530px;
 }
 .DeleteAnswer {
   width: 300px;
@@ -258,12 +259,10 @@ export default {
 }
 .Edito {
   width: 660px;
-  //  height: 630px;
   height: 480px;
-  left: 400px;
-  // left: 300px;
+  // left: 400px;
+  left: 30%;
   top: 80px;
-  // top: 30px;
 }
 .EditOption {
   height: 150px;
@@ -273,13 +272,14 @@ export default {
 .newQ {
   height: 520px;
   width: 800px;
-  left: 280px;
-  top: 60px;
+  // left: 280px;
+  left: 26%;
+  top: 90px;
 }
 .warning {
   width: 300px;
   height: 210px;
-  left: 530px;
+  left: 37%;
 }
 .UpdateSeq {
   background: white;
@@ -320,18 +320,15 @@ export default {
   width: 80px;
   height: 20px;
 }
-
 .button-6:hover,
 .button-6:focus {
   border-color: rgba(0, 0, 0, 0.15);
   box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
   color: rgba(0, 0, 0, 0.65);
 }
-
 .button-6:hover {
   transform: translateY(-1px);
 }
-
 .button-6:active {
   background-color: #f0f0f1;
   border-color: rgba(0, 0, 0, 0.15);
@@ -340,7 +337,6 @@ export default {
   transform: translateY(0);
 }
 /* / */
-
 /* CSS */
 .button-33 {
   background-color: #c2fbd7;
@@ -367,7 +363,6 @@ export default {
   margin-bottom: 10px;
   animation: ShowButton 0.3s ease forwards;
 }
-
 @keyframes ShowButton {
   from {
     transform: translateY(-20px); /* התחל מ-20px מעל למקום הסופי */
@@ -378,7 +373,6 @@ export default {
     opacity: 1; /* הגיע לשקיפות מלאה */
   }
 }
-
 .button-33:hover {
   box-shadow: rgba(44, 187, 99, 0.35) 0 -25px 18px -14px inset,
     rgba(44, 187, 99, 0.25) 0 1px 2px, rgba(44, 187, 99, 0.25) 0 2px 4px,
@@ -394,5 +388,51 @@ export default {
   position: relative;
   top: 40px;
   right: 10px;
+}
+@media screen and (max-width: 1300px) {
+  .AddNewAnswer {
+    height: 300px;
+    width: 400px;
+    left: 60%;
+    // right: -530px;
+  }
+  .DeleteAnswer {
+    width: 300px;
+    height: 200px;
+    left: 35%;
+    top: 35%;
+  }
+  .Edito {
+    width: 660px;
+    height: 480px;
+    // left: 400px;
+    left: 16%;
+    top: 40px;
+  }
+  .EditOption {
+    height: 150px;
+    width: 400px;
+    left: 30%;
+  }
+  .newQ {
+    height: 520px;
+    width: 800px;
+    // left: 280px;
+    left: 14%;
+    top: 20px;
+  }
+  .warning {
+    width: 300px;
+    height: 210px;
+    left: 37%;
+  }
+  .UpdateSeq {
+    background: white;
+    width: 400px;
+    height: auto;
+    padding-bottom: 200px;
+    top: 50px;
+    left: 480px;
+  }
 }
 </style>

@@ -29,17 +29,17 @@ const URL = `https://bprevenserver.dgtracking.co.il`;
 
 // console.log(port);
 const config = {
-  server: "MC58148\\SQLEXPRESS",
-  database: "Bpreven",
-  driver: "msnodesqlv8",
-  user: "sa",
-  password: "Shilo123!!",
-  //
-  // server: "185.68.120.69",
+  // server: "MC58148\\SQLEXPRESS",
   // database: "Bpreven",
   // driver: "msnodesqlv8",
-  // user: "dgtracking_co_il_dgLaw",
-  // password: "dgtrackingJadekia556",
+  // user: "sa",
+  // password: "Shilo123!!",
+  //
+  server: "185.68.120.69",
+  database: "Bpreven",
+  driver: "msnodesqlv8",
+  user: "dgtracking_co_il_dgLaw",
+  password: "dgtrackingJadekia556",
 };
 // console.log(config);
 function SQL(query) {
@@ -111,12 +111,12 @@ function random(min, max) {
 // const q = `SELECT * FROM QuestionsOptions WHERE QuestionsId = 10
 // `;
 // SQLOS(q);
-//FILE
+// $ FILE
 app.post("/postFilee/:Idcategory", upload.single("file"), async (req, res) => {
   let Id = req.params.Idcategory;
   let File = req.file;
   let Type;
-  console.log(File.mimetype);
+  // console.log(File.mimetype);
   const pathFloader = path.join(__dirname, "Upload", Id);
   if (!fs.existsSync(pathFloader)) {
     fs.mkdirSync(pathFloader, { recursive: true });
@@ -368,7 +368,7 @@ app.post("/newequen", async (req, res) => {
 app.delete("/Delquen/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    console.log(id);
+    // console.log(id);
     const q = `DELETE FROM Questionnaire WHERE Id = ${id}`;
     await SQL(q);
     const Query = `SELECT Id FROM Questions WHERE QuestionnaireId = ${id}`;
@@ -376,7 +376,7 @@ app.delete("/Delquen/:id", async (req, res) => {
     IDS = IDS.map((e) => {
       return e.Id;
     });
-    console.log(IDS);
+    // console.log(IDS);
     const Promises = IDS.map(async (e) => {
       let QuaQy = `DELETE FROM Questions WHERE Id = ${e}`;
       await SQL(QuaQy);
@@ -542,6 +542,7 @@ app.get("/GetQuestions", async (req, res) => {
   Q1.StatusId,
   Q1.IsEnd,
   Questionnaire.[Desc] AS DescQuestionnaire,
+  Questionnaire.QuestionnaireTypesId AS TypeQ,
   DataTypes.[Desc] AS DescDataType,
   Q2.[Desc] AS NextQuestionDesc
 FROM Questions AS Q1
@@ -572,6 +573,17 @@ LEFT JOIN DataTypes ON DataTypes.Id = Q1.DataTypesId ORDER BY Questionnaire.[Des
   // await Promise.all(Promises);
   // console.log(result);
   res.json(result);
+});
+app.get("/GetGroups/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    // console.log({ id }.id);
+    const query = `SELECT * FROM Groups WHERE QuestionsId = ${id}`;
+    let data = await SQL(query);
+    res.json(data);
+  } catch (error) {
+    res.json(null);
+  }
 });
 app.get("/GetData", async (req, res) => {
   try {
@@ -661,7 +673,7 @@ app.post("/Updata", async (req, res) => {
       updateQuery += `, DataTypesId = ${dataTypesId}`;
     }
     if (nextQuestionId !== null) {
-      console.log("nextQuestionId", nextQuestionId);
+      // console.log("nextQuestionId", nextQuestionId);
       if (!isNumeric(nextQuestionId)) {
         const querdinio = `SELECT Id FROM Questions WHERE [Desc] = '${nextQuestionId}'`;
         let id = await SQL(querdinio);
@@ -798,7 +810,7 @@ app.post("/UpNextQuestions", async (req, res) => {
   try {
     const val = req.body.val.replace(/'/g, "''");
     const idQ = req.body.id;
-    console.log({ val, idQ });
+    // console.log({ val, idQ });
     // if (val === "ללא שאלה הבאה") {
     //   let qourtoz = `UPDATE Questions
     //   SET IsEnd = 1
@@ -853,6 +865,7 @@ app.post("/FIndQustinnare", async (req, res) => {
     Questions.StatusId,
     Questions.IsEnd,
     Questionnaire.[Desc] AS DescQuestionnaire,
+    Questionnaire.QuestionnaireTypesId,
     DataTypes.[Desc] AS DescDataType
     FROM Questions
     INNER JOIN Questionnaire ON Questionnaire.Id = Questions.QuestionnaireId
@@ -866,7 +879,7 @@ app.post("/FIndQustinnare", async (req, res) => {
 });
 app.get("/GetQustionsz", async (req, res) => {
   try {
-    const q = `SELECT Id,[Desc] FROM Questionnaire`;
+    const q = `SELECT * FROM Questionnaire`;
     let data = await SQL(q);
     res.json(data);
   } catch (error) {
@@ -941,14 +954,16 @@ app.get("/GetOption/:id", async (req, res) => {
     const q = `SELECT 
      QuestionsOptions.[Desc],
      QuestionsOptions.Id, 
+     QuestionsOptions.GroupId, 
      QuestionsOptions.NextQuestionId AS NextQuestionId,
      Questions.[Desc] AS Nextques
+     
     FROM QuestionsOptions
     LEFT JOIN Questions ON QuestionsOptions.NextQuestionId = Questions.Id
      WHERE QuestionsId = ${id} ORDER BY QuestionsOptions.[Seq]`;
     let result = await SQL(q);
     // console.log(result);
-    console.log(result);
+    // console.log(result);
     // const IDS = result.map((e) => e.Id);
     // console.log(IDS);
     // await Promise.all(
@@ -976,7 +991,7 @@ app.get("/GetOption/:id", async (req, res) => {
   }
 });
 app.post("/AddAnswer", async (req, res) => {
-  // console.log(req.body);
+  req.body.text = req.body.text.replace(/'/g, "''");
   try {
     const query = `SELECT MAX([Seq]) AS maxSec FROM QuestionsOptions WHERE QuestionsId = ${req.body.id}`;
     let sek = await SQL(query);
@@ -988,12 +1003,12 @@ app.post("/AddAnswer", async (req, res) => {
       sek++;
     }
     const q = `INSERT INTO QuestionsOptions (QuestionsId,[Desc],[Seq]) VALUES (${req.body.id},'${req.body.text}',${sek})`;
-    let Request = await SQL(q);
+    await SQL(q);
     // console.log(Request);
     res.json(true);
   } catch (error) {
-    console.log(error);
-    res.json(true);
+    console.log("er", error);
+    res.json(false);
   }
 });
 app.delete("/DeleteAnswer/:id", async (req, res) => {
@@ -1175,6 +1190,7 @@ app.post("/updateSek", async (req, res) => {
     res.json(false);
   }
 });
+// $score
 app.post("/AddScore", async (req, res) => {
   try {
     // console.log(req.body);
@@ -1212,7 +1228,10 @@ app.post("/AddScore", async (req, res) => {
 app.post("/deleteScore", async (req, res) => {
   // console.log("req.body", req.body);
   try {
-    const Score = req.body.Score.replace(/'/g, "''");
+    const Score =
+      typeof req.body.Score === "string"
+        ? req.body.Score.replace(/'/g, "''")
+        : req.body.Score;
     const QushinnareName = req.body.Qushinnare.replace(/'/g, "''");
     const arrIds = req.body.arrIds.join();
     const Q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${QushinnareName}' `;
@@ -1220,11 +1239,13 @@ app.post("/deleteScore", async (req, res) => {
     if (id) {
       id = id[0].Id;
     }
+    // console.log({ Score, arrIds, id });
     const Query = `DELETE FROM Score WHERE QuestionnaireId = ${id} AND QuestionsAnswersIds = '${arrIds}' AND 
     QuestionnaireScore = '${Score}'`;
     await SQL(Query);
     res.json(true);
   } catch (error) {
+    console.log(error);
     res.json(false);
   }
 });
@@ -1239,297 +1260,188 @@ app.get("/GetScore/:nameQueshenner", async (req, res) => {
   // console.log(data);
   res.json(data);
 });
-app.get("/GetMessages", async (req, res) => {
-  const Q = `SELECT * FROM Messages`;
-  let data = await SQL(Q);
-  res.json(data);
-});
-app.post("/UpdateMessage", async (req, res) => {
-  // console.log(req.body);
+app.get("/GetAllScore", async (req, res) => {
   try {
-    const Desc = req.body.Desc.replace(/'/g, "''");
-    const Symbol = req.body.Symbol.replace(/'/g, "''");
-    const StatusId = req.body.StatusId ? 1 : 0;
-    const id = req.body.ID;
-    // console.log({ Desc, Symbol, StatusId });
-    const Query = `UPDATE Messages
-    SET [Desc] = '${Desc}',Symbol = '${Symbol}',StatusId = ${StatusId}
-    WHERE Id = ${id}`;
-    await SQL(Query);
-    res.json(true);
-  } catch (error) {
-    res.json(false);
-  }
-});
-app.delete("/DeleteMes/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const Q = `DELETE FROM Messages WHERE Id = ${id}`;
-    await SQL(Q);
-    res.json(true);
-  } catch (error) {
-    res.json(false);
-  }
-});
-app.post("/AddMes", async (req, res) => {
-  // console.log(req.body);
-  let status = req.body.status ? 1 : 0;
-  let DescMes = req.body.DescMes.replace(/'/g, "''");
-  let SymbolMes = req.body.SymbolMes.replace(/'/g, "''");
-  try {
-    const query = `INSERT INTO Messages ([Desc],Symbol,StatusId) VALUES ('${DescMes}','${SymbolMes}',${status})`;
-    await SQL(query);
-    res.json(true);
-  } catch (error) {
-    res.json(false);
-  }
-});
-app.post("/serchMes", async (req, res) => {
-  // console.log(req.body);
-  let val = req.body.val;
-  const Colomn = req.body.ClumnSerch;
+    //  const q = `SELECT Id FROM Questionnaire WHERE `
 
-  if (Colomn === "StatusId" || Colomn === "all") {
-    if (val === "פעיל") {
-      val = 1;
-    }
-    if (val === "לא פעיל") {
-      val = 0;
-    }
-  }
-  let Q = "";
-  if (Colomn === "all") {
-    Q = `SELECT * FROM Messages WHERE Symbol LIKE '${val}%' OR  [Desc] LIKE '${val}%' OR  StatusId LIKE '${val}%'`;
-  } else {
-    Q = `SELECT * FROM Messages WHERE ${Colomn} LIKE '${val}%'`;
-  }
-  let data = await SQL(Q);
-  // console.log(data);
-  res.json(data);
-});
-app.get("/GetFeatures", async (req, res) => {
-  try {
-    const q = `SELECT * FROM Features`;
-    let data = await SQL(q);
+    const query = `SELECT Qu.[Desc] AS NameQ, Qu.Id AS QuId,S.* FROM Score S
+    LEFT JOIN Questionnaire Qu
+    ON  S.QuestionnaireId = Qu.Id WHERE Qu.[Desc] IS NOT NULL AND Qu.QuestionnaireTypesId != 3 	AND Qu.QuestionnaireTypesId != 4`;
+    let data = await SQL(query);
     res.json(data);
   } catch (error) {
     res.json(false);
   }
 });
-app.post("/serchFeach", async (req, res) => {
-  // console.log(req.body);
-  const val = req.body.val;
-  const Clumn = req.body.ClumnSerch;
-  let Q;
-  if (Clumn === "all") {
-    if (!isNumeric(val)) {
-      Q = `SELECT * FROM Features WHERE Symbol LIKE '${val}%'  OR [Desc] LIKE '${val}%'`;
+app.post("/IfScoreMeTapel", async (req, res) => {
+  const { arrIds } = req.body;
+  try {
+    const QueryIf = `SELECT * FROM Score  WHERE  QuestionsAnswersIds = '${arrIds}'`;
+    let Bool = await SQL(QueryIf);
+    let Data = Bool;
+    // console.log(Bool);
+    let score;
+    let Ifinyonim;
+    if (Data[0]) {
+      const scoreId = Data[0].Id;
+      const query2 = `SELECT 1 FROM ScoreActions WHERE ScoreTherapistsId = ${scoreId}`;
+      let DAtrozino = await SQL(query2);
+      Ifinyonim = Boolean(DAtrozino.length);
+    }
+    if (Bool.length === 0) {
+      Bool = false;
+      score = "";
     } else {
-      Q = `SELECT * FROM Features WHERE  Number = ${val}`;
+      Bool = true;
+      score = Data[0].QuestionnaireScore;
     }
-  } else {
-    Q = `SELECT * FROM Features WHERE ${Clumn} LIKE '${val}%'`;
-  }
-  let data = await SQL(Q);
-  // console.log(data);
-  res.json(data);
-});
-app.post("/Addfeacher", async (req, res) => {
-  console.log(req.body);
-  try {
-    const Q = `INSERT INTO Features (Symbol,Number,[Desc]) VALUES ('${req.body.Symbol.replace(
-      /'/g,
-      "''"
-    )}',${req.body.number},'${req.body.Name.replace(/'/g, "''")}')`;
-    await SQL(Q);
-    res.json(true);
+    // console.log({ Bool, score });
+    res.json({ Bool, score, Ifinyonim });
   } catch (error) {
-    res.json(false);
+    console.log(error);
+    res.json(null);
   }
 });
-app.delete("/DeleteFeacher/:id", async (req, res) => {
-  let id = req.params.id;
-  // console.log(id);
+app.get("/GetIdForScore/:NameScore", async (req, res) => {
   try {
-    const Q = `DELETE FROM Features WHERE Id = ${id}`;
-    await SQL(Q);
-    res.json(true);
-  } catch (error) {
-    res.json(true);
-  }
-});
-app.post("/UpFeacher", async (req, res) => {
-  // console.log(req.body);
-  try {
-    const id = req.body.id;
-    const Name = req.body.row.Name.replace(/'/g, "''");
-    const Symbol = req.body.row.Symbol.replace(/'/g, "''");
-    const number = req.body.row.number;
-    const Q = `UPDATE Features
-    SET Symbol = '${Symbol}',Number= ${number},[Desc] = '${Name}'
-    WHERE Id = ${id}`;
-    await SQL(Q);
-    res.json(true);
-  } catch (error) {
-    res.json(false);
-  }
-});
-app.get("/GetExercises", async (req, res) => {
-  try {
-    const q = `SELECT Exercises.* ,ExercisesCategories.[Name] AS NameCategory FROM 
-    Exercises LEFT JOIN  ExercisesCategories ON ExercisesCategories.Id = Exercises.ExercisesCategoriesId
-    `;
-    let data = await SQL(q);
-    res.json(data);
-  } catch (error) {
-    res.json(false);
-  }
-});
-app.post("/serchExercises", async (req, res) => {
-  // console.log(req.body);
-  try {
-    const col = req.body.ClumnSerch;
-    let val = req.body.val;
-    let Q;
-    if (col === "all") {
-      Q = `SELECT Exercises.* ,ExercisesCategories.[Name] AS NameCategory FROM 
-      Exercises LEFT JOIN  ExercisesCategories ON ExercisesCategories.Id = Exercises.ExercisesCategoriesId
-      WHERE ExercisesCategories.[Name] LIKE '${val}%' OR Exercises.About LIKE '${val}%' OR Exercises.StatusId LIKE '${val}'
-      OR  Exercises.Symbol LIKE '${val}%' OR Exercises.Title LIKE '${val}%'`;
-    } else {
-      Q = `SELECT Exercises.* ,ExercisesCategories.[Name] AS NameCategory FROM 
-     Exercises LEFT JOIN  ExercisesCategories ON ExercisesCategories.Id = Exercises.ExercisesCategoriesId
-     WHERE ${col} LIKE '${val}%'
-      `;
+    const nameS = req.params.NameScore;
+    const query = `SELECT Id FROM Score WHERE QuestionnaireScore = '${nameS}'`;
+    let id = await SQL(query);
+    if (id[0]) {
+      id = id[0].Id;
     }
-    let data = await SQL(Q);
-    res.json(data);
-  } catch (error) {
-    res.json(false);
-  }
-});
-app.get("/GetCategiz", async (req, res) => {
-  try {
-    const Q = `SELECT * FROM ExercisesCategories`;
-    let data = await SQL(Q);
-    console.log(data);
-    res.json(data);
-  } catch (error) {
-    res.json(false);
-  }
-});
-app.post("/AddNewExires", async (req, res) => {
-  // console.log(req.body);
-  try {
-    const Title = req.body.Title.replace(/'/g, "''");
-    const Symbol = req.body.Symbol.replace(/'/g, "''");
-    const descrip = req.body.descrip.replace(/'/g, "''");
-    const categityId = req.body.categityId;
-    const stuts = req.body.stuts ? 1 : 0;
-    const link = req.body.link.replace(/'/g, "''");
-    // console.log({ Title, Symbol, descrip, categityId, stuts, link });
-    const Q = `INSERT INTO Exercises (ExercisesCategoriesId,Symbol,Link,Title,About,StatusId)
-    VALUES (${categityId},'${Symbol}','${link}','${Title}','${descrip}',${stuts})`;
-    await SQL(Q);
-    res.json(true);
+    // console.log(id);
+    res.json(id);
   } catch (error) {
     console.log(error);
     res.json(false);
   }
 });
-app.delete("/delEx/:id/:nameFile/:floader", async (req, res) => {
-  try {
-    const floader = req.params.floader;
-    const id = req.params.id;
-    const nameFile = req.params.nameFile;
-    const query = `DELETE FROM Exercises WHERE Id = ${id}`;
-    await SQL(query);
-    if (nameFile !== "none") {
-      deleteFileInFolder(floader, nameFile);
+// score.scoreAction
+app.get(
+  "/GetScoreActionFromTerapist/:scoreNormal/:scoreTerapist",
+  async (req, res) => {
+    try {
+      const scoreNormal = +req.params.scoreNormal;
+      const scoreTerapist = +req.params.scoreTerapist;
+      // console.log({ scoreNormal, scoreTerapist });
+      const query = `SELECT 
+      SA.Id,
+      SA.ScoreId,
+      SA.ScoreTherapistsId,
+      Ex.Id AS valEx,
+      Ex.Title AS DescEx,
+      Ex.Symbol AS SymbolEx,
+      Me.Id AS valMe,
+      Me.[Desc] AS DescMe,
+      Me.Symbol AS SymbolMe,
+      Fe.Id AS valFe,
+      Fe.[Desc] AS DescFe,
+      Fe.Symbol AS SymbolFe
+      FROM ScoreActions SA
+      LEFT JOIN Exercises Ex
+      ON SA.ExercisesId = Ex.Id
+      LEFT JOIN Messages Me
+      ON SA.MessagesId = Me.Id 
+      LEFT JOIN Features Fe
+      ON SA.FeaturesId = Fe.Id
+       WHERE ScoreId = ${scoreNormal} AND  ScoreTherapistsId = ${scoreTerapist}`;
+      let dataSheyesh = await SQL(query);
+      // console.log("🚀 ~ dataSheyesh:", dataSheyesh);
+      // *#Sort Data
+      let idsEx = dataSheyesh
+        .map((e) => {
+          return {
+            valEx: e.valEx,
+          }.valEx;
+        })
+        .filter((e) => e)
+        .join();
+      //
+      let idsMe = dataSheyesh
+        .map((e) => {
+          return {
+            valMe: e.valMe,
+          }.valMe;
+        })
+        .filter((e) => e)
+        .join();
+
+      //
+      let idsFe = dataSheyesh
+        .map((e) => {
+          return {
+            valFe: e.valFe,
+          }.valFe;
+        })
+        .filter((e) => e)
+        .join();
+      objDvarim = { idsEx, idsMe, idsFe };
+      for (const key in objDvarim) {
+        if (!objDvarim[key]) {
+          objDvarim[key] = "0";
+        }
+      }
+      console.log(objDvarim);
+      let query2;
+
+      // if (Boolean(dataSheyesh.length)) {
+      query2 = `SELECT
+       Ex.Id AS valEx,
+       Ex.Title AS DescEx,
+       Ex.Symbol AS SymbolEx,
+       Me.Id AS valMe,
+       Me.[Desc] AS DescMe,
+       Me.Symbol AS SymbolMe,
+       Fe.Id AS valFe,
+       Fe.[Desc] AS DescFe,
+       Fe.Symbol AS SymbolFe
+       FROM ScoreActions SA
+       LEFT JOIN Exercises Ex
+       ON SA.ExercisesId != Ex.Id
+       LEFT JOIN Messages Me
+       ON SA.MessagesId != Me.Id
+       LEFT JOIN Features Fe
+       ON SA.FeaturesId != Fe.Id
+        WHERE Ex.Id NOT IN (${objDvarim.idsEx}) OR Me.Id NOT IN (${objDvarim.idsMe}) OR Fe.Id  NOT IN (${objDvarim.idsFe})
+
+        `;
+      // } else {
+      //   query2 = `SELECT
+      //         Ex.Id AS valEx,
+      //         Ex.Title AS DescEx,
+      //         Ex.Symbol AS SymbolEx,
+      //         Me.Id AS valMe,
+      //         Me.[Desc] AS DescMe,
+      //         Me.Symbol AS SymbolMe,
+      //         Fe.Id AS valFe,
+      //         Fe.[Desc] AS DescFe,
+      //         Fe.Symbol AS SymbolFe
+      //         FROM ScoreActions SA
+      //         LEFT JOIN Exercises Ex
+      //         ON SA.ExercisesId != Ex.Id
+      //         LEFT JOIN Messages Me
+      //         ON SA.MessagesId != Me.Id
+      //         LEFT JOIN Features Fe
+      //         ON SA.FeaturesId != Fe.Id`;
+      // }
+      let dataSheen = await SQL(query2);
+      // let dataSheen = [];
+      // console.log(dataSheen);
+
+      // console.log(data);
+      res.json({ dataSheen, dataSheyesh });
+    } catch (error) {
+      console.log("errrr:aserr", error);
+      res.json(false);
     }
-    res.json(true);
-  } catch (error) {
-    console.log(error);
-    res.json(false);
   }
-});
-app.post("/AddCategory", async (req, res) => {
-  try {
-    let val = req.body.val.replace(/'/g, "''");
-    // console.log(val);
-    const q = `INSERT INTO ExercisesCategories (Name,StatusId) VALUES ('${val}',1)`;
-    await SQL(q);
-    res.json(true);
-  } catch (error) {
-    console.log(error);
-    res.json(false);
-  }
-});
-app.post("/EditCategory", async (req, res) => {
-  try {
-    const id = req.body.id;
-    const val = req.body.val.replace(/'/g, "''");
-    const q = `UPDATE ExercisesCategories
-             SET Name = '${val}' WHERE Id = ${id}`;
-    await SQL(q);
-    res.json(true);
-  } catch (error) {
-    res.json(false);
-  }
-});
-app.delete("/DeeteCategory/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const q = `DELETE FROM ExercisesCategories WHERE Id = ${id}`;
-    await SQL(q);
-    res.json(true);
-  } catch (error) {
-    console.log(error);
-    res.json(false);
-  }
-});
-app.post("/UpdateEx", async (req, res) => {
-  // console.log(req.body);
-  try {
-    const id = req.body.id;
-    const Title = req.body.Title.replace(/'/g, "''");
-    const Symbol = req.body.Symbol.replace(/'/g, "''");
-    const descrip = req.body.descrip.replace(/'/g, "''");
-    const categityId = req.body.categityId;
-    const stuts = req.body.stuts ? 1 : 0;
-    const link = req.body.link.replace(/'/g, "''");
-    console.log({
-      All: { id, Title, Symbol, descrip, categityId, stuts, link },
-    });
-    const query = `UPDATE Exercises
-SET ExercisesCategoriesId = ${categityId} ,Symbol = '${Symbol}'
-,Link = '${link}',Title = '${Title}',About = '${descrip}',
-StatusId = ${stuts} WHERE Id = ${id}`;
-    await SQL(query);
-    res.json(true);
-  } catch (error) {
-    console.log(error);
-    res.json(false);
-  }
-});
-app.delete("/deleFile/:name/:f", async (req, res) => {
-  // console.log("sdfsdfs");
-  try {
-    // console.log(req.params.name);
-    // console.log(req.params.f);
-    if (req.params.name !== "none") {
-      deleteFileInFolder(req.params.f, req.params.name);
-    }
-    res.json(true);
-  } catch (error) {
-    res.json(false);
-  }
-});
+);
 app.get("/GetScoreAction/:arrIds/:Q", async (req, res) => {
   try {
     let arrIds = req.params.arrIds === "null" ? null : req.params.arrIds;
     let Qusinnaire = req.params.Q === "null" ? null : req.params.Q;
-    console.log({ arrIds, Qusinnaire });
+    // console.log({ arrIds, Qusinnaire });
     let data;
     if (arrIds) {
       const q = `SELECT Id FROM Score WHERE QuestionsAnswersIds = '${arrIds}'`;
@@ -1551,12 +1463,12 @@ app.get("/GetScoreAction/:arrIds/:Q", async (req, res) => {
       const q = `SELECT Id FROM Questionnaire WHERE [Desc] = '${Qusinnaire}'`;
       let id = await SQL(q);
       id = id[0].Id;
-      console.log(id);
+      // console.log(id);
       "QuestionnaireId", "QuestionsAnswersIds", "QuestionnaireScore";
       const qu = `SELECT Id FROM Score WHERE QuestionnaireId = ${id} AND QuestionsAnswersIds IS NULL AND QuestionnaireScore IS NULL`;
       let idS = await SQL(qu);
       idS = idS[0].Id;
-      console.log("idS", idS);
+      // console.log("idS", idS);
 
       const Query = `SELECT 
       E.Title AS ExercisesT,
@@ -1605,7 +1517,7 @@ app.post("/GetDataForTableScoreAction", async (req, res) => {
       req.body = [];
     }
   }
-  console.log("req.bodyreq.bodyreq.body", req.body);
+  // console.log("req.bodyreq.bodyreq.body", req.body);
   req.body.forEach((el) => {
     for (const key in el) {
       if (typeof el[key] === "string") {
@@ -1706,9 +1618,10 @@ app.delete("/DeleteScoreAction", async (req, res) => {
     let ques = req.query.Q;
     let Desco = req.query.Desco;
     let Colomn = req.query.Colomn;
-    console.log({ arrIds, ques, Desco, Colomn });
+    let boolenQues = ques !== "null";
+    // console.log({ arrIds, ques, Desco, Colomn });
     let q;
-    if (ques) {
+    if (boolenQues) {
       const qu = `SELECT Id FROM Questionnaire WHERE [Desc] = '${ques}'`;
       let idQ = await SQL(qu);
       idQ = idQ[0].Id;
@@ -1742,6 +1655,360 @@ app.delete("/DeleteScoreAction", async (req, res) => {
     res.json(true);
   } catch (error) {
     console.log("erOr", error);
+    res.json(false);
+  }
+});
+app.post("/AddScoreActionTerapist", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const { ScoreTerapist, ScoreId, val, Ma } = req.body;
+    let column;
+    switch (Ma) {
+      case 0:
+        column = "ExercisesId";
+        break;
+
+      case 1:
+        column = "MessagesId";
+        break;
+
+      case 2:
+        column = "FeaturesId";
+        break;
+    }
+
+    const query = `INSERT INTO ScoreActions (ScoreId,ScoreTherapistsId,${column},StatusId)
+    VALUES (${ScoreId},${ScoreTerapist},${val},1)`;
+    await SQL(query);
+    // console.log(query);
+    res.json(true);
+  } catch (error) {
+    // console.log("errorrr", error);
+    res.json(false);
+  }
+});
+app.post("/DeleteScoreActionTerapist", async (req, res) => {
+  // console.log(req.body);
+  const { ScoreId, ScoreTerapist, stringos, column } = req.body;
+  //
+  try {
+    let Table;
+    let key;
+    switch (column) {
+      case "ExercisesId":
+        Table = "Exercises";
+        key = "Title";
+        break;
+      case "FeaturesId":
+        Table = "Features";
+        key = "[Desc]";
+        break;
+      case "MessagesId":
+        Table = "Messages";
+        key = "[Desc]";
+        break;
+    }
+
+    //
+    const queryGetId = `SELECT Id FROM ${Table} WHERE ${key} = '${stringos}'`;
+    let id = await SQL(queryGetId);
+    id = id[0].Id;
+    // console.log(id);
+
+    const query = `DELETE ScoreActions
+     WHERE ScoreId = ${ScoreId} AND ScoreTherapistsId = ${ScoreTerapist} AND ${column} = ${id}
+    `;
+    await SQL(query);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+// $ messages
+app.get("/GetMessages", async (req, res) => {
+  const Q = `SELECT * FROM Messages`;
+  let data = await SQL(Q);
+  res.json(data);
+});
+app.post("/UpdateMessage", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const Desc = req.body.Desc.replace(/'/g, "''");
+    const Symbol = req.body.Symbol.replace(/'/g, "''");
+    const StatusId = req.body.StatusId ? 1 : 0;
+    const id = req.body.ID;
+    // console.log({ Desc, Symbol, StatusId });
+    const Query = `UPDATE Messages
+    SET [Desc] = '${Desc}',Symbol = '${Symbol}',StatusId = ${StatusId}
+    WHERE Id = ${id}`;
+    await SQL(Query);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.delete("/DeleteMes/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const Q = `DELETE FROM Messages WHERE Id = ${id}`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/AddMes", async (req, res) => {
+  // console.log(req.body);
+  let status = req.body.status ? 1 : 0;
+  let DescMes = req.body.DescMes.replace(/'/g, "''");
+  let SymbolMes = req.body.SymbolMes.replace(/'/g, "''");
+  try {
+    const query = `INSERT INTO Messages ([Desc],Symbol,StatusId) VALUES ('${DescMes}','${SymbolMes}',${status})`;
+    await SQL(query);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/serchMes", async (req, res) => {
+  // console.log(req.body);
+  let val = req.body.val;
+  const Colomn = req.body.ClumnSerch;
+
+  if (Colomn === "StatusId" || Colomn === "all") {
+    if (val === "פעיל") {
+      val = 1;
+    }
+    if (val === "לא פעיל") {
+      val = 0;
+    }
+  }
+  let Q = "";
+  if (Colomn === "all") {
+    Q = `SELECT * FROM Messages WHERE Symbol LIKE '${val}%' OR  [Desc] LIKE '${val}%' OR  StatusId LIKE '${val}%'`;
+  } else {
+    Q = `SELECT * FROM Messages WHERE ${Colomn} LIKE '${val}%'`;
+  }
+  let data = await SQL(Q);
+  // console.log(data);
+  res.json(data);
+});
+app.get("/GetFeatures", async (req, res) => {
+  try {
+    const q = `SELECT * FROM Features`;
+    let data = await SQL(q);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/serchFeach", async (req, res) => {
+  // console.log(req.body);
+  const val = req.body.val;
+  const Clumn = req.body.ClumnSerch;
+  let Q;
+  if (Clumn === "all") {
+    if (!isNumeric(val)) {
+      Q = `SELECT * FROM Features WHERE Symbol LIKE '${val}%'  OR [Desc] LIKE '${val}%'`;
+    } else {
+      Q = `SELECT * FROM Features WHERE  Number = ${val}`;
+    }
+  } else {
+    Q = `SELECT * FROM Features WHERE ${Clumn} LIKE '${val}%'`;
+  }
+  let data = await SQL(Q);
+  // console.log(data);
+  res.json(data);
+});
+app.post("/Addfeacher", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const Q = `INSERT INTO Features (Symbol,Number,[Desc]) VALUES ('${req.body.Symbol.replace(
+      /'/g,
+      "''"
+    )}',${req.body.number},'${req.body.Name.replace(/'/g, "''")}')`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.delete("/DeleteFeacher/:id", async (req, res) => {
+  let id = req.params.id;
+  // console.log(id);
+  try {
+    const Q = `DELETE FROM Features WHERE Id = ${id}`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    res.json(true);
+  }
+});
+app.post("/UpFeacher", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const id = req.body.id;
+    const Name = req.body.row.Name.replace(/'/g, "''");
+    const Symbol = req.body.row.Symbol.replace(/'/g, "''");
+    const number = req.body.row.number;
+    const Q = `UPDATE Features
+    SET Symbol = '${Symbol}',Number= ${number},[Desc] = '${Name}'
+    WHERE Id = ${id}`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+//
+app.get("/GetExercises", async (req, res) => {
+  try {
+    const q = `SELECT Exercises.* ,ExercisesCategories.[Name] AS NameCategory FROM 
+    Exercises LEFT JOIN  ExercisesCategories ON ExercisesCategories.Id = Exercises.ExercisesCategoriesId
+    `;
+    let data = await SQL(q);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/serchExercises", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const col = req.body.ClumnSerch;
+    let val = req.body.val;
+    let Q;
+    if (col === "all") {
+      Q = `SELECT Exercises.* ,ExercisesCategories.[Name] AS NameCategory FROM 
+      Exercises LEFT JOIN  ExercisesCategories ON ExercisesCategories.Id = Exercises.ExercisesCategoriesId
+      WHERE ExercisesCategories.[Name] LIKE '${val}%' OR Exercises.About LIKE '${val}%' OR Exercises.StatusId LIKE '${val}'
+      OR  Exercises.Symbol LIKE '${val}%' OR Exercises.Title LIKE '${val}%'`;
+    } else {
+      Q = `SELECT Exercises.* ,ExercisesCategories.[Name] AS NameCategory FROM 
+     Exercises LEFT JOIN  ExercisesCategories ON ExercisesCategories.Id = Exercises.ExercisesCategoriesId
+     WHERE ${col} LIKE '${val}%'
+      `;
+    }
+    let data = await SQL(Q);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.get("/GetCategiz", async (req, res) => {
+  try {
+    const Q = `SELECT * FROM ExercisesCategories`;
+    let data = await SQL(Q);
+    // console.log(data);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/AddNewExires", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const Title = req.body.Title.replace(/'/g, "''");
+    const Symbol = req.body.Symbol.replace(/'/g, "''");
+    const descrip = req.body.descrip.replace(/'/g, "''");
+    const categityId = req.body.categityId;
+    const stuts = req.body.stuts ? 1 : 0;
+    const link = req.body.link.replace(/'/g, "''");
+    // console.log({ Title, Symbol, descrip, categityId, stuts, link });
+    const Q = `INSERT INTO Exercises (ExercisesCategoriesId,Symbol,Link,Title,About,StatusId)
+    VALUES (${categityId},'${Symbol}','${link}','${Title}','${descrip}',${stuts})`;
+    await SQL(Q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.delete("/delEx/:id/:nameFile/:floader", async (req, res) => {
+  try {
+    const floader = req.params.floader;
+    const id = req.params.id;
+    const nameFile = req.params.nameFile;
+    const query = `DELETE FROM Exercises WHERE Id = ${id}`;
+    await SQL(query);
+    if (nameFile !== "none") {
+      deleteFileInFolder(floader, nameFile);
+    }
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/AddCategory", async (req, res) => {
+  try {
+    let val = req.body.val.replace(/'/g, "''");
+    // console.log(val);
+    const q = `INSERT INTO ExercisesCategories (Name,StatusId) VALUES ('${val}',1)`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/EditCategory", async (req, res) => {
+  try {
+    const id = req.body.id;
+    const val = req.body.val.replace(/'/g, "''");
+    const q = `UPDATE ExercisesCategories
+             SET Name = '${val}' WHERE Id = ${id}`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.delete("/DeeteCategory/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const q = `DELETE FROM ExercisesCategories WHERE Id = ${id}`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/UpdateEx", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const id = req.body.id;
+    const Title = req.body.Title.replace(/'/g, "''");
+    const Symbol = req.body.Symbol.replace(/'/g, "''");
+    const descrip = req.body.descrip.replace(/'/g, "''");
+    const categityId = req.body.categityId;
+    const stuts = req.body.stuts ? 1 : 0;
+    const link = req.body.link.replace(/'/g, "''");
+    // console.log({
+    //   All: { id, Title, Symbol, descrip, categityId, stuts, link },
+    // });
+    const query = `UPDATE Exercises
+SET ExercisesCategoriesId = ${categityId} ,Symbol = '${Symbol}'
+,Link = '${link}',Title = '${Title}',About = '${descrip}',
+StatusId = ${stuts} WHERE Id = ${id}`;
+    await SQL(query);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.delete("/deleFile/:name/:f", async (req, res) => {
+  // console.log("sdfsdfs");
+  try {
+    // console.log(req.params.name);
+    // console.log(req.params.f);
+    if (req.params.name !== "none") {
+      deleteFileInFolder(req.params.f, req.params.name);
+    }
+    res.json(true);
+  } catch (error) {
     res.json(false);
   }
 });
@@ -1924,6 +2191,54 @@ app.get("/GETregisterCodes", async (req, res) => {
   } catch (error) {
     res.json(false);
   }
+});
+// $ Groups Of Questions:
+app.post("/AddGroups", async (req, res) => {
+  try {
+    const { text, id } = req.body;
+    const query = `INSERT INTO Groups (QuestionsId,Name) VALUES (${id},'${text}')`;
+    await SQL(query);
+    let quertinio = `SELECT * FROM Groups`;
+    const data = await SQL(quertinio);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.delete("/DeleteGroup/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const query = `DELETE FROM Groups WHERE Id = ${id}`;
+    await SQL(query);
+    let quertinio = `SELECT * FROM Groups`;
+    const data = await SQL(quertinio);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.put("/UpdateGroup", async (req, res) => {
+  // console.log(req.body);
+  try {
+    const { text, id } = req.body;
+    const query = `UPDATE Groups
+    SET Name = '${text}'
+    WHERE Id = ${id}`;
+    await SQL(query);
+    let quertinio = `SELECT * FROM Groups`;
+    const data = await SQL(quertinio);
+    res.json(data);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.post("/AddGroupFromOption", async (req, res) => {
+  const { IdGroup, id } = req.body;
+  console.log(req.body);
+  const query = `UPDATE QuestionsOptions
+  SET GroupId = '${IdGroup}'
+  WHERE Id = ${id}`;
+  await SQL(query);
 });
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);

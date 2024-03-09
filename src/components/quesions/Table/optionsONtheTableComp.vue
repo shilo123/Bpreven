@@ -36,7 +36,7 @@
           :value="מ"
         ></el-option>
       </el-select>
-      <div class="select">
+      <div class="select" :class="{ selectBig: wachtStore }">
         <select name="S" v-model="FilterChange">
           <option label="הכל" value="הכל" selected>הכל</option>
           <option
@@ -105,18 +105,20 @@ export default {
       }, 500);
     },
     FilterChange(val) {
-      //   console.log(val);
+      // console.log(val);
 
       if (val !== "הכל") {
-        let valDesc = this.Alldata.NameQuen.find((e) => e.Id === val);
-        console.log(valDesc);
-        this.$emit("Changosy", valDesc.Desc);
+        // console.log(val);
+        let valObj = this.Alldata.NameQuen.find((e) => e.Id === val);
+        // console.log(valDesc);
+        this.$emit("Changosy", valObj.Desc);
         this.$ax.post(URL + "FIndQustinnare", { val }).then((res) => {
           // console.log(res.data);
           //   this.data = res.data;
-          this.$store.commit("Update_DATA", res.data);
-          if (this.data.length === 0) {
+          if (res.data.length === 0) {
+            this.$message("אין תוצאות");
           } else {
+            this.$store.commit("Update_DATA", res.data);
             this.$emit("YeshLanu");
           }
         });
@@ -139,6 +141,7 @@ export default {
       this.Alldata.NameQuen = this.$store.state.AllData.NameQuen;
       //   console.log(this.$store.state.AllData);
       let { data } = await this.$ax.get(URL + "GetQustionsz");
+      // console.log(data);
       this.Alldata.NameQuen = data;
       this.data = this.$store.state.data;
       this.data2 = this.$store.state.data;
@@ -251,7 +254,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .optionsONtheTable {
   background: linear-gradient(rgb(158, 170, 170), rgb(59, 62, 70));
   display: flex;
@@ -262,17 +265,17 @@ export default {
   height: 4em;
   left: 80px;
   transition: all 0.3s;
-}
-.optionsONtheTableBig {
-  background: linear-gradient(rgb(158, 170, 170), rgb(59, 62, 70));
-  display: flex;
-  flex-direction: row-reverse;
-  position: absolute;
-  width: 90%;
-  top: 40px;
-  height: 4em;
-  left: 80px;
-  transition: all 0.3s;
+  &Big {
+    background: linear-gradient(rgb(158, 170, 170), rgb(59, 62, 70));
+    display: flex;
+    flex-direction: row-reverse;
+    position: absolute;
+    width: 90%;
+    top: 40px;
+    height: 4em;
+    left: 80px;
+    transition: all 0.3s;
+  }
 }
 .ButtonHosef {
   /* display: none; */
@@ -360,5 +363,58 @@ option {
 .select:hover::after {
   /* display: none; */
   color: #f39c12;
+}
+@media screen and (max-width: 1300px) {
+  .optionsONtheTable {
+    position: absolute;
+    width: 73%;
+    top: 40px;
+    height: 4em;
+    left: 80px;
+    transition: all 0.3s;
+    .select {
+      width: 170px;
+      &Big {
+        width: 170px;
+      }
+    }
+    .Tselect {
+      /* display: none; */
+      position: relative;
+      right: 200px;
+      top: 8px;
+      transition: all 0.3s;
+      width: 100px;
+      &Big {
+        position: relative;
+        right: 240px;
+        top: 8px;
+        transition: all 0.3s;
+      }
+    }
+    &Big {
+      .select {
+        width: 170px;
+        &Big {
+          width: 170px;
+        }
+      }
+      .Tselect {
+        /* display: none; */
+        position: relative;
+        right: 200px;
+        top: 8px;
+        transition: all 0.3s;
+        width: 100px;
+        &Big {
+          width: 100px;
+          position: relative;
+          right: 240px;
+          top: 8px;
+          transition: all 0.3s;
+        }
+      }
+    }
+  }
 }
 </style>

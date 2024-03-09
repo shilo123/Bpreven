@@ -2,15 +2,19 @@ export default {
   namespaced: true,
 
   state: {
-    items: "",
+    width: "",
     data: [],
+    ActivType: {},
   },
   mutations: {
-    UpItems(state, val) {
-      state.items = val;
+    Upwidth(state, val) {
+      state.width = val;
     },
     UpData(state, val) {
       state.data = val;
+    },
+    ActivType(state, val) {
+      state.ActivType = val;
     },
   },
   // actions, getters...

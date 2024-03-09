@@ -147,7 +147,7 @@ export default {
     position: absolute;
     top: 100px;
     right: 0;
-    margin-right: 96.9px;
+    margin-right: 6.5%;
     height: 700px;
     z-index: 3;
     border: 3px solid black;

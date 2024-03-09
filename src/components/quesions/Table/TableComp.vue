@@ -69,7 +69,7 @@
                 v-if="!showSelectOfNextQuestion[`item-${scope.row.Id}`]"
                 type="warning"
                 class="ButtonAddNewNextQustion"
-                size="medium"
+                size="mini"
                 @click="
                   RafreseTable();
                   showSelectOfNextQuestion[`item-${scope.row.Id}`] = true;
@@ -147,6 +147,166 @@
                   אופציות
                 </h1>
               </div>
+              <div class="ManagerGroups" v-if="IfGroups">
+                <h4>ניהול קבוצות</h4>
+                <div
+                  class="Buttonsz"
+                  v-if="
+                    !ManagerGroup.IfUpdate &&
+                    !ManagerGroup.IfDelete &&
+                    !ManagerGroup.IfAdd
+                  "
+                >
+                  <el-button
+                    type="success"
+                    size="medium"
+                    @click="ManagerGroup.IfAdd = true"
+                    >הוסף</el-button
+                  >
+                  <el-button
+                    type="danger"
+                    size="medium"
+                    @click="ManagerGroup.IfDelete = true"
+                    >מחק קבוצה</el-button
+                  >
+                  <el-button
+                    type="primary"
+                    size="medium"
+                    @click="ManagerGroup.IfUpdate = true"
+                    >עדכן</el-button
+                  >
+                </div>
+                <div
+                  v-if="
+                    ManagerGroup.IfUpdate ||
+                    ManagerGroup.IfDelete ||
+                    ManagerGroup.IfAdd
+                  "
+                  class="AllmangGroup"
+                >
+                  <div v-if="ManagerGroup.IfUpdate" class="UpdateG">
+                    <el-button
+                      type="danger"
+                      size="small"
+                      class="Back"
+                      @click="
+                        ManagerGroup.IfUpdate = false;
+                        ManagerGroup.IfDelete = false;
+                        ManagerGroup.IfAdd = false;
+                      "
+                      >חזור</el-button
+                    >
+                    <el-select
+                      dir="rtl"
+                      v-model="ManagerGroup.UpdateId"
+                      placeholder="בחר איזו קבוצה תרצה לעדכן"
+                      size="medium"
+                      @change="FocusInputUp"
+                    >
+                      <el-option
+                        v-for="({ Name, Id, QuestionsId }, i) in ArrGroups"
+                        :key="i"
+                        :label="Name"
+                        :value="Id"
+                        v-show="QuestionsId === activQ.Id"
+                        dir="rtl"
+                      ></el-option>
+                    </el-select>
+                    <div v-show="ManagerGroup.ModelUpdate">
+                      <el-input
+                        dir="rtl"
+                        size="medium"
+                        v-model="ManagerGroup.ModelUpdate"
+                        placeholder="עדכן את שם הקבוצה"
+                        class="InputUPDate"
+                        ref="InputUPDate"
+                      ></el-input>
+                      <el-button
+                        type="primary"
+                        size="small"
+                        class="ButUp"
+                        @click="
+                          UpdateGroup(
+                            ManagerGroup.ModelUpdate,
+                            ManagerGroup.UpdateId
+                          )
+                        "
+                        >עדכן</el-button
+                      >
+                    </div>
+                  </div>
+                  <div v-if="ManagerGroup.IfDelete" class="DeleteG">
+                    <el-button
+                      type="danger"
+                      size="small"
+                      @click="
+                        ManagerGroup.IfUpdate = false;
+                        ManagerGroup.IfDelete = false;
+                        ManagerGroup.IfAdd = false;
+                      "
+                      >חזור</el-button
+                    >
+                    <el-popconfirm
+                      confirm-button-text="כן"
+                      cancel-button-text="לא, תודה"
+                      icon="el-icon-info"
+                      icon-color="red"
+                      title="בטוח שאתה רוצה למחוק?"
+                      @confirm="DeleteGroup(ManagerGroup.DeleteId)"
+                    >
+                      <el-button
+                        slot="reference"
+                        type="danger"
+                        v-show="ManagerGroup.DeleteId"
+                        size="small"
+                        >מחק</el-button
+                      >
+                    </el-popconfirm>
+                    <el-select
+                      dir="rtl"
+                      v-model="ManagerGroup.DeleteId"
+                      placeholder="בחר איזו קבוצה תרצה למחוק"
+                      size="medium"
+                    >
+                      <el-option
+                        v-for="({ Name, Id, QuestionsId }, i) in ArrGroups"
+                        :key="i"
+                        :label="Name"
+                        :value="Id"
+                        v-show="QuestionsId === activQ.Id"
+                      ></el-option>
+                    </el-select>
+                  </div>
+                  <div v-if="ManagerGroup.IfAdd" class="AddG">
+                    <div class="Butnosy">
+                      <el-button
+                        type="success"
+                        size="small"
+                        @click="AdddGroup(ManagerGroup.AddGroup, activQ.Id)"
+                        >הוסף</el-button
+                      >
+                      <el-button
+                        type="danger"
+                        size="small"
+                        @click="
+                          ManagerGroup.IfUpdate = false;
+                          ManagerGroup.IfDelete = false;
+                          ManagerGroup.IfAdd = false;
+                        "
+                        >חזור</el-button
+                      >
+                    </div>
+                    <el-input
+                      dir="rtl"
+                      v-model="ManagerGroup.AddGroup"
+                      placeholder="הוסף אחי"
+                      size="medium"
+                      ref="InputAddG"
+                      class="InputAdd"
+                    ></el-input>
+                  </div>
+                </div>
+              </div>
               <ul class="Answers">
                 <draggable
                   v-model="theOption"
@@ -215,6 +375,26 @@
                           >שמור</el-button
                         >
                       </div>
+                      <!-- {{ $ConSol(O) }} -->
+                      <el-select
+                        placeholder="בחר קבוצה"
+                        class="El_select_Groups"
+                        v-if="IfGroups"
+                        v-model="Groups[`ItemGroups-${O.Id}`]"
+                        size="medium"
+                        @change="
+                          AddGroupFromOption(Groups[`ItemGroups-${O.Id}`], O.Id)
+                        "
+                      >
+                        <el-option label="ללא" :value="0"></el-option>
+                        <el-option
+                          v-for="(Group, i) in ArrGroups"
+                          :key="i"
+                          :label="Group.Name"
+                          :value="Group.Id"
+                          v-show="Group.QuestionsId === activQ.Id"
+                        ></el-option>
+                      </el-select>
                       <el-button
                         type="danger"
                         size="mini"
@@ -281,12 +461,25 @@ export default {
   components: { draggable },
   data() {
     return {
+      wit: window.innerWidth,
       data: [],
       loadingTABLE: false,
       LoadingButton: false,
       LoadingOptionss: true,
       RafreshTable: true,
       overSpan: false,
+      IfGroups: false,
+      ManagerGroup: {
+        IfUpdate: false,
+        IfDelete: false,
+        IfAdd: false,
+        AddGroup: "",
+        ModelUpdate: "",
+        DeleteId: "",
+        UpdateId: "",
+      },
+      ArrGroups: [],
+      Groups: {},
       showHosef: {},
       OptheOption: {},
       ModelQestions: {},
@@ -322,11 +515,28 @@ export default {
       return this.$store.state.data;
     },
     DescDefaultSelect() {
-      return this.$store.state.data.find((e) => e.Id === this.DefoltSelsct)
-        .Desc;
+      return this.DefoltSelsct !== "לפי האופציה"
+        ? this.$store.state.data.find((e) => e.Id === this.DefoltSelsct).Desc
+        : this.DefoltSelsct;
     },
   },
   watch: {
+    "ManagerGroup.IfAdd"(val) {
+      if (val) {
+        try {
+          setTimeout(() => {
+            this.$refs.InputAddG.$el.children[0].focus();
+            // console.log(this.$refs.InputAddG.$el);
+          }, 200);
+        } catch (error) {
+          console.log("errrr");
+        }
+      }
+    },
+    "ManagerGroup.UpdateId"(val) {
+      let { Name } = this.ArrGroups.find((e) => e.Id === val);
+      this.ManagerGroup.ModelUpdate = Name;
+    },
     datos(val) {
       this.Ifloading(val);
     },
@@ -349,15 +559,10 @@ export default {
     DefoltSelsct(val) {
       this.AllnextQuestion = val;
     },
-    overSpan(val) {
-      // let el = this.$refs.StamSpan;
-      // [...el].forEach((e) => {
-      //   if (val) {
-      //     e.style.position = "relative";
-      //   } else {
-      //     e.style.position = "absolute";
-      //   }
-      // });
+    Groups: {
+      handler(val) {
+        // console.log({ ...val });
+      },
     },
   },
   async mounted() {
@@ -391,6 +596,10 @@ export default {
     },
     async GetOptions(row, expanded) {
       this.ModelQestions = [];
+      this.ManagerGroup.IfUpdate = false;
+      this.ManagerGroup.IfDelete = false;
+      this.ManagerGroup.IfAdd = false;
+
       await this.$nextTick();
       this.activQ = row;
       // console.log(row);
@@ -403,7 +612,11 @@ export default {
           this.ModelInputDivAnswer = "";
           this.SortTable();
           this.RafreseTable();
-          this.IdShinuy[`Item-${row.Id}`] = this.DescDefaultSelect;
+          try {
+            this.IdShinuy[`Item-${row.Id}`] = this.DescDefaultSelect;
+          } catch (error) {
+            console.log("הייתה שגיאה אחי");
+          }
           setTimeout(() => {
             this.$emit("UpdateData");
             // console.log("UP");
@@ -419,6 +632,12 @@ export default {
           data.forEach((element) => {
             this.OptheOption[`showButton-${element.Id}`] = false;
             this.OptheOption[`loading-${element.Id}`] = false;
+            // console.log(element);
+            if (element.GroupId) {
+              this.Groups[`ItemGroups-${element.Id}`] = element.GroupId;
+            } else {
+              this.Groups[`ItemGroups-${element.Id}`] = 0;
+            }
             if (element.Nextques) {
               this.ModelQestions[`op-${element.Id}`] = element.NextQuestionId;
             } else {
@@ -426,6 +645,15 @@ export default {
             }
           });
           // console.log(this.OptheOption);
+          if (row.TypeQ === 4) {
+            // console.log(row);
+            let { data } = await this.$ax.get(URL + "GetGroups/" + row.Id);
+            console.log(data);
+            this.ArrGroups = data;
+          }
+          this.IfGroups = row.TypeQ === 4;
+
+          //
           if (!this.theOption.length > 0) {
             setTimeout(() => {
               if (this.$refs.inptutDiv) {
@@ -451,18 +679,6 @@ export default {
           this.DefoltSelsct = "לפי האופציה";
         }
       }
-      const interval = setInterval(() => {
-        if (this.$refs.StamSpan) {
-          // console.log(this.$refs.StamSpan);
-          // this.$refs.StamSpan.forEach((el) => {
-          //   el.addEventListener("mousemove", (e) => {
-          //     el.style.position = "relative";
-          //     console.log(el);
-          //   });
-          // });
-          clearInterval(interval);
-        }
-      }, 500);
     },
     Delete(row) {
       // console.log(row);
@@ -556,13 +772,13 @@ export default {
     },
     async EventChangeOption(val, id) {
       await this.$nextTick();
-      console.log(val.from.children);
+      // console.log(val.from.children);
       let arr = [];
       Array.from(val.from.children).forEach((item, i) => {
         // console.log(item.id, i + 1);
         arr.push({ id: item.id, newSek: i + 1 });
       });
-      console.log(arr);
+      // console.log(arr);
       let QuestionId = id;
       const params = { arr, QuestionId };
       // console.log(params);
@@ -699,7 +915,7 @@ export default {
     RafreshColumnOfOption(id) {
       setTimeout(() => {
         this.RafreseTable();
-        console.log(id);
+        // console.log(id);
         let row = this.data.find((e) => e.Id === id);
         console.log(row);
         setTimeout(() => {
@@ -782,6 +998,67 @@ export default {
       this.data = val;
       // console.log("sd");
     },
+    //////////////////////////////
+    FocusInputUp() {
+      setTimeout(() => {
+        try {
+          // console.log(this.$refs);
+          this.$refs.InputUPDate.$el.children[0].focus();
+        } catch (error) {
+          console.log(error);
+          console.log("errr");
+        }
+      }, 100);
+    },
+    async AdddGroup(text, id) {
+      const params = { text, id };
+      let { data } = await this.$ax.post(URL + "AddGroups", params);
+      if (!data) {
+        this.$message.error("משהו השתבש");
+      } else {
+        this.ArrGroups = data;
+        this.ManagerGroup.IfAdd = false;
+      }
+    },
+    async DeleteGroup(id) {
+      // console.log(id);
+      let { data } = await this.$ax.delete(URL + "DeleteGroup/" + id);
+      if (data) {
+        this.ArrGroups = data;
+      } else {
+        this.$message.error("משהו השתבש");
+      }
+      this.ManagerGroup.DeleteId = "";
+      this.ManagerGroup.IfDelete = false;
+    },
+    async UpdateGroup(text, id) {
+      let { data } = await this.$ax.put(URL + "UpdateGroup", { text, id });
+      if (data) {
+        this.ArrGroups = data;
+      } else {
+        this.$message.error("משהו השתבש");
+      }
+      this.ManagerGroup.ModelUpdate = "";
+      this.ManagerGroup.IfUpdate = false;
+    },
+    //
+    async AddGroupFromOption(IdGroup, id) {
+      // console.log({ IdGroup, id });
+      // this.RafreshColumnOfOption
+      this.LoadingOptionss = false;
+      setTimeout(() => {
+        this.LoadingOptionss = true;
+      }, 30);
+      let { data } = await this.$ax.post(URL + "AddGroupFromOption", {
+        IdGroup,
+        id,
+      });
+      this.$Bool(data, "הקבוצה עודכנה בהצלחה", "משהו השתבש", false);
+      if (data) {
+        // this.ArrGroups = data
+      } else {
+      }
+    },
   },
 };
 </script>
@@ -817,6 +1094,70 @@ export default {
   position: relative;
   top: 11px;
 }
+.ManagerGroups {
+  position: absolute;
+  right: 0;
+  top: 20px;
+  width: 40%;
+  height: 20%;
+  text-align: right;
+  h4 {
+    border-bottom: 2px solid black;
+  }
+  .Buttonsz {
+    // margin: 7px;
+    text-align: center;
+    .el-button {
+      margin-left: 40px;
+    }
+  }
+  .AllmangGroup {
+    display: flex;
+    flex-direction: row-reverse;
+    // width: 100%;
+    // .Butnosy {
+    //   width: 100%;
+    // }
+    .AddG {
+      margin-right: 40px;
+      width: 100%;
+      .InputAdd {
+        width: 55%;
+      }
+      .Butnosy {
+        width: 40%;
+        position: absolute;
+      }
+    }
+    .DeleteG {
+      margin-right: 40px;
+      .el-button {
+        margin-right: 5px;
+      }
+    }
+    .UpdateG {
+      margin-right: 20px;
+      .el-select {
+        width: 40%;
+      }
+      .el-button.Back {
+        margin: 0 10px;
+      }
+
+      .InputUPDate {
+        position: absolute;
+        left: 25%;
+        width: 30%;
+        top: 48%;
+      }
+      .ButUp {
+        position: absolute;
+        left: 15%;
+        top: 48%;
+      }
+    }
+  }
+}
 .headerOFAnswers {
   text-align: center;
   /* margin-bottom: 20px; */
@@ -832,149 +1173,158 @@ export default {
   position: relative;
   left: 52.3%;
 }
-.Del-andComp .indeSel {
-  position: absolute;
-  left: 90px;
-  width: 190px;
-}
-.Del-andComp .indeSel .buutonOF {
-  background: rgb(73, 0, 200);
-  position: absolute;
-  left: -80px;
-  top: 5px;
-}
-.Del-andComp .indeSel .shord {
-  position: absolute;
-  left: -80px;
-  top: 5px;
-}
-.button-and-li {
-  display: flex;
-  align-items: center;
-  position: relative;
-  margin-bottom: 10px;
-  .el-button--primary.buttonUP {
-    background: rgba(4, 82, 252, 0.822);
-    position: absolute;
-    right: 30%;
-    top: 0;
-    &:hover {
-      background: rgba(4, 83, 252, 0.434);
+.Options {
+  .Del-andComp {
+    .indeSel {
+      position: absolute;
+      left: 90px;
+      width: 190px;
+      .buutonOF {
+        background: rgb(73, 0, 200);
+        position: absolute;
+        left: -80px;
+        top: 5px;
+      }
+      .shord {
+        position: absolute;
+        left: -80px;
+        top: 5px;
+      }
     }
   }
-  .el-button--danger {
-    background: rgba(252, 4, 4, 0.822);
-    position: absolute;
-    top: 0;
-    left: 30%;
-    &:hover {
-      background: rgba(252, 4, 4, 0.327);
-    }
-  }
-  span {
-    background: rgb(206, 69, 0);
-    flex-basis: 190px;
-    // max-width: 190px;
-    width: 200px;
-
-    margin-bottom: 20px;
-    height: auto;
-    color: white;
+  .button-and-li {
+    display: flex;
+    align-items: center;
     position: relative;
-    top: 0;
-    right: 41%;
-    overflow-y: auto;
-    padding: 10px;
-    border-radius: 20px;
-    transition: all 0.3s;
-    &:hover {
-      background: rgba(206, 69, 0, 0.821);
-      cursor: grab;
+    margin-bottom: 10px;
+    .el-button--primary.buttonUP {
+      background: rgba(4, 82, 252, 0.822);
+      position: absolute;
+      right: 30%;
+      top: 0;
+      &:hover {
+        background: rgba(4, 83, 252, 0.434);
+      }
+    }
+    .el-button--danger {
+      background: rgba(252, 4, 4, 0.822);
+      position: absolute;
+      top: 0;
+      left: 30%;
+      &:hover {
+        background: rgba(252, 4, 4, 0.327);
+      }
+    }
+    span {
+      background: rgb(206, 69, 0);
+      flex-basis: 190px;
+      // max-width: 190px;
+      width: 200px;
+
+      margin-bottom: 20px;
+      height: auto;
+      color: white;
+      position: relative;
+      top: 0;
+      right: 41%;
+      overflow-y: auto;
+      padding: 10px;
+      border-radius: 20px;
+      transition: all 0.3s;
+      &:hover {
+        background: rgba(206, 69, 0, 0.821);
+        cursor: grab;
+      }
+    }
+    .indeSel {
+      position: absolute;
+      top: 0;
+    }
+    .El_select_Groups {
+      position: absolute;
+      right: 70px;
+      top: 0;
     }
   }
-  .indeSel {
-    position: absolute;
-    top: 0;
+  .bigScreenOPtion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    left: 140px;
   }
-}
-.bigScreenOPtion {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  left: 140px;
-}
-.bigScreenOPtion span {
-  position: relative;
-  right: 620px;
-}
+  .bigScreenOPtion span {
+    position: relative;
+    right: 620px;
+  }
 
-.button-and-li span:active {
-  cursor: move;
-  background: rgb(255, 0, 0);
-}
-.Answers {
-  /* background: rgba(252, 255, 152, 0.619); */
-  background: linear-gradient(
-    rgb(255, 251, 184),
-    rgb(210, 206, 136),
-    rgb(226, 219, 161)
-  );
-  text-align: center;
-  direction: rtl;
-  list-style-position: inside;
-  padding: 15px;
-}
-.buttonSuccess:not(.EN .el-button--success) {
-  background: rgb(46, 156, 46);
-  width: 300px;
-  transition: all 0.3s;
-  position: relative;
-  left: 30px;
-}
-.buttonSuccess:hover:not(.EN .el-button--success) {
-  background: rgba(46, 156, 46, 0.589);
-  width: 300px;
-  font-size: 18px;
-  transition: all 0.3s;
-}
-.ButtonAndLi {
-  display: flex;
-}
-.Div-else-show {
-  text-align: center;
-}
-.Div-else-show .el-button {
-  width: 400px;
-  font-size: 20px;
-  margin: 50px;
-  height: 70px;
-}
-.Div-else-show .el-button:hover {
-  width: 430px;
-  font-size: 25px;
-  /* margin: 30px; */
+  .button-and-li span:active {
+    cursor: move;
+    background: rgb(255, 0, 0);
+  }
+  .Answers {
+    /* background: rgba(252, 255, 152, 0.619); */
+    background: linear-gradient(
+      rgb(255, 251, 184),
+      rgb(210, 206, 136),
+      rgb(226, 219, 161)
+    );
+    text-align: center;
+    direction: rtl;
+    list-style-position: inside;
+    padding: 15px;
+  }
+  .buttonSuccess:not(.EN .el-button--success) {
+    background: rgb(46, 156, 46);
+    width: 300px;
+    transition: all 0.3s;
+    position: relative;
+    left: 30px;
+  }
+  .buttonSuccess:hover:not(.EN .el-button--success) {
+    background: rgba(46, 156, 46, 0.589);
+    width: 300px;
+    font-size: 18px;
+    transition: all 0.3s;
+  }
+  .ButtonAndLi {
+    display: flex;
+  }
+  .Div-else-show {
+    text-align: center;
+  }
+  .Div-else-show .el-button {
+    width: 400px;
+    font-size: 20px;
+    margin: 50px;
+    height: 70px;
+  }
+  .Div-else-show .el-button:hover {
+    width: 430px;
+    font-size: 25px;
+    /* margin: 30px; */
 
-  height: 60px;
-  color: #000;
-}
-.EN span {
-  margin: 0;
-}
-.EN .el-button--success {
-  width: 200px;
-  font-size: 15px;
-  height: 3em;
-  position: absolute;
-  bottom: -11px;
-  left: 50px;
-  margin-left: 220px;
-}
-.EN .el-button--success:hover {
-  width: 200px;
-  font-size: 15px;
-  height: 3em;
-  color: #34495e;
+    height: 60px;
+    color: #000;
+  }
+  .EN span {
+    margin: 0;
+  }
+  .EN .el-button--success {
+    width: 200px;
+    font-size: 15px;
+    height: 3em;
+    position: absolute;
+    bottom: -11px;
+    left: 50px;
+    margin-left: 220px;
+  }
+  .EN .el-button--success:hover {
+    width: 200px;
+    font-size: 15px;
+    height: 3em;
+    color: #34495e;
+  }
 }
 .Date,
 .Text,
@@ -1051,6 +1401,166 @@ export default {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(87, 87, 87, 0.7); /* צבע המגלגל */
   border-radius: 5px; /* עיגול פינות המגלגל */
+}
+// $ TypeText :
+
+@media screen and (max-width: 1300px) {
+  .table {
+    width: 73%;
+    position: absolute;
+    top: 100px;
+    margin-left: 80px;
+    transition: all 0.3s;
+    .ButtonAddNewNextQustion {
+      width: 80px;
+    }
+    ///
+    ///
+    ///
+    ///
+    ///
+    .button-and-li {
+      display: flex;
+      align-items: center;
+      position: relative;
+      margin-bottom: 10px;
+      position: relative;
+      right: -80px;
+      .el-button--primary.buttonUP {
+        background: rgba(4, 82, 252, 0.822);
+        position: absolute;
+        right: 30%;
+        top: 5px;
+        &:hover {
+          background: rgba(4, 83, 252, 0.434);
+        }
+      }
+      .el-button--danger {
+        background: rgba(252, 4, 4, 0.822);
+        position: absolute;
+        top: 5px;
+        left: 25%;
+        &:hover {
+          background: rgba(252, 4, 4, 0.327);
+        }
+      }
+      span {
+        background: rgb(206, 69, 0);
+        flex-basis: 190px;
+        // max-width: 190px;
+        width: 200px;
+
+        margin-bottom: 20px;
+        height: auto;
+        color: white;
+        position: relative;
+        top: 0;
+        right: 41%;
+        overflow-y: auto;
+        padding: 10px;
+        border-radius: 20px;
+        transition: all 0.3s;
+        &:hover {
+          background: rgba(206, 69, 0, 0.821);
+          cursor: grab;
+        }
+      }
+      .indeSel {
+        position: absolute;
+        top: 0;
+        .el-select {
+          position: relative;
+          right: 100px;
+        }
+      }
+      .El_select_Groups {
+        position: absolute;
+        right: 70px;
+        top: 0;
+      }
+    }
+
+    ///
+    ///
+    ///
+    ///
+    ///
+  }
+  .bigTable {
+    .DefaultSelectLabelBig {
+      position: relative;
+      left: 130px;
+      top: 60px;
+    }
+    .DefaultSelectBig {
+      position: relative;
+      left: -82px;
+      top: 120px;
+    }
+    //
+    //
+    // $
+    .button-and-li {
+      display: flex;
+      align-items: center;
+      position: relative;
+      margin-bottom: 10px;
+      position: relative;
+      right: -30px;
+      .el-button--primary.buttonUP {
+        background: rgba(4, 82, 252, 0.822);
+        position: absolute;
+        right: 30%;
+        top: 0;
+        &:hover {
+          background: rgba(4, 83, 252, 0.434);
+        }
+      }
+      .el-button--danger {
+        background: rgba(252, 4, 4, 0.822);
+        position: absolute;
+        top: 0;
+        left: 30%;
+        &:hover {
+          background: rgba(252, 4, 4, 0.327);
+        }
+      }
+      span {
+        background: rgb(206, 69, 0);
+        flex-basis: 190px;
+        // max-width: 190px;
+        width: 200px;
+
+        margin-bottom: 20px;
+        height: auto;
+        color: white;
+        position: relative;
+        top: 0;
+        right: 41%;
+        overflow-y: auto;
+        padding: 10px;
+        border-radius: 20px;
+        transition: all 0.3s;
+        &:hover {
+          background: rgba(206, 69, 0, 0.821);
+          cursor: grab;
+        }
+      }
+      .indeSel {
+        position: absolute;
+        top: 0;
+      }
+      .El_select_Groups {
+        position: absolute;
+        right: 70px;
+        top: 0;
+      }
+    }
+
+    // $
+    //
+    //
+  }
 }
 </style>
 <style></style>

@@ -217,4 +217,20 @@ export default {
     transition: all 0.3s;
   }
 }
+@media screen and (min-width: 1200px) {
+  .selectA {
+    position: relative;
+    right: 300px;
+    top: 8px;
+    width: 100px;
+    &Big {
+      z-index: 501;
+      position: relative;
+      // right: 340px;
+      right: 25%;
+      top: 8px;
+      width: 100px;
+    }
+  }
+}
 </style>
