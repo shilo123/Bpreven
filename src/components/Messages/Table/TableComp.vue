@@ -32,6 +32,7 @@
       </el-table-column>
       <el-table-column label="סימן" prop="Symbol"></el-table-column>
       <el-table-column label="שם" prop="Desc"></el-table-column>
+      <el-table-column label="תוכן" prop="Content"></el-table-column>
     </el-table>
   </div>
 </template>

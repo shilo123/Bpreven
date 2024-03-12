@@ -1,5 +1,13 @@
 <template>
-  <div>
+  <div :class="{ Loading: !loDading, No: loDading }">
+    <i
+      class="fa-solid fa-loader fa-spin fa-2xl Icnon"
+      style="color: #6670ff"
+    ></i>
+    <!-- <div>
+      <br /><br /><br />
+      {{ shomes }}
+    </div> -->
     <div class="divos" v-if="showDivos">
       <transition appear name="expand">
         <div class="indivos">
@@ -27,145 +35,157 @@
         afterClear ? FuncafterClear() : '';
         shomesALL = true;
       "
+      v-if="loDading"
     />
-    <div class="TypeQusinnaire" v-show="activQushinnare && wachtStore">
-      סוג השאלון:
-      {{ typeQueshinarire ? typeQueshinarire.Name : "טוען" }}
-    </div>
-    <div v-if="typeQueshinarire.Id === 3">
-      <el-button type="success" class="ButtonSuccess" @click="HOsefInyanimOreh"
-        >הוסף עיניינים</el-button
-      >
-    </div>
-    <div v-if="typeQueshinarire.Id === 2" class="Harshama">
-      <Hashamos @AddScoreActionFORHarshama="AddScoreActionFORHarshama" />
-    </div>
-    <div v-if="shomesALL && typeQueshinarire.Id === 1">
-      <h1
-        class="LoMatzanu"
-        v-show="
-          activQushinnare
-            ? !ObjDataQuestions[activQushinnare].length > 0
-            : !null && activQushinnare !== ''
-        "
-      >
-        "לא נמצאו שאלות ל "{{ activQushinnare }}
-      </h1>
-      <div v-if="shomes" ref="TheAlElements" class="Allel">
-        <!-- style="position: Sticky; top: -130px; z-index: 3" -->
-        <el-row dir="rtl" :gutter="20">
-          <el-col
-            :span="span"
-            v-for="(q, i) in ObjDataQuestions[activQushinnare]"
-            :key="i"
-            class="content"
-            ref="contentCOL"
-            :style="{ width }"
-          >
-            <!-- v-show="q.DescDateTypes === 'OptionId'" -->
-            <div class="HeaderQuestions" ref="HeaderQuestions">
-              {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
-            </div>
-            <div ref="ItemsNoheader">
-              <div
-                v-for="(s, i) in ComputedOptions({ arrOptions, Desco: q.Desc })"
-                :key="i"
-                class="Item-content"
-                ref="ItemContent"
-              >
-                <!-- :style="
-                  ComputedStyle(
-                    width,
-                    ObjDataQuestions[activQushinnare].length === 1
-                  )
-                " -->
-                <!-- :style="{ width }" -->
-                <span> {{ s.Desc }} </span>
-              </div>
-            </div>
-          </el-col>
-        </el-row>
+    <div v-if="shomes">
+      <div class="TypeQusinnaire" v-show="activQushinnare && wachtStore">
+        סוג השאלון:
+        {{ typeQueshinarire ? typeQueshinarire.Name : "טוען" }}
       </div>
-      <Cardos
-        ref="Cardos"
-        :activQushinnare="activQushinnare"
-        :width="width"
-        v-show="
-          activQushinnare
-            ? ObjDataQuestions[activQushinnare].length > 0
-            : null && activQushinnare !== ''
-        "
-        v-if="IfComponents && activQushinnare"
-        @showPopUp="
-          showDivos = true;
-          Params = $event;
-        "
-        @newParams="NameOfScore = $event"
-      />
-    </div>
-    <div v-else-if="shomesALL && typeQueshinarire.Id === 4">
-      <h1
-        class="LoMatzanu"
-        v-show="
-          activQushinnare
-            ? !ObjDataQuestions[activQushinnare].length > 0
-            : !null && activQushinnare !== ''
-        "
-      >
-        "לא נמצאו שאלות ל "{{ activQushinnare }}
-      </h1>
-      <div v-if="shomes" ref="TheAlElements" class="Allel">
-        <!-- style="position: Sticky; top: -130px; z-index: 3" -->
-        <el-row dir="rtl" :gutter="20">
-          <el-col
-            :span="0.5"
-            v-for="(q, i) in ObjDataQuestions[activQushinnare]"
-            :key="i"
-            class="content"
-            ref="contentCOL"
-            :style="{ width }"
-          >
-            <!-- // v-show="q.DescDateTypes === 'OptionId'" -->
-            <div class="HeaderQuestions" ref="HeaderQuestions">
-              {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
-            </div>
-            <div ref="ItemsNoheader">
-              <div
-                v-for="(s, i) in ComputedOptions({ arrOptions, Desco: q.Desc })"
-                :key="i"
-                class="Item-content"
-                ref="ItemContent"
-              >
-                <!-- :style="
-                  ComputedStyle(
-                    width,
-                    ObjDataQuestions[activQushinnare].length === 1
-                  )
-                " -->
-                <!-- :style="{ width }" -->
-                <span> {{ s.Desc }} </span>
-              </div>
-            </div>
-          </el-col>
-        </el-row>
+      <div v-if="typeQueshinarire.Id === 3">
+        <el-button
+          type="success"
+          class="ButtonSuccess"
+          @click="HOsefInyanimOreh"
+          >הוסף עיניינים</el-button
+        >
       </div>
-      <Cardos
-        ref="Cardos"
-        :activQushinnare="activQushinnare"
-        :width="width"
-        v-show="
-          activQushinnare
-            ? ObjDataQuestions[activQushinnare].length > 0
-            : null && activQushinnare !== ''
-        "
-        v-if="IfComponents && activQushinnare"
-        @showPopUp="
-          showDivos = true;
-          Params = $event;
-        "
-        @newParams="NameOfScore = $event"
-        @ShowPopapMetaplim="PopapMetaplim"
-      />
+      <div v-if="typeQueshinarire.Id === 2" class="Harshama">
+        <Hashamos @AddScoreActionFORHarshama="AddScoreActionFORHarshama" />
+      </div>
+      <div v-if="shomesALL && typeQueshinarire.Id === 1">
+        <h1
+          class="LoMatzanu"
+          v-show="
+            activQushinnare
+              ? !ObjDataQuestions[activQushinnare].length > 0
+              : !null && activQushinnare !== ''
+          "
+        >
+          "לא נמצאו שאלות ל "{{ activQushinnare }}
+        </h1>
+        <div v-if="shomes" ref="TheAlElements" class="Allel">
+          <!-- style="position: Sticky; top: -130px; z-index: 3" -->
+          <el-row dir="rtl" :gutter="20">
+            <el-col
+              :span="span"
+              v-for="(q, i) in ObjDataQuestions[activQushinnare]"
+              :key="i"
+              class="content"
+              ref="contentCOL"
+              :style="{ width }"
+            >
+              <!-- v-show="q.DescDateTypes === 'OptionId'" -->
+              <div class="HeaderQuestions" ref="HeaderQuestions">
+                {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
+              </div>
+              <div ref="ItemsNoheader">
+                <div
+                  v-for="(s, i) in ComputedOptions({
+                    arrOptions,
+                    Desco: q.Desc,
+                  })"
+                  :key="i"
+                  class="Item-content"
+                  ref="ItemContent"
+                >
+                  <!-- :style="
+                    ComputedStyle(
+                      width,
+                      ObjDataQuestions[activQushinnare].length === 1
+                    )
+                  " -->
+                  <!-- :style="{ width }" -->
+                  <span> {{ s.Desc }} </span>
+                </div>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+        <Cardos
+          ref="Cardos"
+          :activQushinnare="activQushinnare"
+          :width="width"
+          v-show="
+            activQushinnare
+              ? ObjDataQuestions[activQushinnare].length > 0
+              : null && activQushinnare !== ''
+          "
+          v-if="IfComponents && activQushinnare"
+          @showPopUp="
+            showDivos = true;
+            Params = $event;
+          "
+          @newParams="NameOfScore = $event"
+        />
+      </div>
+      <div v-else-if="shomesALL && typeQueshinarire.Id === 4">
+        <h1
+          class="LoMatzanu"
+          v-show="
+            activQushinnare
+              ? !ObjDataQuestions[activQushinnare].length > 0
+              : !null && activQushinnare !== ''
+          "
+        >
+          "לא נמצאו שאלות ל "{{ activQushinnare }}
+        </h1>
+        <div v-if="shomes" ref="TheAlElements" class="Allel">
+          <!-- style="position: Sticky; top: -130px; z-index: 3" -->
+          <el-row dir="rtl" :gutter="20">
+            <el-col
+              :span="0.5"
+              v-for="(q, i) in ObjDataQuestions[activQushinnare]"
+              :key="i"
+              class="content"
+              ref="contentCOL"
+              :style="{ width }"
+            >
+              <!-- // v-show="q.DescDateTypes === 'OptionId'" -->
+              <div class="HeaderQuestions" ref="HeaderQuestions">
+                {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
+              </div>
+              <div ref="ItemsNoheader">
+                <div
+                  v-for="(s, i) in ComputedOptions({
+                    arrOptions,
+                    Desco: q.Desc,
+                  })"
+                  :key="i"
+                  class="Item-content"
+                  ref="ItemContent"
+                >
+                  <!-- :style="
+                    ComputedStyle(
+                      width,
+                      ObjDataQuestions[activQushinnare].length === 1
+                    )
+                  " -->
+                  <!-- :style="{ width }" -->
+                  <span> {{ s.Desc }} </span>
+                </div>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+        <Cardos
+          ref="Cardos"
+          :activQushinnare="activQushinnare"
+          :width="width"
+          v-show="
+            activQushinnare
+              ? ObjDataQuestions[activQushinnare].length > 0
+              : null && activQushinnare !== ''
+          "
+          v-if="IfComponents && activQushinnare"
+          @showPopUp="
+            showDivos = true;
+            Params = $event;
+          "
+          @newParams="NameOfScore = $event"
+          @ShowPopapMetaplim="PopapMetaplim"
+        />
+      </div>
     </div>
     <PopapMetape
       v-if="ShowPopapMetaplim"
@@ -211,6 +231,7 @@ export default {
       arrIDSTerapist: "",
       Screen: window.innerWidth - 240,
       span: 0,
+      loDading: true,
     };
   },
   computed: {
@@ -249,6 +270,9 @@ export default {
         this.$store.commit("Score/ActivType", val);
       },
     },
+    shomes(val) {
+      this.loDading = val;
+    },
   },
   async mounted() {
     let { data } = await this.$ax.get(URL + "GetallQuestions");
@@ -283,23 +307,28 @@ export default {
       }
     },
     async sortTabs() {
-      await this.$nextTick();
+      // await this.$nextTick();
       // setTimeout(async () => {
       let widtho;
       let LengthItems;
       const Intervalos = setInterval(() => {
+        // console.log("מנסה");
         if (this.$refs.contentCOL) {
           // setTimeout(async () => {
           // await this.$nextTick();
 
           LengthItems = this.returnLength;
 
-          widtho = this.Screen / LengthItems + "px";
+          // widtho = this.Screen / LengthItems + "px";
+          widtho = 90 / LengthItems + "%";
 
           this.span = LengthItems / 24;
           this.width = widtho;
-          this.$store.commit("Score/Upwidth", widtho);
+          let widthSham = this.Screen / LengthItems + "px";
+          this.$store.commit("Score/Upwidth", widthSham);
           this.IfComponents = true;
+
+          // console.log("הצלחתי");
           // }, 200);
           clearInterval(Intervalos);
         }
@@ -428,7 +457,10 @@ export default {
           };
           this.$store.commit("Score/UpData", Params);
           this.shomes = true;
+        } else {
+          this.shomes = true;
         }
+        //if (res.data.type.Id === 3)
       } catch (error) {
         this.$message.error("משהו השתבשש");
       }
@@ -655,5 +687,17 @@ export default {
 ::-webkit-scrollbar-thumb:hover {
   background: #575757b3; /* צבע המגלגל */
   border-radius: 5px; /* עיגול פינות המגלגל */
+}
+.Loading {
+  background: #1d19198b;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 800;
+  .Icnon {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+  }
 }
 </style>

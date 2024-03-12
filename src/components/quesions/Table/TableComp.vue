@@ -11,6 +11,7 @@
       v-loading="loadingTABLE || !showTable"
       @expand-change="GetOptions"
       @row-dblclick="Edit"
+      @scroll="EventSocorol"
     >
       <!-- v-show="showTable" -->
       <el-table-column label="אופציות" ref="Clumn" width="180">
@@ -159,19 +160,19 @@
                 >
                   <el-button
                     type="success"
-                    size="medium"
+                    :size="wit < 1300 ? 'medium' : 'mini'"
                     @click="ManagerGroup.IfAdd = true"
                     >הוסף</el-button
                   >
                   <el-button
                     type="danger"
-                    size="medium"
+                    :size="wit < 1300 ? 'medium' : 'mini'"
                     @click="ManagerGroup.IfDelete = true"
                     >מחק קבוצה</el-button
                   >
                   <el-button
                     type="primary"
-                    size="medium"
+                    :size="wit < 1300 ? 'medium' : 'mini'"
                     @click="ManagerGroup.IfUpdate = true"
                     >עדכן</el-button
                   >
@@ -395,6 +396,10 @@
                           v-show="Group.QuestionsId === activQ.Id"
                         ></el-option>
                       </el-select>
+                      <!-- <div class="Line">
+                        <div v-if="IfGroups">|</div>
+                        <div v-if="IfGroups">|</div>
+                      </div> -->
                       <el-button
                         type="danger"
                         size="mini"
@@ -478,6 +483,7 @@ export default {
         DeleteId: "",
         UpdateId: "",
       },
+      activscroll: "",
       ArrGroups: [],
       Groups: {},
       showHosef: {},
@@ -492,6 +498,7 @@ export default {
       ModelInputDivAnswer: "",
       IdniFtah: "",
       DefoltSelsct: "לפי האופציה",
+      TargetScroll: "",
       Alldata: {
         Allquestions: [],
         questionsOnly: [],
@@ -564,6 +571,12 @@ export default {
         // console.log({ ...val });
       },
     },
+    activscroll(val) {
+      // console.log(val);
+    },
+    TargetScroll(val) {
+      // console.log(val);
+    },
   },
   async mounted() {
     try {
@@ -602,7 +615,7 @@ export default {
 
       await this.$nextTick();
       this.activQ = row;
-      // console.log(row);
+
       if (row.DescDataType === "OptionId") {
         this.IdniFtah = row.Id;
         this.$emit("IdniFtah", row.Id);
@@ -622,6 +635,14 @@ export default {
             // console.log("UP");
           }, 2000);
         } else if (expanded.length !== 0) {
+          let table = this.$refs.Table.$el.children[2];
+          const interv = setInterval(() => {
+            if (Boolean(table.scrollTop)) {
+              table.scrollTop += 200;
+              clearInterval(interv);
+            }
+          }, 100);
+
           this.loadingTABLE = true;
           this.LoadingOptionss = false;
           let { data } = await this.$ax.get(URL + "GetOption/" + row.Id);
@@ -890,13 +911,14 @@ export default {
             table.children[1].children[0].children[1] &&
             table.children[1].children[0].children[1].children[0]
           ) {
+            table.children[2].addEventListener("scroll", this.EventSocorol);
+
             let TableHeader =
               table.children[1].children[0].children[1].children[0].children;
             Array.from(TableHeader).forEach((element) => {
               element.style.textAlign = "center";
             });
             let tds = table.children[2].children[0].children[1].children;
-            //   console.log(tds);
             Array.from(tds).forEach((element, i) => {
               let elco;
               elco = element.children[8].children[0].children[0].children[0];
@@ -917,9 +939,19 @@ export default {
         this.RafreseTable();
         // console.log(id);
         let row = this.data.find((e) => e.Id === id);
-        console.log(row);
+        // console.log(row);
         setTimeout(() => {
           this.$refs.Table.toggleRowExpansion(row);
+          setTimeout(() => {
+            let table = this.$refs.Table.$el;
+            let tableel = table.children[2];
+            // console.log("this.activscroll", this.activscroll);
+            tableel.scrollTop = this.activscroll;
+          }, 1000); // console.log(
+          //   "🚀 ~ setTimeout ~ this.TargetScroll.scrollTop :",
+          //   this.TargetScroll.scrollTop,
+          //   this.activscroll
+          // );
         }, 100);
       }, 0);
     },
@@ -982,7 +1014,12 @@ export default {
         try {
           await this.$ax.post(URL + "AddAnswer", { text, id });
           this.$message.success("התשובה נוספה");
-          this.theOption.push({ Desc: text });
+          // this.theOption.push({ Desc: text });
+          await this.$store.dispatch("UpdateOption", id);
+          // this.$store.commit("SgorDivos", true);
+          this.ModelInputDivAnswer = "";
+          this.$emit("RafreshTable", id);
+
           // this.shows.showDivos = false;
           // this.RafreseTable();
         } catch (error) {
@@ -1058,6 +1095,11 @@ export default {
         // this.ArrGroups = data
       } else {
       }
+    },
+    //
+    EventSocorol(event) {
+      this.activscroll = event.target.scrollTop;
+      this.TargetScroll = event.target;
     },
   },
 };
@@ -1245,6 +1287,13 @@ export default {
       right: 70px;
       top: 0;
     }
+    .Line {
+      position: absolute;
+      top: 0;
+      right: 25%;
+      display: flex;
+      flex-direction: column;
+    }
   }
   .bigScreenOPtion {
     display: flex;
@@ -1315,8 +1364,10 @@ export default {
     font-size: 15px;
     height: 3em;
     position: absolute;
-    bottom: -11px;
-    left: 50px;
+    // bottom: -11px;
+    top: -120%;
+    // left: 50px;
+    left: 6%;
     margin-left: 220px;
   }
   .EN .el-button--success:hover {
@@ -1326,6 +1377,7 @@ export default {
     color: #34495e;
   }
 }
+//
 .Date,
 .Text,
 .Numeric {
@@ -1477,6 +1529,7 @@ export default {
         position: absolute;
         right: 70px;
         top: 0;
+        width: 140px;
       }
     }
 
@@ -1560,6 +1613,43 @@ export default {
     // $
     //
     //
+  }
+  //
+  //
+  .EN {
+    .el-button--success {
+      width: 200px;
+      font-size: 15px;
+      height: 3em;
+      position: absolute;
+      // bottom: -11px;
+      top: -100% !important;
+      // left: 50px;
+      left: -20% !important;
+      margin: 0;
+      // margin-left: 100px;
+    }
+    .el-button--success:hover {
+      width: 200px;
+      font-size: 15px;
+      height: 3em;
+      color: #34495e;
+    }
+  }
+
+  //
+  .ManagerGroups {
+    width: 40%;
+    .Buttonsz {
+      display: flex;
+      position: relative;
+      left: 30px;
+      .el-button {
+        width: 100px;
+        margin: 5px;
+        // height: 1em;
+      }
+    }
   }
 }
 </style>

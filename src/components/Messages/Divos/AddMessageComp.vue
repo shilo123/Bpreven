@@ -9,6 +9,15 @@
           placeholder="שם ההודעה"
           class="w3-input"
           v-model="NewMes.DescMes"
+        />
+      </div>
+      <div class="InputContent">
+        <!-- <label>שם ההודעה</label> -->
+        <input
+          dir="rtl"
+          placeholder="תוכן ההודעה"
+          class="w3-input"
+          v-model="NewMes.Content"
           v-show="!showTextArea"
           @focus="
             showTextArea = true;
@@ -23,7 +32,7 @@
           type="textarea"
           :autosize="{ minRows: 2, maxRows: 4 }"
           placeholder="שם ההודעה"
-          v-model="NewMes.DescMes"
+          v-model="NewMes.Content"
         >
         </el-input>
       </div>
@@ -99,7 +108,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .inAddmes {
   border: 3px solid black;
   width: 80%;
@@ -122,12 +131,26 @@ label {
   position: absolute;
   top: 0px;
   right: 0;
+  .w3-input {
+    background: rgba(126, 114, 114, 0.26);
+    border-radius: 10px 10px 0 0;
+    position: relative;
+    top: 5px;
+  }
 }
-.InputName .w3-input {
-  background: rgba(126, 114, 114, 0.26);
-  border-radius: 10px 10px 0 0;
-  position: relative;
-  top: 5px;
+.InputContent {
+  width: 40%;
+  /* float: right; */
+  margin: 30px;
+  position: absolute;
+  top: 100px;
+  right: 26%;
+  .w3-input {
+    background: rgba(126, 114, 114, 0.26);
+    border-radius: 10px 10px 0 0;
+    position: relative;
+    top: 5px;
+  }
 }
 .inputSymbol {
   width: 40%;
@@ -143,27 +166,27 @@ label {
   top: 5px;
 }
 .Swichoz {
-  position: relative;
-  top: 150px;
+  position: absolute;
+  // top: 150px;
+  bottom: 0;
+  left: 36%;
+  // right: 0%;
   width: 170px;
   height: 60px;
   padding: 10px;
   background: rgb(127, 116, 116);
   border-radius: 20px;
-  left: 36%;
-}
-.Swichoz .el-switch {
-  position: absolute;
-  left: 14px;
-  top: 20px;
-  /* bottom: 20px; */
-  /* left: 38%; */
-}
-.Swichoz label {
-  display: none;
-  position: absolute;
-  top: 20px;
-  left: 38%;
+  .el-switch {
+    position: absolute;
+    left: 14px;
+    top: 20px;
+  }
+  label {
+    display: none;
+    position: absolute;
+    top: 20px;
+    left: 38%;
+  }
 }
 .Buttons {
   position: absolute;

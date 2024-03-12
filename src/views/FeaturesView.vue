@@ -21,9 +21,6 @@
       "
     />
     <div>
-      <!-- <el-table :data="data">
-        <el-table-column label=""></el-table-column>
-      </el-table> -->
       <Tablos
         v-show="!showLoMatzanu"
         :dat="data"
@@ -38,7 +35,6 @@
           showDivos = true;
         "
       />
-      <!-- v-if="ComplitedData" -->
     </div>
 
     <div class="divos" v-if="showDivos">
@@ -133,7 +129,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .TableComponent {
   width: 78%;
   position: absolute;
@@ -189,6 +185,54 @@ export default {
   }
   to {
     border-radius: 20px;
+  }
+}
+@media screen and (max-width: 1300px) {
+  .TableComponent {
+    width: 74%;
+    position: absolute;
+    top: 120px;
+    margin-left: 80px;
+    transition: all 0.3s;
+    &Bigscreen {
+      width: 88%;
+      position: absolute;
+      top: 120px;
+      margin-left: 80px;
+      transition: all 0.3s;
+    }
+  }
+  .OpTable {
+    position: absolute;
+    top: 45px;
+    width: 74%;
+    margin-left: 80px;
+    transition: all 0.3s;
+    &Bigscreen {
+      position: absolute;
+      top: 45px;
+      width: 88%;
+      margin-left: 80px;
+      transition: all 0.3s;
+    }
+  }
+  .AddFeacher {
+    background: rgba(255, 255, 255, 0.253);
+    border-radius: 20px;
+    left: 20%;
+    top: 10%;
+  }
+  .DeleteFeach {
+    background: rgba(255, 0, 0, 0.352);
+    height: 260px;
+    width: 420px;
+    left: 31%;
+  }
+  .UpF {
+    background: rgb(162, 100, 184);
+    border-radius: 20px;
+    left: 20%;
+    top: 10%;
   }
 }
 </style>

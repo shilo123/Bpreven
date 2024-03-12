@@ -78,7 +78,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
   background: linear-gradient(
     rgb(255, 255, 255),
@@ -116,6 +116,7 @@ input:focus {
 }
 .el-select {
   margin-right: 20px;
+  // margin-right: 0%;
 }
 .AddCategory:hover {
   padding: 15px;
@@ -133,5 +134,12 @@ input:focus {
   font-size: 20px;
   position: relative;
   bottom: 8px;
+}
+@media screen and (max-width: 1300px) {
+  .el-select {
+    position: absolute;
+    right: 110%;
+    width: 100px;
+  }
 }
 </style>

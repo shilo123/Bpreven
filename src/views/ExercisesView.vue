@@ -168,7 +168,8 @@ export default {
   background: white;
   width: 1100px;
   height: 570px;
-  left: 200px;
+  // left: 200px;
+  left: 20%;
   top: 80px;
   border-radius: 20px;
 }
@@ -187,8 +188,77 @@ export default {
   background: white;
   width: 1100px;
   height: 570px;
-  left: 200px;
+  // left: 200px;
+  left: 20%;
+
   top: 80px;
   border-radius: 20px;
+}
+@media screen and (max-width: 1300px) {
+  .TableComponent {
+    width: 75%;
+    position: absolute;
+    top: 120px;
+    margin-left: 80px;
+    transition: all 0.3s;
+    &Big {
+      width: 88%;
+      position: absolute;
+      top: 120px;
+      margin-left: 80px;
+      transition: all 0.3s;
+    }
+  }
+  .OpTable {
+    position: absolute;
+    top: 45px;
+    width: 75%;
+    margin-left: 80px;
+    transition: all 0.3s;
+    &Big {
+      position: absolute;
+      top: 45px;
+      width: 88%;
+      margin-left: 80px;
+      transition: all 0.3s;
+    }
+  }
+  .LoMatz {
+    position: absolute;
+    left: 30%;
+    top: 40%;
+  }
+  //
+  .AddEx {
+    background: white;
+    width: 1100px;
+    height: 510px;
+    left: 5%;
+    top: 0;
+    border-radius: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .DeleteEx {
+    background: rgb(255, 126, 126);
+    border-radius: 20px;
+    width: 480px;
+    height: 290px;
+  }
+  .addCategory {
+    background: white;
+    width: 480px;
+    top: 40px;
+    overflow-y: auto;
+  }
+  .EditEx {
+    background: white;
+    width: 1100px;
+    height: 570px;
+    top: 0;
+    left: 5%;
+
+    border-radius: 20px;
+  }
 }
 </style>

@@ -57,6 +57,7 @@
       @paramsOfDeleteOp="paramsOfDeleteOp"
       @IdniFtah="IdniFtah = $event"
       @UpdateData="UpdateData"
+      @RafreshTable="RafreshTable"
     />
     <h1 class="loMatzanu" v-show="data.length === 0">
       {{

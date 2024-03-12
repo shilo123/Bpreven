@@ -154,7 +154,7 @@ export default {
     },
   },
   async mounted() {
-    this.$message(`${window.innerWidth}`);
+    // this.$message(`${window.innerWidth}`);
     document.title = "Bpreven";
     if (this.$route.path === "/") {
       document.body.style.background = "";

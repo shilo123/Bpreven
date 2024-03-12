@@ -67,24 +67,25 @@ export default {
 
   methods: {
     SortTable() {
-      let table = this.$refs.Table.$el;
-      //   console.log(table);
-      let TableHeader =
-        table.children[1].children[0].children[1].children[0].children;
-      //   console.log(TableHeader);
-      Array.from(TableHeader).forEach((element) => {
-        element.style.textAlign = "center";
-      });
-      let tds = table.children[2].children[0].children[1].children;
-      Array.from(tds).forEach((element) => {
-        Array.from(element.children).forEach((el, i) => {
-          if (i !== 0) {
-            el.style.textAlign = "right";
-          } else {
-            el.style.textAlign = "center";
-          }
+      if (this.$refs.Table) {
+        let table = this.$refs.Table.$el;
+        let TableHeader =
+          table.children[1].children[0].children[1].children[0].children;
+        //   console.log(TableHeader);
+        Array.from(TableHeader).forEach((element) => {
+          element.style.textAlign = "center";
         });
-      });
+        let tds = table.children[2].children[0].children[1].children;
+        Array.from(tds).forEach((element) => {
+          Array.from(element.children).forEach((el, i) => {
+            if (i !== 0) {
+              el.style.textAlign = "right";
+            } else {
+              el.style.textAlign = "center";
+            }
+          });
+        });
+      }
     },
     LoadingTable(val) {
       this.LoadingTABLE = val;

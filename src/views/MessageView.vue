@@ -182,4 +182,46 @@ export default {
   top: 40%;
   font-size: 30px;
 }
+@media screen and (max-width: 1300px) {
+  .Tablos {
+    width: 73%;
+    position: absolute;
+    top: 140px;
+    margin-left: 80px;
+    transition: all 0.3s;
+    &Big {
+      width: 88%;
+    }
+  }
+  .OpTable {
+    position: absolute;
+    top: 45px;
+    width: 73%;
+    margin-left: 80px;
+    transition: all 0.3s;
+    &Big {
+      width: 88%;
+    }
+  }
+  //
+  .Upo {
+    background: white;
+    border-radius: 10px;
+    left: 17%;
+    top: 40px;
+  }
+  .DeleteMes {
+    background: rgba(255, 26, 26, 0.611);
+    height: 260px;
+    width: 420px;
+    left: 31%;
+  }
+  .AddMessage {
+    // background: linear-gradient(to right, #55ddff, #544bff, #59fcd6);
+    background: #afbfff76;
+    border-radius: 10px;
+    left: 17%;
+    top: 40px;
+  }
+}
 </style>

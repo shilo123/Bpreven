@@ -11,6 +11,28 @@
         />
       </div>
 
+      <div class="ItemUpContent">
+        <input
+          dir="rtl"
+          type="text"
+          class="w3-input"
+          placeholder="הקלד תוכן חדש"
+          v-model="Content"
+          v-show="!showTextarea"
+          @focus="showTextarea = true"
+        />
+        <el-input
+          autofocus
+          dir="rtl"
+          @blur="showTextarea = false"
+          type="textarea"
+          :autosize="{ minRows: 4, maxRows: 6 }"
+          placeholder="הקלד שם חדש"
+          v-model="Content"
+          v-show="showTextarea"
+        >
+        </el-input>
+      </div>
       <div class="ItemUpName">
         <input
           dir="rtl"
@@ -18,19 +40,7 @@
           class="w3-input"
           placeholder="הקלד שם חדש"
           v-model="Desc"
-          v-show="!showTextarea"
-          @focus="showTextarea = true"
         />
-        <el-input
-          dir="rtl"
-          @blur="showTextarea = false"
-          type="textarea"
-          :autosize="{ minRows: 2, maxRows: 4 }"
-          placeholder="הקלד שם חדש"
-          v-model="Desc"
-          v-show="showTextarea"
-        >
-        </el-input>
       </div>
       <div class="swichtoz">
         <el-switch
@@ -45,7 +55,7 @@
       <el-button
         type="success"
         class="shmorTO"
-        @click="SaveTheUpdate({ Desc, Symbol, StatusId, ID })"
+        @click="SaveTheUpdate({ Desc, Content, Symbol, StatusId, ID })"
         >שמור</el-button
       >
       <el-button
@@ -69,6 +79,7 @@ export default {
       Desc: this.row.Desc,
       Symbol: this.row.Symbol,
       StatusId: Boolean(this.row.StatusId),
+      Content: this.row.Content,
       ID: this.row.Id,
       showTextarea: false,
     };
@@ -122,10 +133,15 @@ export default {
   width: 40%;
   margin: 30px;
 }
+.ItemUpContent {
+  position: absolute;
+  left: 36%;
+  top: 40%;
+}
 .swichtoz {
   position: absolute;
   left: 40%;
-  top: 63%;
+  top: 80%;
 }
 .Buttons {
   position: absolute;

@@ -1731,15 +1731,16 @@ app.get("/GetMessages", async (req, res) => {
   res.json(data);
 });
 app.post("/UpdateMessage", async (req, res) => {
-  // console.log(req.body);
+  console.log(req.body);
   try {
     const Desc = req.body.Desc.replace(/'/g, "''");
     const Symbol = req.body.Symbol.replace(/'/g, "''");
+    const Content = req.body.Content.replace(/'/g, "''");
     const StatusId = req.body.StatusId ? 1 : 0;
     const id = req.body.ID;
     // console.log({ Desc, Symbol, StatusId });
     const Query = `UPDATE Messages
-    SET [Desc] = '${Desc}',Symbol = '${Symbol}',StatusId = ${StatusId}
+    SET [Desc] = '${Desc}',Symbol = '${Symbol}',StatusId = ${StatusId},Content = '${Content}'
     WHERE Id = ${id}`;
     await SQL(Query);
     res.json(true);
@@ -1762,8 +1763,9 @@ app.post("/AddMes", async (req, res) => {
   let status = req.body.status ? 1 : 0;
   let DescMes = req.body.DescMes.replace(/'/g, "''");
   let SymbolMes = req.body.SymbolMes.replace(/'/g, "''");
+  let Content = req.body.Content.replace(/'/g, "''");
   try {
-    const query = `INSERT INTO Messages ([Desc],Symbol,StatusId) VALUES ('${DescMes}','${SymbolMes}',${status})`;
+    const query = `INSERT INTO Messages ([Desc],Symbol,StatusId,Content) VALUES ('${DescMes}','${SymbolMes}',${status},'${Content}')`;
     await SQL(query);
     res.json(true);
   } catch (error) {
@@ -1793,6 +1795,7 @@ app.post("/serchMes", async (req, res) => {
   // console.log(data);
   res.json(data);
 });
+// $ Feachers :
 app.get("/GetFeatures", async (req, res) => {
   try {
     const q = `SELECT * FROM Features`;
@@ -1860,7 +1863,7 @@ app.post("/UpFeacher", async (req, res) => {
     res.json(false);
   }
 });
-//
+// $ Exercises:
 app.get("/GetExercises", async (req, res) => {
   try {
     const q = `SELECT Exercises.* ,ExercisesCategories.[Name] AS NameCategory FROM 
@@ -1940,41 +1943,6 @@ app.delete("/delEx/:id/:nameFile/:floader", async (req, res) => {
     res.json(false);
   }
 });
-app.post("/AddCategory", async (req, res) => {
-  try {
-    let val = req.body.val.replace(/'/g, "''");
-    // console.log(val);
-    const q = `INSERT INTO ExercisesCategories (Name,StatusId) VALUES ('${val}',1)`;
-    await SQL(q);
-    res.json(true);
-  } catch (error) {
-    console.log(error);
-    res.json(false);
-  }
-});
-app.post("/EditCategory", async (req, res) => {
-  try {
-    const id = req.body.id;
-    const val = req.body.val.replace(/'/g, "''");
-    const q = `UPDATE ExercisesCategories
-             SET Name = '${val}' WHERE Id = ${id}`;
-    await SQL(q);
-    res.json(true);
-  } catch (error) {
-    res.json(false);
-  }
-});
-app.delete("/DeeteCategory/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const q = `DELETE FROM ExercisesCategories WHERE Id = ${id}`;
-    await SQL(q);
-    res.json(true);
-  } catch (error) {
-    console.log(error);
-    res.json(false);
-  }
-});
 app.post("/UpdateEx", async (req, res) => {
   // console.log(req.body);
   try {
@@ -2012,7 +1980,44 @@ app.delete("/deleFile/:name/:f", async (req, res) => {
     res.json(false);
   }
 });
-//
+
+//Exercises.Category
+app.post("/AddCategory", async (req, res) => {
+  try {
+    let val = req.body.val.replace(/'/g, "''");
+    // console.log(val);
+    const q = `INSERT INTO ExercisesCategories (Name,StatusId) VALUES ('${val}',1)`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+app.post("/EditCategory", async (req, res) => {
+  try {
+    const id = req.body.id;
+    const val = req.body.val.replace(/'/g, "''");
+    const q = `UPDATE ExercisesCategories
+             SET Name = '${val}' WHERE Id = ${id}`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    res.json(false);
+  }
+});
+app.delete("/DeeteCategory/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const q = `DELETE FROM ExercisesCategories WHERE Id = ${id}`;
+    await SQL(q);
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+    res.json(false);
+  }
+});
+// $ Users :
 app.get("/GetTypeUser", async (req, res) => {
   try {
     const query = `SELECT * FROM UsersFlow`;
@@ -2240,6 +2245,7 @@ app.post("/AddGroupFromOption", async (req, res) => {
   WHERE Id = ${id}`;
   await SQL(query);
 });
+//
 app.listen(port, () => {
   console.log(`http://localhost:${port}/`);
 });
