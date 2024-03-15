@@ -1,30 +1,32 @@
 <template>
   <div class="all">
-    <el-radio-group v-model="ValRadio" class="Radioz">
-      <el-radio-button label="ניתן ציון"></el-radio-button>
-      <el-radio-button label="לא ניתן ציון"></el-radio-button>
-      <el-radio-button label="הכל"></el-radio-button>
-    </el-radio-group>
-    <el-button class="ButtonReset" @click="ResetSelects">אפס</el-button>
-    <div class="parentsSelects">
-      <div v-for="(n, i) in Questos" :key="i" class="Selects">
-        <el-tooltip effect="dark" :content="n.Desc" placement="top">
-          <miniSelect
-            :ref="`ComponentSelect${i}`"
-            :i="i"
-            :Option="n.op"
-            :placeholder="`אופציה-${i + 1}`"
-            :value="ModelSelect[`Model-${i}`]"
-            @value="ModelSelect[`Model-${i}`] = $event"
-            @change="
-              ModelSelect[`Model-${i}`] = $event.val;
-              EventChange(
-                ModelSelect[`Model-${i}`],
-                RevereseQu.length - ($event.i + 1)
-              );
-            "
-          />
-        </el-tooltip>
+    <div>
+      <el-radio-group v-model="ValRadio" class="Radioz">
+        <el-radio-button label="ניתן ציון"></el-radio-button>
+        <el-radio-button label="לא ניתן ציון"></el-radio-button>
+        <el-radio-button label="הכל"></el-radio-button>
+      </el-radio-group>
+      <el-button class="ButtonReset" @click="ResetSelects">אפס</el-button>
+      <div class="parentsSelects">
+        <div v-for="(n, i) in Questos" :key="i" class="Selects">
+          <el-tooltip effect="dark" :content="n.Desc" placement="top">
+            <miniSelect
+              :ref="`ComponentSelect${i}`"
+              :i="i"
+              :Option="n.op"
+              :placeholder="`אופציה-${i + 1}`"
+              :value="ModelSelect[`Model-${i}`]"
+              @value="ModelSelect[`Model-${i}`] = $event"
+              @change="
+                ModelSelect[`Model-${i}`] = $event.val;
+                EventChange(
+                  ModelSelect[`Model-${i}`],
+                  RevereseQu.length - ($event.i + 1)
+                );
+              "
+            />
+          </el-tooltip>
+        </div>
       </div>
     </div>
     <div v-for="(A, i) in arrsTheOP" :key="i">
@@ -40,11 +42,7 @@
             v-for="(Op, index) in A"
             :key="index"
           >
-            <!-- // {{ ObjFromIds(Op, i) }} -->
-            <!-- // Op.DescQustions -->
             <div v-if="index !== A.length - 1 && index !== A.length - 2">
-              <!-- // v-show="index !== A.length - 3" -->
-              <!-- {{ $ConSol(Op.question) }} -->
               <el-tooltip
                 class="item"
                 effect="dark"
@@ -165,6 +163,7 @@
 <script>
 import { URL } from "@/URL/url";
 import miniSelect from "@/components/Score/Elenents/MiniSelect.vue";
+import { h } from "vue";
 export default {
   props: ["activQushinnare", "typeQueshinarire"],
   name: "BprevenCardsOfScoreComp",
@@ -187,6 +186,7 @@ export default {
       ValRadio: "הכל",
       ShowLomatz: false,
       showPopAp: false,
+      OverSheva: false,
       paramsPop: [],
     };
   },
@@ -315,124 +315,114 @@ export default {
     addIdsArrayToEach(arrs) {
       arrs.forEach((innerArr) => {
         const idsArray = innerArr
-          .filter(
-            (obj) => obj !== null && obj !== undefined && obj.Id !== undefined
-          )
-          .map((obj) => obj.Id);
-
+          .filter((obj) => {
+            if (obj !== null && obj !== undefined && obj.Id !== undefined) {
+              return true;
+            }
+          })
+          .map((obj) => {
+            // console.log(obj.question.DataTypesId);
+            return obj.Id;
+          });
         innerArr.push(idsArray);
       });
 
       return arrs;
     },
-    compData() {
-      // this.$ax.post(URL + "J", this.Questos);
-      // console.log(this.Questos);
-      // console.log(this.Questos.map((e) => e.Seq));
-      this.arrsTheOP = this.generateOptionsPaths(this.Questos);
-      this.arrsTheOP.forEach((element, i) => {
+    async compData() {
+      // גנרט המסלולים
+      let paths = this.generateOptionsPaths(this.Questos);
+
+      // הוסף מזהה חדש לכל אלמנט במערך
+      paths.forEach((element, i) => {
         element.push(i);
       });
-      this.arrsTheOPG = this.arrsTheOP;
-      this.arrsTheOP = this.addIdsArrayToEach(this.arrsTheOP);
+
+      this.arrsTheOPG = paths;
+      paths = this.addIdsArrayToEach(paths);
       this.arrsTheOPG = this.addIdsArrayToEach(this.arrsTheOPG);
       this.arrsTheOPG.forEach((element, i) => {
         element.splice(element.length - 1, 1);
-      }); //   }
-      // });
-      // console.log(this.arrsTheOP);
-      // console.log(this.arrsTheOPG);
+      });
+
+      // איטיות בהוספת הנתונים למערך this.arrsTheOP
+      for (let i = 0; i < 20; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 200)); // המתן שנייה אחת לפני ההוספה הבאה
+        this.arrsTheOP.push(paths[i]); // הוספת האלמנט הנוכחי ל-movieList
+      }
+
+      console.log(this.arrsTheOP);
     },
-    // generateOptionsPaths(questions) {
-    //   let allPaths = [];
-
-    //   const buildPath = (path, questionIndex) => {
-    //     if (questionIndex >= questions.length) {
-    //       allPaths.push(path);
-    //       return;
-    //     }
-
-    //     let currentQuestion = questions[questionIndex];
-    //     if (!currentQuestion.op || currentQuestion.op.length === 0) {
-    //       buildPath(
-    //         [
-    //           ...path,
-    //           {
-    //             Desc: null,
-    //             DescQustions: questions[questionIndex + 1]
-    //               ? questions[questionIndex + 1].Desc
-    //               : null,
-    //           },
-    //         ],
-    //         questionIndex + 1
-    //       );
-    //     } else {
-    //       currentQuestion.op.forEach((option) => {
-    //         option.DescQustions = currentQuestion.Desc;
-    //         let newPath = [...path, option];
-    //         if (option.NextQuestionId === null) {
-    //           newPath = [
-    //             ...newPath,
-    //             {
-    //               Desc: null,
-    //               DescQustions: questions[questionIndex + 1]
-    //                 ? questions[questionIndex + 1].Desc
-    //                 : null,
-    //             },
-    //           ];
-    //           allPaths.push(newPath);
-    //         } else {
-    //           let nextIndex = questions.findIndex(
-    //             (q) => q.Id === option.NextQuestionId
-    //           );
-
-    //           for (let i = questionIndex + 1; i < nextIndex; i++) {
-    //             newPath = [
-    //               ...newPath,
-    //               {
-    //                 Desc: null,
-    //                 DescQustions: questions[questionIndex + 1]
-    //                   ? questions[questionIndex + 1].Desc
-    //                   : null,
-    //               },
-    //             ];
-    //           }
-
-    //           buildPath(newPath, nextIndex);
-    //         }
-    //       });
-
-    //       if (
-    //         currentQuestion.op.some((option) => option.NextQuestionId !== null)
-    //       ) {
-    //         buildPath(
-    //           [
-    //             ...path,
-    //             {
-    //               Desc: null,
-    //               DescQustions: questions[questionIndex + 1]
-    //                 ? questions[questionIndex + 1].Desc
-    //                 : null,
-    //             },
-    //           ],
-    //           questionIndex + 1
-    //         );
-    //       }
-    //     }
-    //   };
-
-    //   buildPath([], 0);
-
-    //   allPaths = allPaths.filter((e, i, arr) => e[0].Desc);
-    //   return allPaths;
+    // $
+    // compData() {
+    //   // this.OverSheva = this.Questos.length > 7;
+    //   // if (this.Questos.length < 7) {
+    //   let paths = this.generateOptionsPaths(this.Questos);
+    //   // console.log(paths);
+    //   // let num = paths.length / 4;
+    //   // this.arrsTheOP = this.generateOptionsPaths(this.Questos);
+    //   paths.forEach(async (element, i) => {
+    //     element.push(i);
+    //   });
+    //   this.arrsTheOPG = paths;
+    //   paths = this.addIdsArrayToEach(this.arrsTheOP);
+    //   this.arrsTheOPG = this.addIdsArrayToEach(this.arrsTheOPG);
+    //   this.arrsTheOPG.forEach((element, i) => {
+    //     element.splice(element.length - 1, 1);
+    //   });
+    //   console.log("paths", paths);
+    //   // } else {
+    //   //   this.$message("בחר שאלה לפי פילטור");
+    //   // }
     // },
-    //..
-    //..
-    //..
-    //..
-    //..
-    //
     generateOptionsPaths(questions) {
+      let allPaths = [];
+
+      function buildPath(currentPath, currentQuestionId) {
+        let question = questions.find((q) => q.Id === currentQuestionId);
+        if (!question) {
+          allPaths.push(currentPath);
+          return;
+        }
+
+        // בודק אם להוסיף את השאלה לנתיב בהתאם לתנאי DataTypesId !== 1
+        let shouldIncludeQuestion = question.DataTypesId !== 1;
+
+        // הוספת השאלה לנתיב רק אם מתקיים התנאי שנבדק
+        let newPath = shouldIncludeQuestion
+          ? [...currentPath, { Desc: question.Desc, question: question }]
+          : currentPath;
+
+        // עבור שאלות שאינן דורשות בחירת אופציה או שאין להן NextQuestionId
+        if (!question.op || question.op.length === 0) {
+          if (question.NextQuestionId) {
+            buildPath(newPath, question.NextQuestionId);
+          } else {
+            if (shouldIncludeQuestion) {
+              allPaths.push(newPath); // הוספת הנתיב רק אם השאלה נכללת
+            }
+          }
+          return;
+        }
+
+        // עבור שאלות עם אופציות, טיפול רגיל
+        question.op.forEach((option) => {
+          let optionPath = [...newPath, { ...option, question: question }];
+          if (option.NextQuestionId) {
+            buildPath(optionPath, option.NextQuestionId);
+          } else {
+            allPaths.push(optionPath);
+          }
+        });
+      }
+
+      // התחלת הבנייה של המסלולים מהשאלה הראשונה
+      buildPath([], this.StartId); // הנחה שה-ID ההתחלתי מוגדר כ-ID של השאלה הראשונה במערך
+      return allPaths;
+    },
+    //
+    /**
+     *  generateOptionsPaths(questions) {
       let allPaths = [];
 
       function buildPath(currentPath, currentQuestionId) {
@@ -473,6 +463,11 @@ export default {
       buildPath([], this.StartId); // Start from the first question
       return allPaths;
     },
+//
+
+     */
+    //
+
     arraysEqual(arr1, arr2) {
       // console.log("arr1", arr1);
       // console.log("arr2", arr2);
@@ -529,6 +524,7 @@ export default {
       this.ShowLomatz = false;
       this.arrsTheOP = this.arrsTheOPG;
       // console.log(this.ModelSelect);
+      // *******************
       if (val !== "ניתן ציון" || val !== "לא ניתן ציון" || val !== "הכל") {
         val = this.ValRadio;
       }
@@ -564,6 +560,9 @@ export default {
         for (const key in this.ModelSelect) {
           arr.push(this.ModelSelect[key]);
         }
+
+        // *******************
+
         this.ShowLomatz = true;
         this.ArrLoMatzanu = arr;
       }
@@ -599,6 +598,7 @@ export default {
   padding: 15px;
   border-radius: 20px;
   padding-right: 0px;
+  overflow-x: auto;
 }
 .Selects {
   margin-right: 50px;

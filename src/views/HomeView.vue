@@ -2,7 +2,8 @@
   <div class="all">
     <h1>היי</h1>
     <div class="content">שלום שלום שלום</div>
-    <!-- <el-button type="primary" @click="Func">Click</el-button> -->
+    <!-- <el-button type="primary" @click="Func">Click</el-button>
+    {{ counter }} -->
   </div>
 </template>
 <script>
@@ -14,6 +15,7 @@ export default {
       visible: false,
       theOption: ["היי", "שלום"],
       over: false,
+      counter: 0,
     };
   },
   watch: {
@@ -29,25 +31,11 @@ export default {
   },
   methods: {
     async Func() {
-      let x = "sd";
-      setTimeout(() => {
-        console.log(2);
-      }, 2);
-      setTimeout(() => {
-        console.log(1);
-      }, 1);
-      setTimeout(() => {
-        console.log(x);
-      }, 0);
-      setTimeout(() => {
-        console.log(x);
-      }, 0);
-      setTimeout(() => {
-        console.log(x);
-      }, 0);
-      setTimeout(() => {
-        console.log(x);
-      }, 0);
+      await this.delay(1000);
+      console.log(1);
+    },
+    delay(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
     },
   },
 };

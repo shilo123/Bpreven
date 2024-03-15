@@ -10,7 +10,7 @@ export default {
   mutations: {
     Upwidth(state, val) {
       state.width = val;
-      console.log(val);
+      // console.log(val);
     },
     UpData(state, val) {
       state.data = val;

@@ -37,7 +37,7 @@
             v-for="(s, i) in Alldata.DataType"
             :key="i"
             :value="s"
-            :label="computedData(s)"
+            :label="$computedData(s)"
           ></el-option>
         </el-select>
       </div>
@@ -131,18 +131,6 @@ export default {
   },
 
   methods: {
-    computedData(val) {
-      //   console.log(val);
-      if (val === "Text") {
-        return "טקסט";
-      } else if (val === "Numeric") {
-        return "מספר";
-      } else if (val === "OptionId") {
-        return "אופציות";
-      } else if (val === "Date") {
-        return "תאריך";
-      }
-    },
     async InsertQuestion() {
       // console.log(this.newQuens);
       if (

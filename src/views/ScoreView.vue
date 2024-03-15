@@ -66,7 +66,7 @@
         </h1>
         <div v-if="shomes" ref="TheAlElements" class="Allel">
           <!-- style="position: Sticky; top: -130px; z-index: 3" -->
-          <el-row dir="rtl" :gutter="20">
+          <el-row :gutter="20">
             <el-col
               :span="span"
               v-for="(q, i) in ObjDataQuestions[activQushinnare]"
@@ -77,7 +77,7 @@
             >
               <!-- v-show="q.DescDateTypes === 'OptionId'" -->
               <div class="HeaderQuestions" ref="HeaderQuestions">
-                {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
+                {{ q.Desc }}/<span>{{ $computedData(q.DescDateTypes) }}</span>
               </div>
               <div ref="ItemsNoheader">
                 <div
@@ -132,7 +132,7 @@
         </h1>
         <div v-if="shomes" ref="TheAlElements" class="Allel">
           <!-- style="position: Sticky; top: -130px; z-index: 3" -->
-          <el-row dir="rtl" :gutter="20">
+          <el-row :gutter="20">
             <el-col
               :span="0.5"
               v-for="(q, i) in ObjDataQuestions[activQushinnare]"
@@ -143,7 +143,7 @@
             >
               <!-- // v-show="q.DescDateTypes === 'OptionId'" -->
               <div class="HeaderQuestions" ref="HeaderQuestions">
-                {{ q.Desc }}/<span>{{ computedData(q.DescDateTypes) }}</span>
+                {{ q.Desc }}/<span>{{ $computedData(q.DescDateTypes) }}</span>
               </div>
               <div ref="ItemsNoheader">
                 <div
@@ -239,7 +239,9 @@ export default {
       return this.$store.state.TogelAnimate;
     },
     returnLength() {
-      return this.ObjDataQuestions[this.activQushinnare].length;
+      return this.ObjDataQuestions[this.activQushinnare]
+        ? this.ObjDataQuestions[this.activQushinnare].length
+        : false;
     },
   },
   watch: {
@@ -292,32 +294,22 @@ export default {
     FuncafterClear() {
       this.FunctionActiveQushinnare(this.activQushinnare);
     },
-    computedData(val) {
-      //   console.log(val);
-      if (val === "Text") {
-        return "טקסט";
-      } else if (val === "Numeric") {
-        return "מספר";
-      } else if (val === "OptionId") {
-        return "אופציות";
-      } else if (val === "Date") {
-        return "תאריך";
-      } else {
-        return val;
-      }
-    },
     async sortTabs() {
       // await this.$nextTick();
       // setTimeout(async () => {
       let widtho;
       let LengthItems;
-      const Intervalos = setInterval(() => {
+      const Intervalos = setInterval(async () => {
         // console.log("מנסה");
         if (this.$refs.contentCOL) {
           // setTimeout(async () => {
           // await this.$nextTick();
 
           LengthItems = this.returnLength;
+          if (!this.returnLength) {
+            await this.delay(500);
+            LengthItems = this.returnLength;
+          }
 
           // widtho = this.Screen / LengthItems + "px";
           widtho = 90 / LengthItems + "%";
@@ -333,91 +325,7 @@ export default {
           clearInterval(Intervalos);
         }
       }, 100);
-      // console.log(col.length);
-      //     let elAll = this.$refs.TheAlElements;
-      //     this.$store.commit("Score/UpItems", elAll);
-      //     col.forEach((e, i) => {
-      //       e = e.$el;
-      //       // console.log(e);
-      //       if (col.length === 2) {
-      //         widtho = this.Screen / col.length - 75 + "px";
-      //       } else if (col.length === 1) {
-      //         widtho = this.Screen / col.length - 175 + "px";
-      //       } else if (col.length > 7) {
-      //         widtho = this.Screen / col.length - 15 + "px";
-      //         if (i === col.length - 1) {
-      //           this.ItemosSorted(ItemsOnly);
-      //         }
-      //       }
-      //       e.style.width = widtho;
-      //       e.style.marginRight = "30px";
-      //     });
-      //     let item = this.$refs.ItemContent;
-      //     if (!item) {
-      //       await this.delay(500);
-      //     }
-      //     if (item) {
-      //       // console.log("item.length", col.length);
-      //       item.forEach((elo) => {
-      //         elo.style.position = "relative";
-      //         if (col.length !== 1) {
-      //           elo.style.left = "50%";
-      //         } else {
-      //           elo.style.left = "34%";
-      //           setTimeout(() => {
-      //             elo.style.width = "80%";
-      //           }, 100);
-      //         }
-      //         elo.style.transform = "translateX(-50%)";
-      //       });
-      //     }
-      //   }
-      //   this.IfComponents = true;
-      //  400);
-      // },
     },
-    //
-    // async ItemosSorted(elements) {
-    //   elements.forEach((el) => {
-    //     // console.log(el);
-    //     Array.from(el.children).forEach((e) => {
-    //       // console.log(e);
-    //       e.style.width = "120px";
-    //     });
-    //   });
-    //   let Headers = this.$refs.HeaderQuestions;
-    //   // console.log(Headers);
-    //   Headers.forEach((element) => {
-    //     // console.log(element);
-    //     element.style.fontSize = "10px";
-    //     element.style.width = "130px";
-    //   });
-    //   let all = this.$refs.contentCOL;
-
-    //   all.forEach((element) => {
-    //     // console.log("Yesh");
-    //     // console.log("element.$el", element.$el);
-    //     let W =
-    //       +element.$el.style.width.split("px")[0] +
-    //       +element.$el.style.marginRight.split("px")[0];
-    //     W = W + "px";
-    //     this.width = W;
-    //     element.$el.style.position = "relative";
-    //     element.$el.style.left = "40px";
-    //     // element.$el.style.width = "0px";
-    //     let ELOS = Array.from(element.$el.children[1].children);
-    //     setTimeout(() => {
-    //       ELOS.forEach((e) => {
-    //         // console.log("e", e);
-    //         e.style.position = "relative";
-    //         e.style.left = "60px";
-    //         e.style.marginRight = "30px";
-    //         // console.log(e.style.left);
-    //       });
-    //     }, 300);
-    //   });
-    // },
-    //
     ComputedOptions(val) {
       // console.log(val);
       let result = val.arrOptions.find((e) => {
@@ -522,7 +430,7 @@ export default {
   padding: 6px;
   max-height: 100px;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
   margin-bottom: 10px;
 }
 .HeaderQuestions span {
@@ -585,16 +493,6 @@ export default {
   width: 20%;
   position: relative;
   top: 100px;
-}
-.el-card {
-  height: 100px;
-  font-size: 15px;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  padding: 10px;
 }
 .option,
 .score {

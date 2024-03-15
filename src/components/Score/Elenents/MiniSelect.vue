@@ -1,22 +1,24 @@
 <template>
   <div>
-    <el-select
-      v-model="val"
-      size="mini"
-      :placeholder="placeholder"
-      ref="Selectos"
-      @visible-change="sort($event)"
-      @change="$emit('change', { val, i })"
-    >
-      <el-option value="ריק"></el-option>
-      <el-option label="ללא" value=""></el-option>
-      <el-option
-        ref="Op"
-        v-for="(Op, i) in Option"
-        :value="Op.Desc"
-        :key="i"
-      ></el-option>
-    </el-select>
+    <div>
+      <el-select
+        v-model="val"
+        size="mini"
+        :placeholder="placeholder"
+        ref="Selectos"
+        @visible-change="sort($event)"
+        @change="$emit('change', { val, i })"
+      >
+        <el-option value="ריק"></el-option>
+        <el-option label="ללא" value=""></el-option>
+        <el-option
+          ref="Op"
+          v-for="(Op, i) in Option"
+          :value="Op.Desc"
+          :key="i"
+        ></el-option>
+      </el-select>
+    </div>
   </div>
 </template>
 <script>
@@ -48,11 +50,17 @@ export default {
   methods: {
     sort(boll) {
       if (boll) {
-        let TextOp = this.$refs.Op;
-        TextOp = TextOp.map((e) => (e = e.$el));
-        TextOp.forEach((el) => {
-          el.style.color = "black";
-        });
+        const intervalos = setInterval(() => {
+          let TextOp = this.$refs.Op;
+
+          if (TextOp) {
+            TextOp = TextOp.map((e) => (e = e.$el));
+            TextOp.forEach((el) => {
+              el.style.color = "black";
+            });
+            clearInterval(intervalos);
+          }
+        }, 50);
       }
     },
     resizeTo() {

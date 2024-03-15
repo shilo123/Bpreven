@@ -52,7 +52,7 @@
       </el-table-column>
       <el-table-column label="סוג התשובה">
         <template slot-scope="scope">
-          {{ computedData(scope.row.DescDataType) }}
+          {{ $computedData(scope.row.DescDataType) }}
         </template>
       </el-table-column>
       <el-table-column label="השאלה הבאה">
@@ -98,7 +98,7 @@
                   :key="i"
                   :value="a.Id"
                   :label="a.Desc"
-                  v-show="a.Desc !== scope.row.Desc"
+                  v-show="a.Desc !== scope.row.Desc && a.Seq > scope.row.Seq"
                 ></el-option>
               </el-select>
             </div>
@@ -972,20 +972,6 @@ export default {
         return "אופציות";
       } else if (val === "Date") {
         return "תאריך";
-      }
-    },
-    REVERScomputedData(val) {
-      // console.log(val);
-      if (val === "טקסט") {
-        return "Text";
-      } else if (val === "מספר") {
-        return "Numeric";
-      } else if (val === "אופציות") {
-        return "OptionId";
-      } else if (val === "תאריך") {
-        return "Date";
-      } else {
-        return val;
       }
     },
     inptutDiv(e) {

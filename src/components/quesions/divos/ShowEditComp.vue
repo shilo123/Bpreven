@@ -33,7 +33,7 @@
       ></el-table-column>
       <el-table-column label="סוג התשובה" align="center">
         <template slot-scope="scope">
-          {{ computedData(scope.row.DescDataType) }}
+          {{ $computedData(scope.row.DescDataType) }}
         </template>
       </el-table-column>
       <el-table-column
@@ -55,7 +55,7 @@
               v-for="(s, i) in Alldata.DataType"
               :key="i"
               :value="s"
-              :label="computedData(s)"
+              :label="$computedData(s)"
             ></el-option>
           </el-select>
         </div>
@@ -90,8 +90,9 @@
               :label="a.Desc"
               v-show="
                 a.Desc !== rowEdit.Desc &&
-                rowEdit.DescDataType === 'OptionId' &&
-                !rowEdit.IsEnd
+                // rowEdit.DescDataType === 'OptionId' &&
+                !rowEdit.IsEnd &&
+                a.Seq > rowEdit.Seq
               "
             ></el-option>
           </el-select>
@@ -225,32 +226,6 @@ export default {
         return "כן";
       } else {
         return "לא";
-      }
-    },
-    computedData(val) {
-      //   console.log(val);
-      if (val === "Text") {
-        return "טקסט";
-      } else if (val === "Numeric") {
-        return "מספר";
-      } else if (val === "OptionId") {
-        return "אופציות";
-      } else if (val === "Date") {
-        return "תאריך";
-      }
-    },
-    REVERScomputedData(val) {
-      // console.log(val);
-      if (val === "טקסט") {
-        return "Text";
-      } else if (val === "מספר") {
-        return "Numeric";
-      } else if (val === "אופציות") {
-        return "OptionId";
-      } else if (val === "תאריך") {
-        return "Date";
-      } else {
-        return val;
       }
     },
     async EditQ() {
